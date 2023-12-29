@@ -1,0 +1,93 @@
+@import "gerillass";
+
+:root {
+	// ? Font Sizes
+	--text-xs: 0.75rem;
+	--text-sm: 0.875rem;
+	--text-base: 1rem;
+	--text-lg: rfs(1.125rem);
+	--text-xl: rfs(1.25rem);
+	--text-xl2: rfs(1.5rem);
+	--text-xl3: rfs(1.875rem);
+	--text-xl4: rfs(2.25rem);
+	--text-xl5: rfs(3rem);
+	--text-xl6: rfs(3.75rem);
+	--text-xl7: rfs(4.5rem);
+	--text-xl8: rfs(6rem);
+	--text-xl9: rfs(8rem);
+}
+
+// It's also possible to pass multiple values
+// padding: rfs(3rem 4rem);
+
+// or even
+// box-shadow: rfs(0 3px 4rem red);
+
+// or even comma seperated values
+// box-shadow: rfs(0 3px 4rem red, 3px 0 4rem blue);
+
+// To combine it with !important, use
+// box-shadow: rfs(0 3px 4rem red) !important;
+
+// ? spacing
+$rounded: 1rem;
+$margin-section: rfs(15rem);
+
+/** others */
+$box-shadow: rfs(0 0 2rem rgb(0 0 0 / 25%));
+$main-transition-delay: 0.8s;
+
+
+@mixin text-rgd-primary-100() {
+	$rgd-100: #c592fc;
+	$rgd-200: #f1e7ff;
+
+	background: radial-gradient(circle at 100% 100%, $rgd-100, $rgd-200 54%);
+	background-clip: text;
+	-webkit-text-fill-color: transparent;
+}
+
+@mixin text-rgd-primary-200() {
+	$rgd-100: #8c21f8;
+	$rgd-200: #a958fa;
+
+	background: radial-gradient(circle at 100% 100%, $rgd-100 38%, #a958fa 66%);
+	background-clip: text;
+	-webkit-text-fill-color: transparent;
+}
+
+@mixin text-rgd-secondary-100() {
+	$rgd-100: #dabbfe;
+	$rgd-200: #f5f0ff;
+
+	background: linear-gradient(90deg, $rgd-100 0%, $rgd-200 100%);
+	background-clip: text;
+	-webkit-text-fill-color: transparent;
+}
+
+@mixin text-rgd-secondary-200() {
+	$rgd-100: #ede1ff;
+	$rgd-200: #eadbff;
+
+	background: linear-gradient(90deg, $rgd-100 6%, $rgd-200 93%);
+	background-clip: text;
+	-webkit-text-fill-color: transparent;
+}
+
+@mixin text-rgd-secondary-300() {
+	$rgd-100: #d5b0fd;
+	$rgd-200: #bc7efc;
+
+	background: linear-gradient(90deg, $rgd-100 0%, $rgd-200 100%);
+	background-clip: text;
+	-webkit-text-fill-color: transparent;
+}
+
+@mixin text-rgd-secondary-400() {
+	$rgd-100: #dbbdfe;
+	$rgd-200: #f6f2ff;
+
+	background: radial-gradient(circle at 100% 70%, $rgd-100 12%, $rgd-200 81%);
+	background-clip: text;
+	-webkit-text-fill-color: transparent;
+}

@@ -15,6 +15,7 @@ const credentials = require("@middleware/credentials");
 const errorHandler = require("@middleware/errorHandler");
 const verifyJWT = require("@middleware/verifyJWT");
 const morgan = require("morgan");
+const { upload } = require("@middleware/multerUploader");
 
 const PORT = process.env.PORT || 3000;
 
@@ -72,8 +73,8 @@ app.use("/logout", require("@routes/logout"));
 //* Protected routes : will check for a valid JWT in the Authorization header, (Authorization: Bearer <token>)
 //*  and if it's present, the user will be allowed to access
 app.use(verifyJWT);
-// app.use("/employees", require("@routes/api/employees"));
 app.use("/users", require("@routes/api/users"));
+app.use("/posts",upload.single("myFile"), require("@routes/api/posts"));
 
 // app.all("*", (req, res) => {
 // 	res.status(404);
@@ -87,6 +88,8 @@ app.use("/users", require("@routes/api/users"));
 // });
 
 app.use(errorHandler);
+
+
 
 connection.once("open", () => {
 	console.log("Connected to MongoDB");

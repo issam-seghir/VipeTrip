@@ -13,8 +13,7 @@ const verifyJWT = (req, res, next) => {
 		if (err) {
 			return res.status(401).send("Invalid token");
 		}
-		req.userId = decoded.id;
-		req.email = decoded.email;
+		req.user = decoded.user;
 		next();
 	});
 };

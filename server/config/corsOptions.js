@@ -1,5 +1,5 @@
-const whitelist = require("./allowedOrigins.js");
-const { isProduction } = require("./const.js");
+const whitelist = require("@config/allowedOrigins.js");
+const { isProduction } = require("@config/const.js");
 
 const corsOptions = {
 	origin: function (origin, callback) {

@@ -1,13 +1,13 @@
 const express = require("express");
 
 const router = express.Router();
-const authController = require("@controllers/authController");
-const registerController = require("@controllers/registerController");
-const upload = require("@middleware/multerUploader");
+const { handleLogin } = require("@controllers/loginController");
+const { handleNewUser } = require("@controllers/registerController");
+const {upload} = require("@middleware/multerUploader");
 
 
 
-router.post("/login", authController.handleLogin);
-router.post("/register", upload.single("pic"), registerController.handleNewUser);
+router.post("/login", handleLogin);
+router.post("/register", upload.single("pic"), handleNewUser);
 
 module.exports = router;

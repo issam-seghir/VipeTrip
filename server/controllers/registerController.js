@@ -2,31 +2,40 @@ const User = require('@model/User');
 const bcrypt = require('bcrypt');
 
 const handleNewUser = async (req, res) => {
-    const { firstName, lastName, email, password, picturePath, occupation, location, friends } = req.body;
+	const { firstName, lastName, email, password, picturePath, occupation, location, friends } = req.body;
 
-    // check for duplicate usernames in the db
-    const duplicate = await User.findOne({ email }).exec();
-    if (duplicate) return res.sendStatus(409); //Conflict
+	try {
+		// check for duplicate usernames in the db
+		const duplicate = await User.findOne({ email });
+		if (duplicate) return res.status(409).json({ message: "Email already in use" }); //Conflict
 
-    try {
-        //encrypt the password
-        const hashedPass = await bcrypt.hash(password, 10);
-
-        //create and store the new user
-        const result = await User.create({
+		//create and store the new user
+		const user = await User.create({
 			firstName,
 			lastName,
 			email,
-			password: hashedPass,
+			password, //  Don't hash the password yet for validation
 			picturePath,
 			occupation,
 			location,
 			friends,
 		});
-        res.status(201).json({ success: `New user ${firstName + "" + lastName} created!` ,userInfo: result});
-    } catch (error) {
-        res.status(500).json({ 'message': error.message });
-    }
+
+		// Validate user
+		const validationError = user.validateSync();
+		if (validationError) {
+			return res.status(400).json({ message: validationError.message });
+		}
+
+		//encrypt the password
+		user.password = await bcrypt.hash(password, 10);
+		// Save user
+		await user.save();
+
+		res.status(201).json({ success: `New user ${firstName + "-" + lastName} created!`, userInfo: user });
+	} catch (error) {
+		res.status(500).json({ message: error.message });
+	}
 }
 
 module.exports = { handleNewUser };

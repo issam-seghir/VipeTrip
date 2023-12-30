@@ -7,21 +7,21 @@ const userSchema = new Schema(
 		firstName: {
 			type: String,
 			required: true,
-			min: 2,
-			max: 50,
+			minlength: 3,
+			maxlength: 50,
 		},
 		lastName: {
 			type: String,
 			required: true,
-			min: 2,
-			max: 50,
+			minlength: 3,
+			maxlength: 50,
 		},
 		email: {
 			type: String,
 			required: true,
-			max: 50,
+			minlength: 7,
 			unique: true,
-			validate: {
+			validate: {  //!  Validation will only run when create or save (so is not working with methods like findOneAndUpdate , findOneAndDelete , etc.)
 				validator: function (v) {
 					// Simple regex for email validation
 					const regex = /^\S+@\S+\.\S+$/;

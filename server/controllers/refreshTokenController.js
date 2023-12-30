@@ -3,23 +3,26 @@ const jwt = require("jsonwebtoken");
 
 const handleRefreshToken = async (req, res) => {
 	const cookies = req.cookies;
-	if (!cookies?.jwt) return res.sendStatus(401);
+	if (!cookies?.jwt) return res.status(401).json({ message: "No token provided" }); // Unauthorized
 	const refreshToken = cookies.jwt;
 
-	const foundUser = await User.findOne({ refreshToken }).exec();
-	if (!foundUser) return res.sendStatus(403); //Forbidden
-	// evaluate jwt
-	jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, decoded) => {
-		if (err || foundUser.email !== decoded.email) return res.sendStatus(403);
-		const accessToken = jwt.sign(
-			{
-				email: decoded.email,
-			},
-			process.env.ACCESS_TOKEN_SECRET,
-			{ expiresIn: "1h" }
-		);
-		res.json({ accessToken });
-	});
+	try {
+		const foundUser = await User.findOne({ refreshToken });
+
+		if (!foundUser) return res.status(403).json({ message: "Invalid refresh token" }); // Forbidden
+
+		jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, async (err, decoded) => {
+			if (err || foundUser.email !== decoded.email || foundUser.id !== decoded.id) return res.status(403).json({ message: "Token verification failed" });
+
+
+			const accessToken = jwt.sign({ id: decoded.id, email: decoded.email }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "1h" });
+
+			res.json({ accessToken });
+		});
+	} catch (error) {
+		console.error(error);
+		res.status(500).json({ message: "Internal server error" }); // Internal Server Error
+	}
 };
 
 module.exports = { handleRefreshToken };

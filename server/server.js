@@ -24,7 +24,6 @@ const app = express();
 connectDB();
 
 // Use Helmet for header security !
-// Content-Security-Policy header.
 app.use(helmet(helmetOptions));
 
 // morgan console logger
@@ -44,6 +43,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
 //middleware for cookies
+// allows you to access cookie values via req.cookies.
 app.use(cookieParser());
 
 //serve static files
@@ -61,12 +61,16 @@ app.use(express.static(join(__dirname, "public")));
 // 	res.send(file);
 // });
 
-// routes
+//* Public routes
 app.use("/", require("@routes/root"));
+//? Authentication : who the user is
 app.use("/auth",  require("@routes/auth"));
-// app.use("/refresh", require("@routes/refresh"));
-// app.use("/logout", require("@routes/logout"));
+app.use("/refresh", require("@routes/refresh"));
+app.use("/logout", require("@routes/logout"));
 
+//? Authorization: what the user is allowed to access
+//* Protected routes : will check for a valid JWT in the Authorization header, (Authorization: Bearer <token>)
+//*  and if it's present, the user will be allowed to access
 app.use(verifyJWT);
 // app.use("/employees", require("@routes/api/employees"));
 app.use("/users", require("@routes/api/users"));

@@ -1,11 +1,12 @@
 const User = require("@model/User");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const {isProduction} = require("@config/const");
 
 const handleLogin = async (req, res) => {
 	const { email, password } = req.body;
 	try {
-		const foundUser = await User.findOne({ email }).exec();
+		const foundUser = await User.findOne({ email });
 		if (!foundUser) return res.status(404).send("User not found");
 		// evaluate password
 		const match = await bcrypt.compare(password, foundUser.password);
@@ -23,13 +24,18 @@ const handleLogin = async (req, res) => {
 			process.env.ACCESS_TOKEN_SECRET,
 			{ expiresIn: "1h" }
 		);
-		const refreshToken = jwt.sign({ email: foundUser.email }, process.env.REFRESH_TOKEN_SECRET, { expiresIn: "1d" });
+		const refreshToken = jwt.sign({ id: foundUser._id.toString(), email: foundUser.email }, process.env.REFRESH_TOKEN_SECRET, { expiresIn: "1d" });
 		// Saving refreshToken with current user
 		foundUser.refreshToken = refreshToken;
 		await foundUser.save();
 
 		// Creates Secure Cookie with refresh token
-		res.cookie("jwt", refreshToken, { httpOnly: true, secure: true, sameSite: "None", maxAge: 24 * 60 * 60 * 1000 });
+		//? Use the httpOnly flag to prevent JavaScript from reading it.
+		//? Use the secure=true flag so it can only be sent over HTTPS.
+		//? Use the SameSite=strict flag whenever possible to prevent CSRF. This can only be used if the Authorization Server has the same site as your front-end.
+		console.log(isProduction);
+		res.cookie("jwt", refreshToken, { httpOnly: true, secure: isProduction, sameSite: isProduction ? "strict" : "None", maxAge: 24 * 60 * 60 * 1000 });
+		// console.log(isProduction);
 		// Send authorization roles and access token to user
 		res.json({ accessToken });
 	} catch (error) {

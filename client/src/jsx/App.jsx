@@ -1,35 +1,21 @@
-// import React from "react";
-// import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-
-// import { Navbar } from "./Components/Navbar";
-
-// import { PostsList } from "./store/slices/posts/PostsList";
-// import { AddPostForm } from "./store/slices/posts/AddPostForm";
-// import { EditPostForm } from "./store/slices/posts/EditPostForm";
-// import { SinglePostPage } from "./store/slices/posts/SinglePostPage";
+import { themeSettings } from "@data/themes/theme";
+import { selectMode } from "@jsx/store/slices/globalSlice";
+import { ThemeProvider } from "@mui/material";
+import { createTheme } from "@mui/material/styles";
+import { useMemo } from "react";
+import { useSelector } from "react-redux";
 import { Outlet } from "react-router-dom";
-// import Auth from "./pages/Auth";
 
 function App() {
+	const mode = useSelector(selectMode);
+	const theme = useMemo(() => createTheme(themeSettings(mode)), [mode]);
+	const isAuth = Boolean(useSelector((state) => state.token));
+
 	return (
-		<div>
-			{/* <ModeToggle /> */}
-		{/* <Auth/> */}
-     <Outlet />
-		</div>
+		<ThemeProvider theme={theme}>
+			<Outlet />
+		</ThemeProvider>
 	);
 }
 
 export default App;
-
-			{/*  <Router>
-              <Navbar />
-              <div className="App">
-                <Routes>
-                  <Route path="/" element={<React.Fragment><AddPostForm /><PostsList /></React.Fragment>} />
-                  <Route path="/posts/:postId" element={<SinglePostPage />} />
-                  <Route path="/editPost/:postId" element={<EditPostForm />} />
-                  <Route path="*" element={<Navigate to="/" />} />
-                </Routes>
-              </div>
-            </Router> */}

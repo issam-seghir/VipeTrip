@@ -1,18 +1,21 @@
 /* eslint-disable unicorn/prefer-query-selector */
-import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { Provider as ReduxStoreProvider } from "react-redux";
-
+import { ThemeProvider } from "@mui/material";
+import { createTheme } from "@mui/material/styles";
+import { StrictMode} from "react";
+import { PersistGate } from "redux-persist/integration/react";
+import { store,persistor } from "@store/store";
 
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import App from "@jsx/App.jsx";
-// import Home from "@pages/Home";
-// import Error from "@pages/Error";
+import Home from "@pages/Home";
+import LogIn from "@pages/LogIn";
+import Profile from "@pages/Profile";
 
-import { store } from "./store/store";
+
 
 import "@scss/main.scss";
-import "@mantine/core/styles.layer.css";
 
 // const Loading = React.lazy(() => import("@pages/Loading"));
 // const Tracker = React.lazy(() => import("@pages/Tracker"));
@@ -31,56 +34,21 @@ export const router = createBrowserRouter(
 		{
 			path: "/",
 			element: <App />,
-			// errorElement: <Error />,
+			// errorElement: <Error />, // the same as <Route path="*" element={<Error />}>
 			children: [
-				// {
-				// 	index: true,
-				// 	element: <Home />,
-				// },
-				// {
-				// 	path: "home",
-				// 	element: <Home />,
-				// },
-				// {
-				// 	path: "auth",
-				// 	element: <Auth />,
-				// },
-				// {
-				// 	path: "employees",
-				// 	element: <Employees />,
-				// },
-				// {
-				// 	path: "customers",
-				// 	element: <Customers />,
-				// },
-				// {
-				// 	path: "scheduler",
-				// 	element: <Scheduler />,
-				// },
-				// {
-				// 	path: "kanban",
-				// 	element: <Kanban />,
-				// },
-				// {
-				// 	path: "markdawn-editor",
-				// 	element: <Editor />,
-				// },
-				// {
-				// 	path: "drawer",
-				// 	element: <Drawer />,
-				// },
-				// {
-				// 	path: "analytics",
-				// 	element: <Analytics />,
-				// },
-				// {
-				// 	path: "tracker",
-				// 	element: <Tracker />,
-				// },
-				// {
-				// 	path: "map",
-				// 	element: <Map />,
-				// },
+				{
+					// default Outlet route , the same as <Route index element={<LogIn/>} />
+					index: true,
+					element: <LogIn />,
+				},
+				{
+					path: "home",
+					element: <Home />,
+				},
+				{
+					path: "profile/:userId",
+					element: <Profile />,
+				},
 			],
 		},
 	],
@@ -88,13 +56,14 @@ export const router = createBrowserRouter(
 );
 
 
-ReactDOM.createRoot(document.getElementById("root")!).render(
-	<React.StrictMode>
-		<MantineProvider theme={theme} defaultColorScheme="auto">
-			<ReduxStoreProvider store={store}>
+ReactDOM.createRoot(document.getElementById("root")).render(
+	<StrictMode>
+		<ReduxStoreProvider store={store}>
+			{/* delay the rendering of our app's UI until the persisted data is available in the Redux store. */}
+			<PersistGate loading={null} persistor={persistor}>
+				<RouterProvider router={router} />
 				{/* <RouterProvider router={router} fallbackElement={<Loading />} /> */}
-				<RouterProvider router={router}  />
-			</ReduxStoreProvider>
-		</MantineProvider>
-	</React.StrictMode>
+			</PersistGate>
+		</ReduxStoreProvider>
+	</StrictMode>
 );

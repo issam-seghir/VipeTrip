@@ -82,6 +82,10 @@ module.exports = {
 			},
 		},
 	],
+	parserOptions: {
+		ecmaVersion: "latest",
+		sourceType: "module",
+	},
 	ignorePatterns: ["**/node_modules/", "**/build/", "**/dist/", "**/.vscode/", "**/.idea/", "**/.git/", "**/coverage/", "**/.cache/", "**/__tests__/", "**/*.config.cjs", "**/*.config.mjs", "**/*.config.js", "**/*.config.ts", "**/*.test.js", "**/*.test.ts", "**/*.spec.js", "**/*.spec.ts"],
 	rules: {
 		// get ride of import/no-unresolved when using ?react for svgr (svg as component)

@@ -1,0 +1,73 @@
+{
+	"compilerOptions": {
+		"baseUrl": ".",
+		"paths": {
+			"@assets/*": [
+				"src/assets/*"
+			],
+			"@jsx/*": [
+				"src/jsx/*"
+			],
+			"@scss/*": [
+				"src/scss/*"
+			],
+			"@images/*": [
+				"src/assets/images/*"
+			],
+			"@svg/*": [
+				"src/assets/svg/*"
+			],
+			"@videos/*": [
+				"src/assets/videos/*"
+			],
+			"@api/*": [
+				"src/jsx/api/*"
+			],
+			"@components/*": [
+				"src/jsx/components/*"
+			],
+			"@contexts/*": [
+				"src/jsx/contexts/*"
+			],
+			"@data/*": [
+				"src/jsx/data/*"
+			],
+			"@hooks/*": [
+				"src/jsx/hooks/*"
+			],
+			"@pages/*": [
+				"src/jsx/pages/*"
+			],
+			"@routes/*": [
+				"src/jsx/routes/*"
+			],
+			"@store/*": [
+				"src/jsx/store/*"
+			],
+			"@types/*": [
+				"src/jsx/types/*"
+			],
+			"@utils/*": [
+				"src/jsx/utils/*"
+			],
+			"@abstracts/*": [
+				"src/scss/abstracts/*"
+			],
+			"@base/*": [
+				"src/scss/base/*"
+			],
+			"@scssComponents/*": [
+				"src/scss/components/*"
+			],
+			"@utilities/*": [
+				"src/scss/utilities/*"
+			],
+			"@/*": [
+				"src/*"
+			],
+			"@firebase/*": [
+				"src/jsx/firebase/*"
+			]
+		}
+	}
+}

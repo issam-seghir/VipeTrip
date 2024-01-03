@@ -1,5 +1,5 @@
-import { useForm } from "react-hook-form"
-import { useState, useRef } from "react";
+import { useForm, Form } from "react-hook-form";
+import { useState, useRef,useCallback } from "react";
 import {
   Box,
   Button,
@@ -14,43 +14,80 @@ import { useDispatch } from "react-redux";
 import Dropzone from "react-dropzone";
 import FlexBetween from "@components/FlexBetween";
 
+import { z } from "zod";
+import { DevTool } from "@hookform/devtools";
+import {zodResolver} from '@hookform/resolvers/zod';
+
+
+const LoginSchema = z.object({
+	firstName: z.string().min(3).max(15),
+	lastName: z.string().min(3).max(15),
+	age: z.number().min(18).max(99),
+}).refine((data) => {
+  data.firstName !== data.lastName
+  },
+  {
+    message: "First name and last name must be different",
+    path:["firstName", "lastName"]
+  },
+  );
+
+// LoginSchema.parse({ firstName: "Ludwig" });
+
+
 
 export default function LoginForm() {
   const {
 		register,
 		handleSubmit,
-		watch,
-		reset,
+		watch, // wathc input change (use devtool instead)
+		reset, // clear the form ( for example after successful submit)
 		setValue,
-		formState: { errors },
+		control,
+		formState: { errors, isValid, isValidating, isSubmitSuccessful, isSubmitted, isLoading, isSubmitting },
   } = useForm({
+		mode: "onChange",
+		resolver: zodResolver(LoginSchema),
 		defaultValues: {
 			// firstName: "test",
 			// password: "123",
-      //  isLogin ? initialValuesLogin : initialValuesRegister,
-      //  resolver: isLogin ? loginResolver : registerResolver, // You need to create these resolvers using `yupResolver` from `@hookform/resolvers/yup`
+			//  isLogin ? initialValuesLogin : initialValuesRegister,
 		},
   });
 
-  function handleFormSubmit(data) {
+  const onSubmit = useCallback((data) => {
+    // fetch data
     console.log(data);
-  }
-  const onSubmit = (data) => handleFormSubmit(data)
-
-  console.log(watch("firstName")); // watch input value by passing the name of it
-
+    isSubmitting ? console.log("submitting ...") : console.log("sub completed");
+    //reset form after submit
+  }, []);
+  console.log(errors);
 
     return (
 		/* "handleSubmit" will validate your inputs before invoking "onSubmit" */
-		<form onSubmit={handleSubmit(onSubmit)}>
-			<input {...register("password", { required: true, minLength: 4 })} />
-			<span>{errors.password?.message}</span>
-			{/* {errors.password && <span>This field is required</span>} */}
-			<TextField label="First Name" {...register("firstName", { required: "this is required", minLength: { value: 4, message: "min length 4" } })} error={Boolean(errors.firstName)} helperText={errors.firstName?.message} sx={{ gridColumn: "span 2" }} />
-			<TextField label="Last Name" {...register("lastName", { required: "this is required", pattern: /^[a-z]+$/i })} error={Boolean(errors.lastName)} helperText={errors.lastName?.message} sx={{ gridColumn: "span 2" }} />
-			<TextField label="Number" type="number" {...register("age", { required: "this is required", min: { value: 18, message: "min 18 " }, max: 99 })} error={Boolean(errors.age)} helperText={errors.age?.message} sx={{ gridColumn: "span 2" }} />
-			<input type="submit" />
-		</form>
+		<>
+			<DevTool control={control} placement="top-left" />
+			<Form
+				onSubmit={handleSubmit(onSubmit)}
+				// action="/api/save" // Send post request with the FormData
+				// encType={'application/json'} you can also switch to json object
+				onSuccess={() => {
+					alert("Your application is updated.");
+				}}
+				onError={() => {
+					alert("Submission has failed.");
+				}}
+				control={control}
+			>
+				<input {...register("password")} />
+				<span>{errors.password?.message}</span>
+				{/* {errors.password && <span>This field is required</span>} */}
+				<TextField label="First Name" {...register("firstName")} error={Boolean(errors.firstName)} helperText={errors.firstName?.message} sx={{ gridColumn: "span 2" }} />
+				<TextField label="Last Name" {...register("lastName")} error={Boolean(errors.lastName)} helperText={errors.lastName?.message} sx={{ gridColumn: "span 2" }} />
+				<TextField label="Number" {...register("age")} error={Boolean(errors.age)} helperText={errors.age?.message} sx={{ gridColumn: "span 2" }} />
+				<input type="submit" />
+			</Form>
+		</>
 	);
 }
 

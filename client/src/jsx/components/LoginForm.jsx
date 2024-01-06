@@ -1,4 +1,3 @@
-/* eslint-disable unicorn/better-regex */
 import { Box, Button, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { useApiLoginMutation, useApiRegisterMutation } from "@store/api/authApi";
 import { useEffect, useState } from "react";
@@ -8,36 +7,7 @@ import { useNavigate } from "react-router-dom";
 import FormTextField from "@components/FormTextField";
 import { DevTool } from "@hookform/devtools";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-
-// ----------------- Schema Validation ------------------
-
-const registerSchema = z
-	.object({
-		firstName: z.string().min(1, "This is a required field").trim().min(3).max(15),
-		lastName: z.string().min(1, "This is a required field").min(3).max(15),
-		email: z.string().min(1, "This is a required field").email().trim().toLowerCase().min(3).max(20),
-		password: z
-			.string()
-			.min(1, "This is a required field")
-			.min(8, "Password should be at least 8 characters")
-			.max(100, "Password should not exceed 100 characters")
-			.regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!$%&*?@#])[\d!$%&*?@#A-Za-z]{8,}$/, "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"),
-		confirmPassword: z.string().min(1, "This is a required field"),
-		location: z.string().max(100).optional(),
-		job: z.string().max(100).optional(),
-		picture: z.string().url({ message: "Picture must be a valid URL" }).optional().or(z.literal("")), // fix optional for url / email ...,
-	})
-	.refine((data) => data.password === data.confirmPassword, {
-		//For advanced features - multiple issues ,  see (superRefine)
-		message: "Passwords do not match",
-		path: ["confirmPassword"],
-	});
-
-const loginSchema = z.object({
-	email: z.string().min(1, "This is a required field").trim().toLowerCase(),
-	password: z.string().min(1, "This is a required field"),
-});
+import { loginSchema, registerSchema } from "@utils/validationSchema";
 
 export default function LoginForm() {
 	const [isLogin, setIsLogin] = useState(true);
@@ -66,6 +36,17 @@ export default function LoginForm() {
 		isLogin ? apiLogin(data) : apiRegister(data);
 	};
 
+	const handleFormSwitch = () => {
+			setIsLogin((prev) => {
+				// Reset the form fields when switching between login and register form
+				reset({
+					email: prev ? "" : "admin@test.com",
+					password: prev ? "" : "123456@Admin",
+				});
+				return !prev;
+			});
+	};
+
 	// reset form when submit is successful (keep default values)
 	useEffect(() => {
 		if ((isLoginSuccess || isRegisterSuccess) && isSubmitSuccessful) {
@@ -82,7 +63,9 @@ export default function LoginForm() {
 
 	return (
 		<>
+			{/* react hook form dev tool  */}
 			{import.meta.env.DEV && <DevTool control={control} placement="top-left" />}
+			{/* login / register FORM */}
 			<form onSubmit={handleSubmit(onSubmit)}>
 				<Box
 					display="grid"
@@ -108,6 +91,7 @@ export default function LoginForm() {
 
 				{/* BUTTONS */}
 				<Box>
+					{/* Submit button */}
 					<Button
 						fullWidth
 						disabled={isSubmitting || isRegisterLoading || isLoginLoading} // disabled the button when submitting
@@ -122,19 +106,9 @@ export default function LoginForm() {
 					>
 						{isLoginLoading || isRegisterLoading ? "Loading..." : isLogin ? "LOGIN" : "REGISTER"}
 					</Button>
-					{/* switch between login and register form */}
+					{/* Switch between login and register form */}
 					<Typography
-						onClick={() => {
-							setIsLogin((prev) => {
-								// Reset the form fields when switching between login and register form
-								reset({
-									email: prev ? "" : "admin@test.com",
-									password: prev ? "" : "123456@Admin",
-									// Add other fields here if necessary
-								});
-								return !prev;
-							});
-						}}
+						onClick={handleFormSwitch}
 						sx={{
 							textDecoration: "underline",
 							color: palette.primary.main,

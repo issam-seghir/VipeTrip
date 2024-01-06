@@ -21,7 +21,7 @@
 				"src/assets/videos/*"
 			],
 			"@api/*": [
-				"src/jsx/api/*"
+				"src/jsx/store/api/*"
 			],
 			"@components/*": [
 				"src/jsx/components/*"

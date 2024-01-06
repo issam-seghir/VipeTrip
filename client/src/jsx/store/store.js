@@ -1,4 +1,4 @@
-// ignore eslint error about global process.env
+/* eslint-disable unicorn/prefer-spread */
 /*global process*/
 
 import globalReducer from "@store/slices/globalSlice";
@@ -6,6 +6,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import { setupListeners } from "@reduxjs/toolkit/query";
 import { FLUSH, PAUSE, PERSIST, PURGE, REGISTER, REHYDRATE, persistReducer, persistStore } from "redux-persist";
 import storage from "redux-persist/lib/storage";
+import { authApi } from "@store/api/authApi";
 //? use redux-persist to store the state in localStorage
 //? you can use any other storage as well like sessionStorage or cookies
 //* ref : https://blog.logrocket.com/persist-state-redux-persist-redux-toolkit-react/
@@ -25,27 +26,19 @@ const persistConfig = {
 const persistedGlobalReducer = persistReducer(persistConfig, globalReducer);
 
 export const store = configureStore({
-	reducer: persistedGlobalReducer,
-	/* 	reducer: {
-		// auth: persistedGlobalReducer, // you can access the state using useSelector(state => state.auth)
-		// [pokemonApi.reducerPath]: pokemonApi.reducer, // Include the reducer for the Pokemon API
-	}, */
+	reducer: {
+		global: persistedGlobalReducer, // you can access the state using useSelector(state => state.auth)
+		[authApi.reducerPath]: authApi.reducer, // Include the reducer for the Pokemon API
+	},
 	// skip console errors for redux-persist
 	middleware: (getDefaultMiddleware) =>
 		getDefaultMiddleware({
 			serializableCheck: {
 				ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
 			},
-		}),
+		}).concat(authApi.middleware), // Include the middleware for the auth API,
+
 	devTools: process.env.NODE_ENV !== "production", // Disable DevTools in production
-	// Adding the api middleware enables caching, invalidation, polling,
-	// and other useful features of `rtk-query`.
-	// middleware: (getDefaultMiddleware) =>
-	//   getDefaultMiddleware(
-	//		serializableCheck: {ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],},
-	//    )
-	//   .concat(pokemonApi.middleware) , // Include the middleware for the Pokemon API
-	//   .concat(anotherApi.middleware), // Add the Another API middleware
 });
 
 // optional, but required for refetchOnFocus/refetchOnReconnect behaviors

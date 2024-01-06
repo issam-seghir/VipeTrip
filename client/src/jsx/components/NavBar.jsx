@@ -10,7 +10,7 @@ export default function NavBar() {
 const [isMobileMenuToggled, setIsMobileMenuToggled] = useState(false);
 const dispatch = useDispatch();
 const navigate = useNavigate();
-const user = useSelector((state) => state.user);
+const user = useSelector((state) => state.global.user);
 const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
 
 const theme = useTheme();

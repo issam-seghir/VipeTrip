@@ -42,6 +42,6 @@ export const globalSlice = createSlice({
 	},
 });
 
-export const selectMode = (state) => state.mode;
+export const selectMode = (state) => state.global.mode;
 export const { setMode, setLogin, setLogout, setFriends, setPosts, setPost } = globalSlice.actions;
 export default globalSlice.reducer;

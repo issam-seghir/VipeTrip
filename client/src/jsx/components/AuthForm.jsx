@@ -9,13 +9,17 @@ import { DevTool } from "@hookform/devtools";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema, registerSchema } from "@utils/validationSchema";
 
-export default function LoginForm() {
+import { useFormHandleErrors } from "@utils/hooks/useFormHandleErrors";
+
+export default function AuthForm() {
 	const [isLogin, setIsLogin] = useState(true);
-	const [apiLogin, { data: loginData, error: loginError, isLoading: isLoginLoading, isSuccess: isLoginSuccess, isError: isLoginError }] = useApiLoginMutation();
-	const [apiRegister, { data: registerData, error: registerError, isLoading: isRegisterLoading, isSuccess: isRegisterSuccess, isError: isRegisterError }] = useApiRegisterMutation();
+
 	const { palette } = useTheme();
 	const navigate = useNavigate();
 	const isNonMobile = useMediaQuery("(min-width:600px)");
+
+	const [apiLogin, { data: loginData, error: loginError, isLoading: isLoginLoading, isSuccess: isLoginSuccess, isError: isLoginError }] = useApiLoginMutation();
+	const [apiRegister, { data: registerData, error: registerError, isLoading: isRegisterLoading, isSuccess: isRegisterSuccess, isError: isRegisterError }] = useApiRegisterMutation();
 	const {
 		handleSubmit,
 		reset,
@@ -25,6 +29,8 @@ export default function LoginForm() {
 		mode: "onBlur", // when to validate the form
 		resolver: zodResolver(isLogin ? loginSchema : registerSchema),
 	});
+
+	const errorMessage = useFormHandleErrors(isLoginError, loginError, isRegisterError, registerError);
 
 	console.log("login message " + JSON.stringify(loginError?.data));
 	console.log("register message " + JSON.stringify(registerError?.data));
@@ -37,14 +43,14 @@ export default function LoginForm() {
 	};
 
 	const handleFormSwitch = () => {
-			setIsLogin((prev) => {
-				// Reset the form fields when switching between login and register form
-				reset({
-					email: prev ? "" : "admin@test.com",
-					password: prev ? "" : "123456@Admin",
-				});
-				return !prev;
+		setIsLogin((prev) => {
+			// Reset the form fields when switching between login and register form
+			reset({
+				email: prev ? "" : "admin@test.com",
+				password: prev ? "" : "123456@Admin",
 			});
+			return !prev;
+		});
 	};
 
 	// reset form when submit is successful (keep default values)
@@ -122,8 +128,7 @@ export default function LoginForm() {
 					</Typography>
 					{/* error message */}
 					<Typography align="center" variant="h3" sx={{ color: palette.error.main, mt: 5 }}>
-						{isLoginError && <div>{loginError?.error}</div>}
-						{isRegisterError && <div>Error: {registerError?.error}</div>}
+						{errorMessage && <div>{errorMessage}</div>}
 					</Typography>
 				</Box>
 			</form>

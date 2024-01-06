@@ -2,6 +2,24 @@ import { FormLabel, Slider } from "@mui/material";
 import React, { useEffect } from "react";
 import { Controller } from "react-hook-form";
 
+
+
+//? --------------- Usage ---------------
+
+/*
+
+	const { control, setValue } = useForm({
+		defaultValues: defaultValues,
+	});
+	<FormInputSlider
+        name={"sliderValue"}
+        control={control}
+        setValue={setValue}
+        label={"Slider Input"}
+		/>
+*/
+
+
 export const FormInputSlider = ({ name, control, setValue,defaultValue, label,sx }) => {
 	const [sliderValue, setSliderValue] = React.useState(30);
 

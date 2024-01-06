@@ -67,6 +67,12 @@
 			],
 			"@firebase/*": [
 				"src/jsx/firebase/*"
+			],
+			"@jsxUtilsHooks/*": [
+				"src/jsx/utils/hooks/*"
+			],
+			"@helpers/*": [
+				"src/jsx/utils/helpers/*"
 			]
 		}
 	}

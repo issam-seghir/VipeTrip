@@ -13,7 +13,7 @@ export const registerSchema = z
 			.min(1, "This is a required field")
 			.min(8, "Password should be at least 8 characters")
 			.max(100, "Password should not exceed 100 characters")
-			.regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!$%&*?@#])[\d!$%&*?@#A-Za-z]{8,}$/, "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"),
+			.regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!$%&*?@#])[\d!$%&*?@#A-Za-z]{8,}$/, "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character (!$%&*?@#)"),
 		confirmPassword: z.string().min(1, "This is a required field"),
 		location: z.string().max(100).optional(),
 		job: z.string().max(100).optional(),

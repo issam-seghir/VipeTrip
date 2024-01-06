@@ -10,7 +10,7 @@ import { store,persistor } from "@store/store";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import App from "@jsx/App.jsx";
 import Home from "@pages/Home";
-import LogIn from "@pages/LogIn";
+import LogIn from "@jsx/pages/Auth";
 import Profile from "@pages/Profile";
 
 

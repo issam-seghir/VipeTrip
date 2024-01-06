@@ -1,5 +1,5 @@
 import { Box, Typography, useTheme, useMediaQuery } from "@mui/material";
-import LoginForm from "@components/LoginForm";
+import AuthForm from "@jsx/components/AuthForm";
 
 export default function LogIn() {
       const theme = useTheme();
@@ -16,7 +16,7 @@ export default function LogIn() {
 				<Typography fontWeight="500" variant="h5" sx={{ mb: "1.5rem" }}>
 					Welcome to Socipedia, the Social Media for Sociopaths!
 				</Typography>
-                <LoginForm/>
+                <AuthForm/>
 			</Box>
 		</Box>
 	);

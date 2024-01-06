@@ -1,17 +1,17 @@
 /* eslint-disable unicorn/better-regex */
-import { Box, Button, TextField, Typography, useMediaQuery, useTheme } from "@mui/material";
+import { Box, Button, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { useApiLoginMutation, useApiRegisterMutation } from "@store/api/authApi";
 import { useEffect, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 
-// import { setLogin } from "state";
-
+import FormTextField from "@components/FormTextField";
 import { DevTool } from "@hookform/devtools";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
-//TODO: fix confirm password error message (not showing :refine)
+// ----------------- Schema Validation ------------------
+
 const registerSchema = z
 	.object({
 		firstName: z.string().min(1, "This is a required field").trim().min(3).max(15),
@@ -33,6 +33,7 @@ const registerSchema = z
 		message: "Passwords do not match",
 		path: ["confirmPassword"],
 	});
+
 const loginSchema = z.object({
 	email: z.string().min(1, "This is a required field").trim().toLowerCase(),
 	password: z.string().min(1, "This is a required field"),
@@ -40,30 +41,30 @@ const loginSchema = z.object({
 
 export default function LoginForm() {
 	const [isLogin, setIsLogin] = useState(true);
-	const [apiLogin, {data: loginData, error: loginError ,isLoading: isLoginLoading, isSuccess: isLoginSuccess, isError: isLoginError}] = useApiLoginMutation();
-	const [apiRegister, {registerData, isLoading: isRegisterLoading, isSuccess: isRegisterSuccess }] = useApiRegisterMutation();
+	const [apiLogin, { data: loginData, error: loginError, isLoading: isLoginLoading, isSuccess: isLoginSuccess, isError: isLoginError }] = useApiLoginMutation();
+	const [apiRegister, { data: registerData, error: registerError, isLoading: isRegisterLoading, isSuccess: isRegisterSuccess, isError: isRegisterError }] = useApiRegisterMutation();
 	const { palette } = useTheme();
 	const navigate = useNavigate();
 	const isNonMobile = useMediaQuery("(min-width:600px)");
-console.log("login error " + isLoginError ? loginError?.toString() : "no error");
-console.log("login data "+ loginData);
-	const onSubmit = (data) => {
-			isLogin ? apiLogin(data) : apiRegister(data);
-
-	};
-
-	//TODO : add default values for login and register (admin for testing)
-
 	const {
-		register,
 		handleSubmit,
-		reset, // clear the form ( for example after successful submit)
+		reset,
 		control,
-		formState: { errors, isSubmitSuccessful, isSubmitted, isSubmitting },
+		formState: { errors, isSubmitSuccessful, isSubmitting },
 	} = useForm({
 		mode: "onBlur", // when to validate the form
 		resolver: zodResolver(isLogin ? loginSchema : registerSchema),
 	});
+
+	console.log("login message " + JSON.stringify(loginError?.data));
+	console.log("register message " + JSON.stringify(registerError?.data));
+	console.log("login data " + loginData);
+	console.log("register data " + registerData);
+	console.log(errors);
+
+	const onSubmit = (data) => {
+		isLogin ? apiLogin(data) : apiRegister(data);
+	};
 
 	// reset form when submit is successful (keep default values)
 	useEffect(() => {
@@ -75,16 +76,13 @@ console.log("login data "+ loginData);
 	// redirect to home page after successful login
 	useEffect(() => {
 		if (isLoginSuccess) {
-			navigate("/home"); // replace '/home' with the actual path of your home route
+			navigate("/home");
 		}
 	}, [isLoginSuccess, navigate]);
 
-	console.log(errors);
-
 	return (
-		/* "handleSubmit" will validate your inputs before invoking "onSubmit" */
 		<>
-			<DevTool control={control} placement="top-left" />
+			{import.meta.env.DEV && <DevTool control={control} placement="top-left" />}
 			<form onSubmit={handleSubmit(onSubmit)}>
 				<Box
 					display="grid"
@@ -96,25 +94,16 @@ console.log("login data "+ loginData);
 				>
 					{!isLogin && (
 						<>
-							<Controller defaultValue="" name="firstName" control={control} render={({ field: { name, ...field }, fieldState: { invalid, error }, formState }) => <TextField {...field} label="First Name" error={!!error} helperText={error?.message} sx={{ gridColumn: "span 2" }} />} />
-							<Controller defaultValue="" name="lastName" control={control} render={({ field: { name, ...field }, fieldState: { invalid, error }, formState }) => <TextField {...field} label="last Name" error={!!error} helperText={error?.message} sx={{ gridColumn: "span 2" }} />} />
-							<Controller defaultValue="" name="location" control={control} render={({ field: { name, ...field }, fieldState: { invalid, error }, formState }) => <TextField {...field} label="Location" error={!!error} helperText={error?.message} sx={{ gridColumn: "span 4" }} />} />
-							<Controller defaultValue="" name="job" control={control} render={({ field: { name, ...field }, fieldState: { invalid, error }, formState }) => <TextField {...field} label="Job" error={!!error} helperText={error?.message} sx={{ gridColumn: "span 4" }} />} />
-							<Controller defaultValue="" name="picture" control={control} render={({ field: { name, ...field }, fieldState: { invalid, error }, formState }) => <TextField {...field} label="Picture" error={!!error} helperText={error?.message} sx={{ gridColumn: "span 4" }} />} />
+							<FormTextField defaultValue="" name={"firstName"} label="First Name" control={control} sx={{ gridColumn: "span 2" }} />
+							<FormTextField defaultValue="" name={"lastName"} label="last Name" control={control} sx={{ gridColumn: "span 2" }} />
+							<FormTextField defaultValue="" name={"location"} label="Location" control={control} sx={{ gridColumn: "span 4" }} />
+							<FormTextField defaultValue="" name={"job"} label="Job" control={control} sx={{ gridColumn: "span 4" }} />
+							<FormTextField defaultValue="" name={"picture"} label="Picture URL" control={control} sx={{ gridColumn: "span 4" }} />
 						</>
 					)}
-
-					<Controller
-						defaultValue="test@gmail.com"
-						rules={{ required: "email  is required" }}
-						name="email"
-						control={control}
-						render={({ field: { name, ...field }, fieldState: { invalid, error }, formState }) => <TextField {...field} label="Email" error={!!error} helperText={error?.message} sx={{ gridColumn: "span 4" }} />}
-					/>
-
-					{/* <TextField {...register("email")} label="Email" error={!!errors.email} helperText={errors.email?.message} sx={{ gridColumn: "span 4" }} /> */}
-					<TextField {...register("password")} label="Password" type="password" error={!!errors.password} helperText={errors.password?.message || errors.password?.password?.message} sx={{ gridColumn: "span 4" }} />
-					{!isLogin && <TextField {...register("confirmPassword")} label="Confirm Password" type="password" error={!!errors.confirmPassword} helperText={errors.confirmPassword?.message} sx={{ gridColumn: "span 4" }} />}
+					<FormTextField defaultValue={"admin@test.com"} name={"email"} label="Email" control={control} sx={{ gridColumn: "span 4" }} />
+					<FormTextField defaultValue={"123456@Admin"} name={"password"} label="Password" type="password" control={control} sx={{ gridColumn: "span 4" }} />
+					{!isLogin && <FormTextField defaultValue="" name={"confirmPassword"} label="Confirm Password" type="password" control={control} sx={{ gridColumn: "span 4" }} />}
 				</Box>
 
 				{/* BUTTONS */}
@@ -131,14 +120,20 @@ console.log("login data "+ loginData);
 							"&:hover": { color: palette.primary.main },
 						}}
 					>
-						{isLogin ? "LOGIN" : "REGISTER"}
-						{isLoginLoading && "Loading..."}
+						{isLoginLoading || isRegisterLoading ? "Loading..." : isLogin ? "LOGIN" : "REGISTER"}
 					</Button>
-					{isLoginError &&  loginError.status &&JSON.stringify(loginError.data)}
-					{/* {isRegisterError && <div>Error: {registerError.message}</div>} */}
+					{/* switch between login and register form */}
 					<Typography
 						onClick={() => {
-							setIsLogin((prev) => !prev);
+							setIsLogin((prev) => {
+								// Reset the form fields when switching between login and register form
+								reset({
+									email: prev ? "" : "admin@test.com",
+									password: prev ? "" : "123456@Admin",
+									// Add other fields here if necessary
+								});
+								return !prev;
+							});
 						}}
 						sx={{
 							textDecoration: "underline",
@@ -150,6 +145,11 @@ console.log("login data "+ loginData);
 						}}
 					>
 						{isLogin ? "Don't have an account? Sign Up here." : "Already have an account? Login here."}
+					</Typography>
+					{/* error message */}
+					<Typography align="center" variant="h3" sx={{ color: palette.error.main, mt: 5 }}>
+						{isLoginError && <div>{loginError?.error}</div>}
+						{isRegisterError && <div>Error: {registerError?.error}</div>}
 					</Typography>
 				</Box>
 			</form>

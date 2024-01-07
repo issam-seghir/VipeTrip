@@ -27,8 +27,8 @@ export const FormInputDropdown = ({ name, control, label, defaultValue, sx }) =>
 		<FormControl size={"small"}>
 			<InputLabel>{label}</InputLabel>
 			<Controller
-				render={({ field: { onChange, value } }) => (
-					<Select onChange={onChange} value={value} sx={sx}>
+				render={({ field: { onChange, value, ...field } }) => (
+					<Select {...field}  onChange={onChange} value={value} sx={sx}>
 						{generateSingleOptions()}
 					</Select>
 				)}

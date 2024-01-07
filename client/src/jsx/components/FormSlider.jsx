@@ -34,7 +34,7 @@ export const FormInputSlider = ({ name, control, setValue,defaultValue, label,sx
 	return (
 		<>
 			<FormLabel component="legend">{label}</FormLabel>
-			<Controller name={name} defaultValue={defaultValue} control={control} render={({ field, fieldState, formState }) => <Slider value={sliderValue} onChange={handleChange} valueLabelDisplay="auto" min={0} max={100} step={1} sx={sx}/>} />
+			<Controller name={name} defaultValue={defaultValue} control={control} render={({ field, fieldState, formState }) => <Slider {...field} value={sliderValue} onChange={handleChange} valueLabelDisplay="auto" min={0} max={100} step={1} sx={sx} />} />
 		</>
 	);
 };

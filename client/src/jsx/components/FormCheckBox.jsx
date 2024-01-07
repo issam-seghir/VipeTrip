@@ -62,7 +62,7 @@ export const FormInputMultiCheckbox = ({ name, control, setValue, label, default
 									name={name}
 									control={control}
 									render={({ field }) => {
-										return <Checkbox checked={selectedItems.includes(option.value)} onChange={() => handleSelect(option.value)} sx={sx} />;
+										return <Checkbox {...field} checked={selectedItems.includes(option.value)} onChange={() => handleSelect(option.value)} sx={sx} />;
 									}}
 								/>
 							}

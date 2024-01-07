@@ -1,15 +1,18 @@
 import { Box, Button, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { useApiLoginMutation, useApiRegisterMutation } from "@store/api/authApi";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 
 import FormTextField from "@components/FormTextField";
 import { DevTool } from "@hookform/devtools";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { loginSchema, registerSchema } from "@utils/validationSchema";
-
+import { mbToByte } from "@jsx/utils/mbToByte";
 import { useFormHandleErrors } from "@utils/hooks/useFormHandleErrors";
+import { loginSchema, registerSchema } from "@utils/validationSchema";
+import {useDropzone} from "react-dropzone";
+
+import DropZone from "@components/DropZone";
 
 export default function AuthForm() {
 	const [isLogin, setIsLogin] = useState(true);
@@ -23,6 +26,8 @@ export default function AuthForm() {
 	const {
 		handleSubmit,
 		reset,
+		setValue,
+		watch,
 		control,
 		formState: { errors, isSubmitSuccessful, isSubmitting },
 	} = useForm({
@@ -32,11 +37,19 @@ export default function AuthForm() {
 
 	const errorMessage = useFormHandleErrors(isLoginError, loginError, isRegisterError, registerError);
 
-	console.log("login message " + JSON.stringify(loginError?.data));
-	console.log("register message " + JSON.stringify(registerError?.data));
-	console.log("login data " + loginData);
-	console.log("register data " + registerData);
-	console.log(errors);
+	// console.log("login message " + JSON.stringify(loginError?.data));
+	// console.log("register message " + JSON.stringify(registerError?.data));
+	// console.log("login data " + loginData);
+	// console.log("register data " + registerData);
+	// console.log(errors);
+
+	const handleDropZone = (acceptedFiles) => {
+		// add new value (picture) to form
+		setValue("picture", acceptedFiles[0]);
+	};
+	const { getRootProps, getInputProps, fileRejections, ...state } = useDropzone({ accept: { "image/*": [] }, maxSize: mbToByte(2), maxFiles: 1, multiple: false, onDrop: handleDropZone });
+	const picture = watch("picture");
+
 
 	const onSubmit = (data) => {
 		isLogin ? apiLogin(data) : apiRegister(data);
@@ -87,7 +100,7 @@ export default function AuthForm() {
 							<FormTextField defaultValue="" name={"lastName"} label="last Name" control={control} sx={{ gridColumn: "span 2" }} />
 							<FormTextField defaultValue="" name={"location"} label="Location" control={control} sx={{ gridColumn: "span 4" }} />
 							<FormTextField defaultValue="" name={"job"} label="Job" control={control} sx={{ gridColumn: "span 4" }} />
-							<FormTextField defaultValue="" name={"picture"} label="Picture URL" control={control} sx={{ gridColumn: "span 4" }} />
+							<DropZone getInputProps={getInputProps} getRootProps={getRootProps} fileRejections={fileRejections} picture={picture} state={state} />
 						</>
 					)}
 					<FormTextField defaultValue={"admin@test.com"} name={"email"} label="Email" control={control} sx={{ gridColumn: "span 4" }} />

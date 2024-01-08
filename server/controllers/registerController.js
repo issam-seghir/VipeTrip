@@ -2,8 +2,8 @@ const User = require('@model/User');
 const bcrypt = require('bcrypt');
 
 const handleNewUser = async (req, res) => {
-	const { firstName, lastName, email, password, picturePath, occupation, location, friends } = req.body;
-
+	const { firstName, lastName, email, password, picture, job, location, friends } = req.body;
+console.log(req.body);
 	try {
 		// check for duplicate usernames in the db
 		const duplicate = await User.findOne({ email });
@@ -15,8 +15,8 @@ const handleNewUser = async (req, res) => {
 			lastName,
 			email,
 			password, //  Don't hash the password yet for validation
-			picturePath,
-			occupation,
+			picture,
+			job,
 			location,
 			friends,
 		});

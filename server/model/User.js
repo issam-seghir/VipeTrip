@@ -42,7 +42,7 @@ const userSchema = new Schema(
 			// 	message: (props) => `Password should have at least 8 characters, one uppercase letter, one lowercase letter, one digit, and one special character`,
 			// },
 		},
-		picturePath: {
+		picture: {
 			type: String,
 			default: "",
 		},
@@ -54,7 +54,7 @@ const userSchema = new Schema(
 			},
 		],
 		location: String,
-		occupation: String,
+		job: String,
 		viewedProfile: {
 			type: Number,
 			default: 1,

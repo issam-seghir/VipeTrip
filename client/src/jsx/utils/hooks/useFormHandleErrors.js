@@ -5,7 +5,7 @@ export const useFormHandleErrors = (isLoginError, loginError, isRegisterError, r
 
 	useEffect(() => {
 		if (isLoginError || isRegisterError) {
-			setErrorMessage(isLoginError ? loginError?.error : registerError?.error);
+			setErrorMessage(isLoginError ? loginError : registerError);
 			const timer = setTimeout(() => {
 				setErrorMessage(null);
 			}, 5000); // Error message will disappear after 5 seconds

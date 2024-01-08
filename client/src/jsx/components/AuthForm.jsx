@@ -1,6 +1,6 @@
 import { Box, Button, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { useApiLoginMutation, useApiRegisterMutation } from "@store/api/authApi";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 
@@ -10,17 +10,18 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { mbToByte } from "@jsx/utils/mbToByte";
 import { useFormHandleErrors } from "@utils/hooks/useFormHandleErrors";
 import { loginSchema, registerSchema } from "@utils/validationSchema";
-import {useDropzone} from "react-dropzone";
+import { useDropzone } from "react-dropzone";
 
 import DropZone from "@components/DropZone";
+import { logFormData } from "@jsx/utils/logFormData";
 
 export default function AuthForm() {
 	const [isLogin, setIsLogin] = useState(true);
+	const [pictureData, setPhotoData] = useState(null);
 
 	const { palette } = useTheme();
 	const navigate = useNavigate();
 	const isNonMobile = useMediaQuery("(min-width:600px)");
-
 	const [apiLogin, { data: loginData, error: loginError, isLoading: isLoginLoading, isSuccess: isLoginSuccess, isError: isLoginError }] = useApiLoginMutation();
 	const [apiRegister, { data: registerData, error: registerError, isLoading: isRegisterLoading, isSuccess: isRegisterSuccess, isError: isRegisterError }] = useApiRegisterMutation();
 	const {
@@ -38,20 +39,21 @@ export default function AuthForm() {
 	const errorMessage = useFormHandleErrors(isLoginError, loginError, isRegisterError, registerError);
 
 	// console.log("login message " + JSON.stringify(loginError?.data));
-	// console.log("register message " + JSON.stringify(registerError?.data));
-	// console.log("login data " + loginData);
-	// console.log("register data " + registerData);
+	console.log(loginData);
+	console.log(registerData);
 	// console.log(errors);
+	console.log(errorMessage);
 
 	const handleDropZone = (acceptedFiles) => {
+		// save picture data to pass it to drop zone component
+		setPhotoData(acceptedFiles[0]);
 		// add new value (picture) to form
-		setValue("picture", acceptedFiles[0]);
+		setValue("picture", acceptedFiles[0]?.name || "");
 	};
 	const { getRootProps, getInputProps, fileRejections, ...state } = useDropzone({ accept: { "image/*": [] }, maxSize: mbToByte(2), maxFiles: 1, multiple: false, onDrop: handleDropZone });
-	const picture = watch("picture");
-
 
 	const onSubmit = (data) => {
+		console.log(data);
 		isLogin ? apiLogin(data) : apiRegister(data);
 	};
 
@@ -67,18 +69,13 @@ export default function AuthForm() {
 	};
 
 	// reset form when submit is successful (keep default values)
+	// redirect to home page after successful login
 	useEffect(() => {
 		if ((isLoginSuccess || isRegisterSuccess) && isSubmitSuccessful) {
 			reset();
-		}
-	}, [isLoginSuccess, isRegisterSuccess, isSubmitSuccessful, reset]);
-
-	// redirect to home page after successful login
-	useEffect(() => {
-		if (isLoginSuccess) {
 			navigate("/home");
 		}
-	}, [isLoginSuccess, navigate]);
+	}, [isLoginSuccess, isRegisterSuccess, isSubmitSuccessful, reset, navigate]);
 
 	return (
 		<>
@@ -100,11 +97,11 @@ export default function AuthForm() {
 							<FormTextField defaultValue="" name={"lastName"} label="last Name" control={control} sx={{ gridColumn: "span 2" }} />
 							<FormTextField defaultValue="" name={"location"} label="Location" control={control} sx={{ gridColumn: "span 4" }} />
 							<FormTextField defaultValue="" name={"job"} label="Job" control={control} sx={{ gridColumn: "span 4" }} />
-							<DropZone getInputProps={getInputProps} getRootProps={getRootProps} fileRejections={fileRejections} picture={picture} state={state} />
+							<DropZone getInputProps={getInputProps} getRootProps={getRootProps} fileRejections={fileRejections} picture={pictureData} state={state} />
 						</>
 					)}
-					<FormTextField defaultValue={"admin@test.com"} name={"email"} label="Email" control={control} sx={{ gridColumn: "span 4" }} />
-					<FormTextField defaultValue={"123456@Admin"} name={"password"} label="Password" type="password" control={control} sx={{ gridColumn: "span 4" }} />
+					<FormTextField defaultValue={"admin@test.com"} name={"email"} label="Email" control={control} errorMessage={errorMessage?.originalStatus === 404 && errorMessage} sx={{ gridColumn: "span 4" }} />
+					<FormTextField defaultValue={"123456@Admin"} name={"password"} label="Password" type="password" errorMessage={errorMessage?.originalStatus === 401 && errorMessage} control={control} sx={{ gridColumn: "span 4" }} />
 					{!isLogin && <FormTextField defaultValue="" name={"confirmPassword"} label="Confirm Password" type="password" control={control} sx={{ gridColumn: "span 4" }} />}
 				</Box>
 
@@ -141,7 +138,7 @@ export default function AuthForm() {
 					</Typography>
 					{/* error message */}
 					<Typography align="center" variant="h3" sx={{ color: palette.error.main, mt: 5 }}>
-						{errorMessage && <div>{errorMessage}</div>}
+						{errorMessage && <div>{`${errorMessage?.originalStatus || errorMessage?.status} : ${errorMessage?.data || errorMessage?.error}`}</div>}
 					</Typography>
 				</Box>
 			</form>

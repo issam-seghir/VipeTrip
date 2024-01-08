@@ -8,6 +8,6 @@ const {upload} = require("@middleware/multerUploader");
 
 
 router.post("/login", handleLogin);
-router.post("/register", upload.single("pic"), handleNewUser);
+router.post("/register", upload.single("picture"), handleNewUser);
 
 module.exports = router;

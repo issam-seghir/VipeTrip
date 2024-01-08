@@ -1,7 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"
 
 
-const baseUrl = "http://localhost:3500/api/auth"
+const baseUrl = "http://localhost:3500/auth"
 
 // Create the API using RTK Query
 export const authApi = createApi({

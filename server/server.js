@@ -52,15 +52,15 @@ app.use(express.static(join(__dirname, "public")));
 
 
 
-// app.post("/upload", upload.single("myFile"), (req, res, next) => {
-// 	const file = req.file;
-// 	if (!file) {
-// 		const error = new Error("Please upload a file");
-// 		error.httpStatusCode = 400;
-// 		return next(error);
-// 	}
-// 	res.send(file);
-// });
+app.post("/upload", upload.single("myFile"), (req, res, next) => {
+	const file = req.file;
+	if (!file) {
+		const error = new Error("Please upload a file");
+		error.httpStatusCode = 400;
+		return next(error);
+	}
+	res.send(file);
+});
 
 //* Public routes
 app.use("/", require("@routes/root"));

@@ -35,7 +35,6 @@ const handleLogin = async (req, res) => {
 		//? Use the SameSite=strict flag whenever possible to prevent CSRF. This can only be used if the Authorization Server has the same site as your front-end.
 		console.log(isProduction);
 		res.cookie("jwt", refreshToken, { httpOnly: true, secure: isProduction, sameSite: isProduction ? "strict" : "None", maxAge: 24 * 60 * 60 * 1000 });
-		// console.log(isProduction);
 		// Send authorization roles and access token to user
 		res.json({ accessToken });
 	} catch (error) {

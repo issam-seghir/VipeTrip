@@ -52,9 +52,18 @@ export default function AuthForm() {
 	};
 	const { getRootProps, getInputProps, fileRejections, ...state } = useDropzone({ accept: { "image/*": [] }, maxSize: mbToByte(2), maxFiles: 1, multiple: false, onDrop: handleDropZone });
 
+	async function handleLogin(data) {
+		const res = await apiLogin(data);
+		console.log(res.data.accessToken);
+		if (res) {
+			localStorage.setItem("token", res?.data?.accessToken);
+			navigate("/home");
+		};
+	}
 	const onSubmit = (data) => {
 		console.log(data);
-		isLogin ? apiLogin(data) : apiRegister(data);
+		isLogin ? handleLogin(data) : apiRegister(data);
+
 	};
 
 	const handleFormSwitch = () => {

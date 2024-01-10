@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt');
 const handleNewUser = async (req, res) => {
 	const { firstName, lastName, email, password, picture, job, location, friends } = req.body;
 console.log(req.body);
+console.log(req.file);
 	try {
 		// check for duplicate usernames in the db
 		const duplicate = await User.findOne({ email });

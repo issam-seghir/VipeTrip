@@ -1,16 +1,24 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"
+import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-
-const baseUrl = "http://localhost:3500/auth"
+const baseUrl = "http://localhost:3500/auth";
 
 // Create the API using RTK Query
 export const authApi = createApi({
-	// reducerPath : the state that hold the api data  is used as the key in the Redux store ,
 	// to select data from the store, you might do something like const data = useSelector((state) => state.authApi).
 	// defaults to 'api'
 	reducerPath: "authApi",
-	// fetchBaseQuery : A small wrapper around fetch
-	baseQuery: fetchBaseQuery({ baseUrl }),
+	baseQuery: fetchBaseQuery({
+		baseUrl,
+		prepareHeaders: (headers, { getState }) => {
+			// Use Redux's useSelector to get the token from the state
+			// usually we use local storage but in this case we already setup react-persist
+			const token = getState().global.token;
+			if (token) {
+				headers.set("authorization", `Bearer ${token}`);
+			}
+			return headers;
+		},
+	}),
 	endpoints: (builder) => ({
 		apiLogin: builder.mutation({
 			query: (credentials) => ({
@@ -31,7 +39,6 @@ export const authApi = createApi({
 
 // Export the generated hooks for easy usage
 export const { useApiLoginMutation, useApiRegisterMutation } = authApi;
-
 
 //* explain tags :
 /* The providesTags and invalidatesTags options in RTK Query are not added automatically

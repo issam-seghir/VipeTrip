@@ -1,29 +1,30 @@
 import { Box, Button, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { useApiLoginMutation, useApiRegisterMutation } from "@store/api/authApi";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 
+import DropZone from "@components/DropZone";
 import FormTextField from "@components/FormTextField";
 import { DevTool } from "@hookform/devtools";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { setCredentials } from "@jsx/store/slices/globalSlice";
+import { logFormData } from "@jsx/utils/logFormData";
 import { mbToByte } from "@jsx/utils/mbToByte";
 import { useFormHandleErrors } from "@utils/hooks/useFormHandleErrors";
 import { loginSchema, registerSchema } from "@utils/validationSchema";
 import { useDropzone } from "react-dropzone";
-
-import DropZone from "@components/DropZone";
-import { logFormData } from "@jsx/utils/logFormData";
+import { useDispatch } from "react-redux";
 
 export default function AuthForm() {
 	const [isLogin, setIsLogin] = useState(true);
-	const [pictureData, setPhotoData] = useState(null);
 
 	const { palette } = useTheme();
+	const dispatch = useDispatch();
 	const navigate = useNavigate();
 	const isNonMobile = useMediaQuery("(min-width:600px)");
-	const [apiLogin, { data: loginData, error: loginError, isLoading: isLoginLoading, isSuccess: isLoginSuccess, isError: isLoginError }] = useApiLoginMutation();
-	const [apiRegister, { data: registerData, error: registerError, isLoading: isRegisterLoading, isSuccess: isRegisterSuccess, isError: isRegisterError }] = useApiRegisterMutation();
+	const [apiLogin, { error: loginError, isLoading: isLoginLoading, isError: isLoginError }] = useApiLoginMutation();
+	const [apiRegister, { error: registerError, isLoading: isRegisterLoading, isError: isRegisterError }] = useApiRegisterMutation();
 	const {
 		handleSubmit,
 		reset,
@@ -36,36 +37,71 @@ export default function AuthForm() {
 		resolver: zodResolver(isLogin ? loginSchema : registerSchema),
 	});
 
+	const picture = watch("picture");
 	const errorMessage = useFormHandleErrors(isLoginError, loginError, isRegisterError, registerError);
 
-	// console.log("login message " + JSON.stringify(loginError?.data));
-	console.log(loginData);
-	console.log(registerData);
-	// console.log(errors);
-	console.log(errorMessage);
-
 	const handleDropZone = (acceptedFiles) => {
-		// save picture data to pass it to drop zone component
-		setPhotoData(acceptedFiles[0]);
 		// add new value (picture) to form
-		setValue("picture", acceptedFiles[0]?.name || "");
+		setValue("picture", acceptedFiles[0]);
 	};
 	const { getRootProps, getInputProps, fileRejections, ...state } = useDropzone({ accept: { "image/*": [] }, maxSize: mbToByte(2), maxFiles: 1, multiple: false, onDrop: handleDropZone });
 
-	async function handleLogin(data) {
-		const res = await apiLogin(data);
-		console.log(res.data.accessToken);
-		if (res) {
-			localStorage.setItem("token", res?.data?.accessToken);
-			navigate("/home");
-		};
-	}
-	const onSubmit = (data) => {
-		console.log(data);
-		isLogin ? handleLogin(data) : apiRegister(data);
-
+	const getServerErrorMessageForField = (fieldName) => {
+		switch (fieldName) {
+			case "email": {
+				return (errorMessage?.originalStatus === 404 || errorMessage?.status === 409) && errorMessage;
+			}
+			case "password": {
+				return (errorMessage?.originalStatus === 401 || errorMessage?.originalStatus === 400) && errorMessage;
+			}
+			default: {
+				return null;
+			}
+		}
 	};
 
+	async function handleLogin(data) {
+		try {
+			const res = await apiLogin(data).unwrap();
+
+			if (res) {
+				console.log(res);
+				dispatch(setCredentials({ user: res?.user, token: res?.token }));
+				// reset form when submit is successful (keep default values)
+				reset();
+				// redirect to home page after successful login
+				navigate("/home");
+			}
+		} catch (error) {
+			console.error(error);
+		}
+	}
+	async function handleRegister(data) {
+		try {
+			// the file picture will be added in FormData
+			const formData = new FormData();
+			Object.keys(data).forEach((key) => formData.append(key, data[key]));
+			// add a new field content the Picture Path to save it in the db
+			formData.append("picturePath", data?.picture?.name || "");
+			logFormData(formData);
+			const res = await apiRegister(data).unwrap();
+
+			if (res) {
+				// reset form when submit is successful (keep default values)
+				reset();
+				// redirect to home page after successful login
+				navigate("/home");
+			}
+		} catch (error) {
+			console.error(error);
+		}
+	}
+
+	const onSubmit = (data) => {
+		console.log(data);
+		isLogin ? handleLogin(data) : handleRegister(data);
+	};
+console.log(isLogin);
 	const handleFormSwitch = () => {
 		setIsLogin((prev) => {
 			// Reset the form fields when switching between login and register form
@@ -76,15 +112,6 @@ export default function AuthForm() {
 			return !prev;
 		});
 	};
-
-	// reset form when submit is successful (keep default values)
-	// redirect to home page after successful login
-	useEffect(() => {
-		if ((isLoginSuccess || isRegisterSuccess) && isSubmitSuccessful) {
-			reset();
-			navigate("/home");
-		}
-	}, [isLoginSuccess, isRegisterSuccess, isSubmitSuccessful, reset, navigate]);
 
 	return (
 		<>
@@ -106,11 +133,11 @@ export default function AuthForm() {
 							<FormTextField defaultValue="" name={"lastName"} label="last Name" control={control} sx={{ gridColumn: "span 2" }} />
 							<FormTextField defaultValue="" name={"location"} label="Location" control={control} sx={{ gridColumn: "span 4" }} />
 							<FormTextField defaultValue="" name={"job"} label="Job" control={control} sx={{ gridColumn: "span 4" }} />
-							<DropZone getInputProps={getInputProps} getRootProps={getRootProps} fileRejections={fileRejections} picture={pictureData} state={state} />
+							<DropZone getInputProps={getInputProps} getRootProps={getRootProps} fileRejections={fileRejections} picture={picture} state={state} />
 						</>
 					)}
-					<FormTextField defaultValue={"admin@test.com"} name={"email"} label="Email" control={control} errorMessage={errorMessage?.originalStatus === 404 && errorMessage} sx={{ gridColumn: "span 4" }} />
-					<FormTextField defaultValue={"123456@Admin"} name={"password"} label="Password" type="password" errorMessage={errorMessage?.originalStatus === 401 && errorMessage} control={control} sx={{ gridColumn: "span 4" }} />
+					<FormTextField defaultValue={"admin@test.com"} name={"email"} label="Email" control={control} errorMessage={getServerErrorMessageForField("email")} sx={{ gridColumn: "span 4" }} />
+					<FormTextField defaultValue={"123456@Admin"} name={"password"} label="Password" type="password" errorMessage={getServerErrorMessageForField("password")} control={control} sx={{ gridColumn: "span 4" }} />
 					{!isLogin && <FormTextField defaultValue="" name={"confirmPassword"} label="Confirm Password" type="password" control={control} sx={{ gridColumn: "span 4" }} />}
 				</Box>
 
@@ -147,7 +174,7 @@ export default function AuthForm() {
 					</Typography>
 					{/* error message */}
 					<Typography align="center" variant="h3" sx={{ color: palette.error.main, mt: 5 }}>
-						{errorMessage && <div>{`${errorMessage?.originalStatus || errorMessage?.status} : ${errorMessage?.data || errorMessage?.error}`}</div>}
+						{errorMessage && <div>{`${errorMessage?.originalStatus || errorMessage?.status} : ${errorMessage?.data.message || errorMessage?.error}`}</div>}
 					</Typography>
 				</Box>
 			</form>

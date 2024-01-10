@@ -36,7 +36,7 @@ const handleLogin = async (req, res) => {
 		console.log(isProduction);
 		res.cookie("jwt", refreshToken, { httpOnly: true, secure: isProduction, sameSite: isProduction ? "strict" : "None", maxAge: 24 * 60 * 60 * 1000 });
 		// Send authorization roles and access token to user
-		res.json({ accessToken });
+		res.json({ token:accessToken, user : foundUser });
 	} catch (error) {
 		console.error(error);
 		res.status(500).send("Server error");

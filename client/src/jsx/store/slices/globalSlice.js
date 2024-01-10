@@ -14,7 +14,7 @@ export const globalSlice = createSlice({
 		setMode: (state) => {
 			state.mode = state.mode === "light" ? "dark" : "light";
 		},
-		setLogin: (state, action) => {
+		setCredentials: (state, action) => {
 			state.user = action.payload.user;
 			state.token = action.payload.token;
 		},
@@ -43,5 +43,5 @@ export const globalSlice = createSlice({
 });
 
 export const selectMode = (state) => state.global.mode;
-export const { setMode, setLogin, setLogout, setFriends, setPosts, setPost } = globalSlice.actions;
+export const { setMode, setCredentials, setLogout, setFriends, setPosts, setPost } = globalSlice.actions;
 export default globalSlice.reducer;

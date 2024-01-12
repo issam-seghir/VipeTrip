@@ -10,7 +10,8 @@ import { store,persistor } from "@store/store";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import App from "@jsx/App.jsx";
 import Home from "@pages/Home";
-import LogIn from "@jsx/pages/Auth";
+import Login from "@pages/Login"
+import Register from "@pages/Register"
 import Profile from "@pages/Profile";
 
 
@@ -39,7 +40,15 @@ export const router = createBrowserRouter(
 				{
 					// default Outlet route , the same as <Route index element={<LogIn/>} />
 					index: true,
-					element: <LogIn />,
+					element: <Login />,
+				},
+				{
+					path: "login",
+					element: <Login />,
+				},
+				{
+					path: "register",
+					element: <Register />,
 				},
 				{
 					path: "home",

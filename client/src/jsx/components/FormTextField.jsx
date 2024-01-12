@@ -7,7 +7,7 @@ export default function FormTextField({ name, label, control, defaultValue, type
 			defaultValue={defaultValue}
 			name={name}
 			control={control}
-			render={({ field: { name, ...field }, fieldState: { invalid, error }, formState }) => <TextField {...field} label={label} type={type} error={!!error || !!errorMessage} helperText={error?.message || errorMessage?.data?.message} sx={sx} />}
+			render={({ field: { name, ...field }, fieldState: { invalid, error }, formState }) => <TextField {...field} label={label} type={type} error={!!error || !!errorMessage} helperText={error?.message || errorMessage?.data || errorMessage?.data?.message || errorMessage?.error} sx={sx} />}
 		/>
 	);
 }

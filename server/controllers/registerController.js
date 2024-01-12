@@ -2,7 +2,7 @@ const User = require('@model/User');
 const bcrypt = require('bcrypt');
 
 const handleNewUser = async (req, res) => {
-	const { firstName, lastName, email, password, picture, job, location, friends } = req.body;
+	const { firstName, lastName, email, password, picturePath, job, location, friends } = req.body;
 console.log(req.body);
 console.log(req.file);
 	try {
@@ -16,7 +16,7 @@ console.log(req.file);
 			lastName,
 			email,
 			password, //  Don't hash the password yet for validation
-			picture,
+			picturePath,
 			job,
 			location,
 			friends,

@@ -1,7 +1,8 @@
 import { Box, Typography, useTheme, useMediaQuery } from "@mui/material";
 import AuthForm from "@jsx/components/AuthForm";
+import LoginForm from "@components/LoginForm";
 
-export default function LogIn() {
+export default function Auth({children}) {
       const theme = useTheme();
 		const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
 	return (
@@ -16,7 +17,9 @@ export default function LogIn() {
 				<Typography fontWeight="500" variant="h5" sx={{ mb: "1.5rem" }}>
 					Welcome to Socipedia, the Social Media for Sociopaths!
 				</Typography>
-                <AuthForm/>
+				{children}
+				{/* <AuthForm/> */}
+				{/* <LoginForm /> */}
 			</Box>
 		</Box>
 	);

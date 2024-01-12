@@ -20,14 +20,8 @@
 			"@videos/*": [
 				"src/assets/videos/*"
 			],
-			"@api/*": [
-				"src/jsx/store/api/*"
-			],
 			"@components/*": [
 				"src/jsx/components/*"
-			],
-			"@contexts/*": [
-				"src/jsx/contexts/*"
 			],
 			"@data/*": [
 				"src/jsx/data/*"
@@ -38,14 +32,8 @@
 			"@pages/*": [
 				"src/jsx/pages/*"
 			],
-			"@routes/*": [
-				"src/jsx/routes/*"
-			],
 			"@store/*": [
 				"src/jsx/store/*"
-			],
-			"@types/*": [
-				"src/jsx/types/*"
 			],
 			"@utils/*": [
 				"src/jsx/utils/*"
@@ -65,14 +53,8 @@
 			"@/*": [
 				"src/*"
 			],
-			"@firebase/*": [
-				"src/jsx/firebase/*"
-			],
-			"@jsxUtilsHooks/*": [
-				"src/jsx/utils/hooks/*"
-			],
-			"@helpers/*": [
-				"src/jsx/utils/helpers/*"
+			"@LogininFrom.jsx/*": [
+				"src/jsx/components/LogininFrom.jsx/*"
 			]
 		}
 	}

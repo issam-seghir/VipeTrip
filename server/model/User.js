@@ -21,7 +21,8 @@ const userSchema = new Schema(
 			required: true,
 			minlength: 7,
 			unique: true,
-			validate: {  //!  Validation will only run when create or save (so is not working with methods like findOneAndUpdate , findOneAndDelete , etc.)
+			validate: {
+				//!  Validation will only run when create or save (so is not working with methods like findOneAndUpdate , findOneAndDelete , etc.)
 				validator: function (v) {
 					// Simple regex for email validation
 					const regex = /^\S+@\S+\.\S+$/;
@@ -42,7 +43,7 @@ const userSchema = new Schema(
 			// 	message: (props) => `Password should have at least 8 characters, one uppercase letter, one lowercase letter, one digit, and one special character`,
 			// },
 		},
-		picture: {
+		picturePath: {
 			type: String,
 			default: "",
 		},

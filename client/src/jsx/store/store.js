@@ -1,12 +1,14 @@
 /* eslint-disable unicorn/prefer-spread */
 /*global process*/
 
-import globalReducer from "@store/slices/globalSlice";
+import { api } from "@store/api/api";
 import { configureStore } from "@reduxjs/toolkit";
 import { setupListeners } from "@reduxjs/toolkit/query";
+import globalReducer from "@store/slices/globalSlice";
 import { FLUSH, PAUSE, PERSIST, PURGE, REGISTER, REHYDRATE, persistReducer, persistStore } from "redux-persist";
 import storage from "redux-persist/lib/storage";
-import { authApi } from "@store/api/authApi";
+import authReducer from "@store/slices/authSlice"
+
 //? use redux-persist to store the state in localStorage
 //? you can use any other storage as well like sessionStorage or cookies
 //* ref : https://blog.logrocket.com/persist-state-redux-persist-redux-toolkit-react/
@@ -17,18 +19,20 @@ const persistConfig = {
 	//! It is also strongly recommended to blacklist any api(s) that you have configured with RTK Query.
 	//! If the api slice reducer is not blacklisted, the api cache will be automatically persisted
 	//! and restored which could leave you with phantom subscriptions from components that do not exist any more.
+	blacklist: [api.reducerPath], //Things u dont want to persist
 	/*
 		whitelist: ['globalReducer', 'pageReducer',...], //Things u want to persist
-		blacklist: [pokemonApi.reducerPath,...], //Things u dont want to persist
 	 */
 };
 
 const persistedGlobalReducer = persistReducer(persistConfig, globalReducer);
+const persistedAuthReducer = persistReducer(persistConfig, authReducer);
 
 export const store = configureStore({
 	reducer: {
 		global: persistedGlobalReducer, // you can access the state using useSelector(state => state.auth)
-		[authApi.reducerPath]: authApi.reducer, // Include the reducer for the Pokemon API
+		auth: persistedAuthReducer, // you can access the state using useSelector(state => state.auth)
+		[api.reducerPath]: api.reducer, // Include the reducer for the Pokemon API
 	},
 	// skip console errors for redux-persist
 	middleware: (getDefaultMiddleware) =>
@@ -36,7 +40,7 @@ export const store = configureStore({
 			serializableCheck: {
 				ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
 			},
-		}).concat(authApi.middleware), // Include the middleware for the auth API,
+		}).concat(api.middleware), // Include the middleware for the auth API,
 
 	devTools: process.env.NODE_ENV !== "production", // Disable DevTools in production
 });

@@ -1,5 +1,6 @@
 import FlexBetween from "@components/FlexBetween";
-import { setLogout, setMode } from "@store/slices/globalSlice";
+import {  setMode } from "@store/slices/globalSlice";
+import {  setLogout } from "@store/slices/authSlice";
 import { Close, DarkMode, Help, LightMode, Menu, Message, Notifications, Search } from "@mui/icons-material";
 import { Box, FormControl, IconButton, InputBase, MenuItem, Select, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { useState } from "react";
@@ -10,7 +11,7 @@ export default function NavBar() {
 const [isMobileMenuToggled, setIsMobileMenuToggled] = useState(false);
 const dispatch = useDispatch();
 const navigate = useNavigate();
-const user = useSelector((state) => state.global.user);
+const user = useSelector((state) => state.auth.user);
 const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
 
 const theme = useTheme();

@@ -1,6 +1,5 @@
-import { useLoginMutation, useRegisterMutation } from "@jsx/store/api/authApi";
+import { useRegisterMutation } from "@jsx/store/api/authApi";
 import { Box, Button, Typography, useMediaQuery, useTheme } from "@mui/material";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import useFormPersist from "react-hook-form-persist";
 import { useNavigate } from "react-router-dom";
@@ -9,23 +8,18 @@ import DropZone from "@components/DropZone";
 import FormTextField from "@components/FormTextField";
 import { DevTool } from "@hookform/devtools";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { setCredentials } from "@jsx/store/slices/authSlice";
 import { logFormData } from "@jsx/utils/logFormData";
 import { mbToByte } from "@jsx/utils/mbToByte";
 import { useFormHandleErrors } from "@utils/hooks/useFormHandleErrors";
-import { loginSchema, registerSchema } from "@utils/validationSchema";
+import { registerSchema } from "@utils/validationSchema";
 import { useDropzone } from "react-dropzone";
 import { useDispatch } from "react-redux";
-import { useConditionalFormPersist } from "@jsx/utils/hooks/useFormPersistConditional";
 
 export default function AuthForm() {
-	const [isLogin, setIsLogin] = useState(true);
-
 	const { palette } = useTheme();
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
 	const isNonMobile = useMediaQuery("(min-width:600px)");
-	const [login, { error: loginError, isLoading: isLoginLoading, isError: isLoginError }] = useLoginMutation();
 	const [register, { error: registerError, isLoading: isRegisterLoading, isError: isRegisterError }] = useRegisterMutation();
 	const {
 		handleSubmit,
@@ -36,20 +30,17 @@ export default function AuthForm() {
 		formState: { errors, isSubmitSuccessful, isSubmitting },
 	} = useForm({
 		mode: "onBlur", // when to validate the form
-		resolver: zodResolver(isLogin ? loginSchema : registerSchema),
+		resolver: zodResolver(registerSchema),
 	});
-	// useConditionalFormPersist(isLogin, window.sessionStorage, watch, setValue, ["picture", "password"]);
-    const persistHook = useFormPersist("registerForm", {
+	useFormPersist("registerForm", {
 		watch,
 		setValue,
 		storage: window.sessionStorage, // default window.sessionStorage
 		exclude: ["picture", "password"],
 	});
-	const persistHookII = null;
-	isLogin ? persistHook : persistHookII;
 
 	const picture = watch("picture");
-	const errorMessage = useFormHandleErrors(isLoginError, loginError, isRegisterError, registerError);
+	const errorMessage = useFormHandleErrors(isRegisterError, registerError);
 	const errorMessageFormat = errorMessage && `${errorMessage?.originalStatus || errorMessage?.status} : ${errorMessage?.data || errorMessage?.data?.message || errorMessage?.error}`;
 	const handleDropZone = (acceptedFiles) => {
 		// add new value (picture) to form
@@ -71,22 +62,6 @@ export default function AuthForm() {
 		}
 	};
 
-	async function handleLogin(data) {
-		try {
-			const res = await login(data).unwrap();
-
-			if (res) {
-				console.log(res);
-				dispatch(setCredentials({ user: res?.user, token: res?.token }));
-				// reset form when submit is successful (keep default values)
-				reset();
-				// redirect to home page after successful login
-				navigate("/home");
-			}
-		} catch (error) {
-			console.error(error);
-		}
-	}
 	async function handleRegister(data) {
 		try {
 			console.log(data);
@@ -111,17 +86,7 @@ export default function AuthForm() {
 
 	const onSubmit = (data) => {
 		console.log(data);
-		isLogin ? handleLogin(data) : handleRegister(data);
-	};
-	const handleFormSwitch = () => {
-		setIsLogin((prev) => {
-			// Reset the form fields when switching between login and register form
-			reset({
-				email: prev ? "" : "admin@test.com",
-				password: prev ? "" : "123456@Admin",
-			});
-			return !prev;
-		});
+		handleRegister(data);
 	};
 
 	return (
@@ -138,18 +103,14 @@ export default function AuthForm() {
 						"& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
 					}}
 				>
-					{!isLogin && (
-						<>
-							<FormTextField defaultValue="" name={"firstName"} label="First Name" control={control} sx={{ gridColumn: "span 2" }} />
-							<FormTextField defaultValue="" name={"lastName"} label="last Name" control={control} sx={{ gridColumn: "span 2" }} />
-							<FormTextField defaultValue="" name={"location"} label="Location" control={control} sx={{ gridColumn: "span 4" }} />
-							<FormTextField defaultValue="" name={"job"} label="Job" control={control} sx={{ gridColumn: "span 4" }} />
-							<DropZone getInputProps={getInputProps} getRootProps={getRootProps} fileRejections={fileRejections} picture={picture} state={state} />
-						</>
-					)}
-					<FormTextField defaultValue={"admin@test.com"} name={"email"} label="Email" control={control} errorMessage={getServerErrorMessageForField("email")} sx={{ gridColumn: "span 4" }} />
-					<FormTextField defaultValue={"123456@Admin"} name={"password"} label="Password" type="password" errorMessage={getServerErrorMessageForField("password")} control={control} sx={{ gridColumn: "span 4" }} />
-					{!isLogin && <FormTextField defaultValue="" name={"confirmPassword"} label="Confirm Password" type="password" control={control} sx={{ gridColumn: "span 4" }} />}
+					<FormTextField defaultValue="" name={"firstName"} label="First Name" control={control} sx={{ gridColumn: "span 2" }} />
+					<FormTextField defaultValue="" name={"lastName"} label="last Name" control={control} sx={{ gridColumn: "span 2" }} />
+					<FormTextField defaultValue="" name={"location"} label="Location" control={control} sx={{ gridColumn: "span 4" }} />
+					<FormTextField defaultValue="" name={"job"} label="Job" control={control} sx={{ gridColumn: "span 4" }} />
+					<DropZone getInputProps={getInputProps} getRootProps={getRootProps} fileRejections={fileRejections} picture={picture} state={state} />
+					<FormTextField defaultValue={""} name={"email"} label="Email" control={control} errorMessage={getServerErrorMessageForField("email")} sx={{ gridColumn: "span 4" }} />
+					<FormTextField defaultValue={""} name={"password"} label="Password" type="password" errorMessage={getServerErrorMessageForField("password")} control={control} sx={{ gridColumn: "span 4" }} />
+					<FormTextField defaultValue="" name={"confirmPassword"} label="Confirm Password" type="password" control={control} sx={{ gridColumn: "span 4" }} />
 				</Box>
 
 				{/* BUTTONS */}
@@ -157,7 +118,7 @@ export default function AuthForm() {
 					{/* Submit button */}
 					<Button
 						fullWidth
-						disabled={isSubmitting || isRegisterLoading || isLoginLoading} // disabled the button when submitting
+						disabled={isSubmitting || isRegisterLoading} // disabled the button when submitting
 						type="submit"
 						sx={{
 							m: "2rem 0",
@@ -167,11 +128,11 @@ export default function AuthForm() {
 							"&:hover": { color: palette.primary.main },
 						}}
 					>
-						{isLoginLoading || isRegisterLoading ? "Loading..." : isLogin ? "LOGIN" : "REGISTER"}
+						{isRegisterLoading ? "Loading..." : "REGISTER"}
 					</Button>
 					{/* Switch between login and register form */}
 					<Typography
-						onClick={handleFormSwitch}
+						onClick={() => navigate("/login")}
 						sx={{
 							textDecoration: "underline",
 							color: palette.primary.main,
@@ -181,7 +142,7 @@ export default function AuthForm() {
 							},
 						}}
 					>
-						{isLogin ? "Don't have an account? Sign Up here." : "Already have an account? Login here."}
+						{"Already have an account? Login here."}
 					</Typography>
 					{/* error message */}
 					<Typography align="center" variant="h3" sx={{ color: palette.error.main, mt: 5 }}>

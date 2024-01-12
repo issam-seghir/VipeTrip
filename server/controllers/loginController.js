@@ -7,10 +7,10 @@ const handleLogin = async (req, res) => {
 	const { email, password } = req.body;
 	try {
 		const foundUser = await User.findOne({ email });
-		if (!foundUser) return res.status(404).send("User not found");
+		if (!foundUser) return res.status(404).send({ message: "User not found"});
 		// evaluate password
 		const match = await bcrypt.compare(password, foundUser.password);
-		if (!match) return res.status(401).send("Incorrect password");
+		if (!match) return res.status(401).send( {message: "Incorrect password"});
 
 		if (!process.env.ACCESS_TOKEN_SECRET || !process.env.REFRESH_TOKEN_SECRET) {
 			return res.status(500).send("Server error: JWT secrets not defined");
@@ -33,7 +33,7 @@ const handleLogin = async (req, res) => {
 		//? Use the httpOnly flag to prevent JavaScript from reading it.
 		//? Use the secure=true flag so it can only be sent over HTTPS.
 		//? Use the SameSite=strict flag whenever possible to prevent CSRF. This can only be used if the Authorization Server has the same site as your front-end.
-		console.log(isProduction);
+		console.log("isProduction:",isProduction);
 		res.cookie("jwt", refreshToken, { httpOnly: true, secure: isProduction, sameSite: isProduction ? "strict" : "None", maxAge: 24 * 60 * 60 * 1000 });
 		// Send authorization roles and access token to user
 		res.json({ token:accessToken, user : foundUser });

@@ -36,12 +36,12 @@ export default function AuthForm() {
 		watch,
 		setValue,
 		storage: window.sessionStorage, // default window.sessionStorage
-		exclude: ["picture", "password"],
+		exclude: ["picture", "password", "confirmPassword"],
 	});
 
 	const picture = watch("picture");
 	const errorMessage = useFormHandleErrors(isRegisterError, registerError);
-	const errorMessageFormat = errorMessage && `${errorMessage?.originalStatus || errorMessage?.status} : ${errorMessage?.data || errorMessage?.data?.message || errorMessage?.error}`;
+	const errorMessageFormat = errorMessage && `${errorMessage?.originalStatus || errorMessage?.status} : ${errorMessage?.data?.message || errorMessage?.error}`;
 	const handleDropZone = (acceptedFiles) => {
 		// add new value (picture) to form
 		setValue("picture", acceptedFiles[0]);
@@ -51,16 +51,17 @@ export default function AuthForm() {
 	const getServerErrorMessageForField = (fieldName) => {
 		switch (fieldName) {
 			case "email": {
-				return (errorMessage?.originalStatus === 404 || errorMessage?.status === 409) && errorMessage;
+				return errorMessage?.status === 409 && errorMessage;
 			}
 			case "password": {
-				return (errorMessage?.originalStatus === 401 || errorMessage?.originalStatus === 400) && errorMessage;
+				return errorMessage?.status === 400 && errorMessage;
 			}
 			default: {
 				return null;
 			}
 		}
 	};
+	console.log(getServerErrorMessageForField("email"));
 
 	async function handleRegister(data) {
 		try {

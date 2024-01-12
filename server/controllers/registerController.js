@@ -1,5 +1,6 @@
 const User = require('@model/User');
 const bcrypt = require('bcrypt');
+const mongoose = require('mongoose');
 
 const handleNewUser = async (req, res) => {
 	const { firstName, lastName, email, password, picturePath, job, location, friends } = req.body;
@@ -8,7 +9,7 @@ console.log(req.file);
 	try {
 		// check for duplicate usernames in the db
 		const duplicate = await User.findOne({ email });
-		if (duplicate) return res.status(409).json({ message: "Email already in use" }); //Conflict
+		if (duplicate) return res.status(409).send({ message: "Email already in use" }); //Conflict
 
 		//create and store the new user
 		const user = await User.create({
@@ -22,12 +23,6 @@ console.log(req.file);
 			friends,
 		});
 
-		// Validate user
-		const validationError = user.validateSync();
-		if (validationError) {
-			return res.status(400).json({ message: validationError.message });
-		}
-
 		//encrypt the password
 		user.password = await bcrypt.hash(password, 10);
 		// Save user
@@ -35,7 +30,11 @@ console.log(req.file);
 
 		res.status(201).json({ success: `New user ${firstName + "-" + lastName} created!`, userInfo: user });
 	} catch (error) {
-		res.status(500).json({ message: error.message });
+		if (error instanceof mongoose.Error.ValidationError) {
+			res.status(400).json({ message: error.message });
+		} else {
+			res.status(500).json({ message: "Something went wrong" });
+		}
 	}
 }
 

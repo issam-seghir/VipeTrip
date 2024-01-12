@@ -28,15 +28,15 @@ export default function AuthForm() {
 	});
 
 	const errorMessage = useFormHandleErrors(isLoginError, loginError);
-	const errorMessageFormat = errorMessage && `${errorMessage?.originalStatus || errorMessage?.status} : ${errorMessage?.data || errorMessage?.data?.message || errorMessage?.error}`;
+	const errorMessageFormat = errorMessage && `${errorMessage?.originalStatus || errorMessage?.status} : ${errorMessage?.data?.message || errorMessage?.error}`;
 
 	const getServerErrorMessageForField = (fieldName) => {
 		switch (fieldName) {
 			case "email": {
-				return (errorMessage?.originalStatus === 404 || errorMessage?.status === 409) && errorMessage;
+				return errorMessage?.status === 404 && errorMessage;
 			}
 			case "password": {
-				return (errorMessage?.originalStatus === 401 || errorMessage?.originalStatus === 400) && errorMessage;
+				return errorMessage?.status === 401 && errorMessage;
 			}
 			default: {
 				return null;

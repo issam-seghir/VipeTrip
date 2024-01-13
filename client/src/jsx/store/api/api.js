@@ -4,7 +4,7 @@ import { setCredentials, setLogout } from "@store/slices/authSlice";
 const baseUrl = "http://localhost:3500/";
 const baseQuery = fetchBaseQuery({
 	baseUrl,
-	credentials: "same-origin",
+	credentials: "include", // Include cookies in requests
 	prepareHeaders: (headers, { getState }) => {
 		// Use Redux's useSelector to get the token from the state
 		// usually we use local storage but in this case we already setup react-persist

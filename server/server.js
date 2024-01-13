@@ -8,7 +8,7 @@ const helmet = require("helmet");
 const { connection } = require("mongoose");
 
 const { join } = require("node:path");
-const corsOptions = require("@config/corsOptions");
+const {corsOptions} = require("@config/corsOptions");
 const connectDB = require("@config/dbConn");
 const { helmetOptions } = require("@config/helmetOptions");
 const credentials = require("@middleware/credentials");
@@ -36,6 +36,8 @@ app.use(credentials);
 
 // Cross Origin Resource Sharing
 app.use(cors(corsOptions));
+
+
 
 // built-in middleware to handle urlencoded form data
 app.use(express.urlencoded({ extended: false }));
@@ -78,7 +80,6 @@ app.use("/posts",upload.single("myFile"), require("@routes/api/posts"));
 
 
 app.use(errorHandler);
-
 
 
 connection.once("open", () => {

@@ -38,6 +38,7 @@ const handleLogin = async (req, res) => {
 		// Send authorization roles and access token to user
 		res.json({ token:accessToken, user : foundUser });
 	} catch (error) {
+		
 		console.error(error);
 		res.status(500).send("Server error");
 	}

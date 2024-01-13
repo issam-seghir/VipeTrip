@@ -1,9 +1,9 @@
-const whitelist = require("@config/allowedOrigins.js");
+const {whitelist} = require("@config/allowedOrigins.js");
 const { isProduction } = require("@config/const.js");
 
 const corsOptions = {
 	origin: function (origin, callback) {
-		if (whitelist.includes(origin) || (!isProduction && !origin)) {
+		if (whitelist.includes(origin)) {
 			callback(null, true);
 		} else {
 			callback(new Error("Not allowed by CORS"));

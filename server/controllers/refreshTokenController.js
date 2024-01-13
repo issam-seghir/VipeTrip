@@ -3,6 +3,9 @@ const jwt = require("jsonwebtoken");
 
 const handleRefreshToken = async (req, res) => {
 	const cookies = req.cookies;
+	console.log("hello im refrech");
+	console.log("cokkies");
+	console.log(cookies);
 	if (!cookies?.jwt) return res.status(401).json({ message: "No token provided" }); // Unauthorized
 	const refreshToken = cookies.jwt;
 

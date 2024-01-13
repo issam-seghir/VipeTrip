@@ -17,7 +17,7 @@ export const registerSchema = z
 		confirmPassword: z.string().min(1, "This is a required field"),
 		location: z.string().max(100).optional(),
 		job: z.string().max(100).optional(),
-		picture: z.string().optional().or(z.literal("")), // fix optional for url / email ...,
+		picture: z.instanceof(FileList).optional().or(z.literal("")), // fix optional for url / email ...,
 	})
 	.refine((data) => data.password === data.confirmPassword, {
 		//For advanced features - multiple issues ,  see (superRefine)

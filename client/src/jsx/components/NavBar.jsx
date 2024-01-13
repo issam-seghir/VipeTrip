@@ -40,6 +40,7 @@ return (
 			>
 				Sociopedia
 			</Typography>
+			{user?.picturePath ? <img src={import.meta.env.VITE_SERVER_URL + "/" + user?.picturePath} alt="User" /> : <img src="https://i.imgur.com/OirnA4S.png" alt="User" />}
 			{isNonMobileScreens && (
 				<FlexBetween backgroundColor={neutralLight} borderRadius="9px" gap="3rem" padding="0.1rem 1.5rem">
 					<InputBase placeholder="Search..." />

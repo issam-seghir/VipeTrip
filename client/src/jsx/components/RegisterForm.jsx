@@ -1,11 +1,12 @@
 import { useRegisterMutation } from "@jsx/store/api/authApi";
 import { Box, Button, Typography, useMediaQuery, useTheme } from "@mui/material";
-import { useForm } from "react-hook-form";
+import { useForm,Controller } from "react-hook-form";
 import useFormPersist from "react-hook-form-persist";
 import { useNavigate } from "react-router-dom";
 
 import DropZone from "@components/DropZone";
 import FormTextField from "@components/FormTextField";
+import FormPickImage from "@components/FormPickImage"
 import { DevTool } from "@hookform/devtools";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { logFormData } from "@jsx/utils/logFormData";
@@ -14,6 +15,7 @@ import { useFormHandleErrors } from "@utils/hooks/useFormHandleErrors";
 import { registerSchema } from "@utils/validationSchema";
 import { useDropzone } from "react-dropzone";
 import { useDispatch } from "react-redux";
+import { setCredentials } from "@jsx/store/slices/authSlice";
 
 export default function AuthForm() {
 	const { palette } = useTheme();
@@ -27,6 +29,9 @@ export default function AuthForm() {
 		setValue,
 		watch,
 		control,
+		getValues,
+		register: formRegister,
+		trigger,
 		formState: { errors, isSubmitSuccessful, isSubmitting },
 	} = useForm({
 		mode: "onBlur", // when to validate the form
@@ -40,13 +45,14 @@ export default function AuthForm() {
 	});
 
 	const picture = watch("picture");
+	console.log(picture);
 	const errorMessage = useFormHandleErrors(isRegisterError, registerError);
 	const errorMessageFormat = errorMessage && `${errorMessage?.originalStatus || errorMessage?.status} : ${errorMessage?.data?.message || errorMessage?.error}`;
-	const handleDropZone = (acceptedFiles) => {
-		// add new value (picture) to form
-		setValue("picture", acceptedFiles[0]);
-	};
-	const { getRootProps, getInputProps, fileRejections, ...state } = useDropzone({ accept: { "image/*": [] }, maxSize: mbToByte(2), maxFiles: 1, multiple: false, onDrop: handleDropZone });
+	// const handleDropZone = (acceptedFiles) => {
+	// 	// add new value (picture) to form
+	// 	setValue("picture", acceptedFiles[0]);
+	// };
+	// const { getRootProps, getInputProps, fileRejections, ...state } = useDropzone({ accept: { "image/*": [] }, maxSize: mbToByte(2), maxFiles: 1, multiple: false, onDrop: handleDropZone });
 
 	const getServerErrorMessageForField = (fieldName) => {
 		switch (fieldName) {
@@ -61,20 +67,31 @@ export default function AuthForm() {
 			}
 		}
 	};
-	console.log(getServerErrorMessageForField("email"));
 
 	async function handleRegister(data) {
 		try {
 			console.log(data);
 			// the file picture will be added in FormData
 			const formData = new FormData();
-			Object.keys(data).forEach((key) => formData.append(key, data[key]));
-			// add a new field content the Picture Path to save it in the db
-			formData.append("picturePath", data?.picture?.name || "");
+			// Append all form data to formData
+			for (const key in data) {
+				if (key !== "picture") {
+					// Skip picture field
+					formData.append(key, data[key]);
+				}
+			}
+
+			// Append file to formData
+			const file = data?.picture[0];
+			if (file) {
+				formData.append("picture", file);
+			}
+
 			logFormData(formData);
-			const res = await register(data).unwrap();
+			const res = await register(formData).unwrap();
 
 			if (res) {
+				dispatch(setCredentials({ user: res?.userInfo, token: null }));
 				// reset form when submit is successful (keep default values)
 				reset();
 				// redirect to home page after successful login
@@ -86,6 +103,7 @@ export default function AuthForm() {
 	}
 
 	const onSubmit = (data) => {
+		console.log(getValues());
 		console.log(data);
 		handleRegister(data);
 	};
@@ -108,7 +126,8 @@ export default function AuthForm() {
 					<FormTextField defaultValue="" name={"lastName"} label="last Name" control={control} sx={{ gridColumn: "span 2" }} />
 					<FormTextField defaultValue="" name={"location"} label="Location" control={control} sx={{ gridColumn: "span 4" }} />
 					<FormTextField defaultValue="" name={"job"} label="Job" control={control} sx={{ gridColumn: "span 4" }} />
-					<DropZone getInputProps={getInputProps} getRootProps={getRootProps} fileRejections={fileRejections} picture={picture} state={state} />
+					<FormPickImage name="picture" errors={errors} type={"image/*"} multiple={false} register={formRegister} />
+					{/* <DropZone getInputProps={getInputProps} getRootProps={getRootProps} fileRejections={fileRejections} picture={picture} state={state} /> */}
 					<FormTextField defaultValue={""} name={"email"} label="Email" control={control} errorMessage={getServerErrorMessageForField("email")} sx={{ gridColumn: "span 4" }} />
 					<FormTextField defaultValue={""} name={"password"} label="Password" type="password" errorMessage={getServerErrorMessageForField("password")} control={control} sx={{ gridColumn: "span 4" }} />
 					<FormTextField defaultValue="" name={"confirmPassword"} label="Confirm Password" type="password" control={control} sx={{ gridColumn: "span 4" }} />

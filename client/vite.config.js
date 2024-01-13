@@ -30,6 +30,7 @@ export default defineConfig({
 	},
 
 	server: {
+		port: 3000,
 		// open the server with google chrome browser
 		// open: (process.env.BROWSER = "E:\\Apps\\scoop\\apps\\googlechrome-dev\\current\\chrome.exe"),
 	},

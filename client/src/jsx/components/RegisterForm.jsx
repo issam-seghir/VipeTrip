@@ -48,11 +48,6 @@ export default function AuthForm() {
 	console.log(picture);
 	const errorMessage = useFormHandleErrors(isRegisterError, registerError);
 	const errorMessageFormat = errorMessage && `${errorMessage?.originalStatus || errorMessage?.status} : ${errorMessage?.data?.message || errorMessage?.error}`;
-	// const handleDropZone = (acceptedFiles) => {
-	// 	// add new value (picture) to form
-	// 	setValue("picture", acceptedFiles[0]);
-	// };
-	// const { getRootProps, getInputProps, fileRejections, ...state } = useDropzone({ accept: { "image/*": [] }, maxSize: mbToByte(2), maxFiles: 1, multiple: false, onDrop: handleDropZone });
 
 	const getServerErrorMessageForField = (fieldName) => {
 		switch (fieldName) {
@@ -91,7 +86,6 @@ export default function AuthForm() {
 			const res = await register(formData).unwrap();
 
 			if (res) {
-				dispatch(setCredentials({ user: res?.userInfo, token: null }));
 				// reset form when submit is successful (keep default values)
 				reset();
 				// redirect to home page after successful login
@@ -103,8 +97,8 @@ export default function AuthForm() {
 	}
 
 	const onSubmit = (data) => {
-		console.log(getValues());
-		console.log(data);
+		// console.log(getValues());
+		// console.log(data);
 		handleRegister(data);
 	};
 

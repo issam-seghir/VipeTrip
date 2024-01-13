@@ -15,7 +15,7 @@ const handleRefreshToken = async (req, res) => {
 			if (err || foundUser.email !== decoded.email || foundUser.id !== decoded.id) return res.status(403).json({ message: "Token verification failed" });
 
 
-			const accessToken = jwt.sign({ id: decoded.id, email: decoded.email }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "1h" });
+			const accessToken = jwt.sign({ id: decoded.id, email: decoded.email }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: process.env.ACCESS_TOKEN_SECRET_EXPIRE });
 
 			res.json({ accessToken });
 		});

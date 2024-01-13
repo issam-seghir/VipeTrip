@@ -5,8 +5,8 @@ const mongoose = require('mongoose');
 const handleNewUser = async (req, res) => {
 	const { firstName, lastName, email, password, job, location, friends } = req.body;
 	const picturePath = req?.file?.path || ""; // Get picturePath from req.file
-	console.log(req.body);
-	console.log(req.file);
+	// console.log(req.body);
+	// console.log(req.file);
 	try {
 		// check for duplicate usernames in the db
 		const duplicate = await User.findOne({ email });

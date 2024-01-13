@@ -76,16 +76,6 @@ app.use(verifyJWT);
 app.use("/users", require("@routes/api/users"));
 app.use("/posts",upload.single("myFile"), require("@routes/api/posts"));
 
-// app.all("*", (req, res) => {
-// 	res.status(404);
-// 	if (req.accepts("html")) {
-// 		res.sendFile(join(__dirname, "views", "404.html"));
-// 	} else if (req.accepts("json")) {
-// 		res.json({ error: "404 Not Found" });
-// 	} else {
-// 		res.type("txt").send("404 Not Found");
-// 	}
-// });
 
 app.use(errorHandler);
 

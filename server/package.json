@@ -9,7 +9,8 @@
 		"node": ">=14.16"
 	},
 	"scripts": {
-		"dev": "node --watch --env-file=.env  server.js"
+		"dev": "node --watch --env-file=.env.development.local  server.js",
+		"prod": "node --watch --env-file=.env  server.js"
 	},
 	"_moduleAliases": {
 		"@root": ".",

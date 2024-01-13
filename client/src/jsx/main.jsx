@@ -13,7 +13,7 @@ import Home from "@pages/Home";
 import Login from "@pages/Login"
 import Register from "@pages/Register"
 import Profile from "@pages/Profile";
-
+import PrivateRoute from "@components/PrivateRoute.jsx"
 
 
 import "@scss/main.scss";
@@ -37,6 +37,7 @@ export const router = createBrowserRouter(
 			element: <App />,
 			// errorElement: <Error />, // the same as <Route path="*" element={<Error />}>
 			children: [
+				//? Public routes
 				{
 					// default Outlet route , the same as <Route index element={<LogIn/>} />
 					index: true,
@@ -50,13 +51,19 @@ export const router = createBrowserRouter(
 					path: "register",
 					element: <Register />,
 				},
+				//? Private routes
 				{
-					path: "home",
-					element: <Home />,
-				},
-				{
-					path: "profile/:userId",
-					element: <Profile />,
+					element: <PrivateRoute />,
+					children: [
+						{
+							path: "home",
+							element: <Home />,
+						},
+						{
+							path: "profile/:userId",
+							element: <Profile />,
+						},
+					],
 				},
 			],
 		},

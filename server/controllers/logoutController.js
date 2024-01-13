@@ -13,7 +13,7 @@ const handleLogout = async (req, res) => {
 		// Check if refreshToken exists in the database
 		const foundUser = await User.findOne({ refreshToken });
 		if (!foundUser) {
-			res.clearCookie("jwt", { httpOnly: true, secure: isProduction, sameSite: isProduction ? "strict" : "None", maxAge: 24 * 60 * 60 * 1000 });
+			res.clearCookie("jwt", { httpOnly: true, secure: isProduction, sameSite: isProduction ? "strict" : "None", maxAge: Number(process.env.COOKIE_MAX_AGE) });
 			return res.status(204).send();
 		}
 
@@ -22,7 +22,7 @@ const handleLogout = async (req, res) => {
 		const result = await foundUser.save();
 		console.log(result);
 
-		res.clearCookie("jwt", { httpOnly: true, secure: isProduction, sameSite: isProduction ? "strict" : "None", maxAge: 24 * 60 * 60 * 1000 });
+		res.clearCookie("jwt", { httpOnly: true, secure: isProduction, sameSite: isProduction ? "strict" : "None", maxAge: Number(process.env.COOKIE_MAX_AGE) });
 		res.status(204).send();
 	} catch (error) {
 		console.error(error);

@@ -1,16 +1,16 @@
 const User = require("@model/User");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const {isProduction} = require("@config/const");
+const { isProduction } = require("@config/const");
 
 const handleLogin = async (req, res) => {
 	const { email, password } = req.body;
 	try {
 		const foundUser = await User.findOne({ email });
-		if (!foundUser) return res.status(404).send({ message: "User not found"});
+		if (!foundUser) return res.status(404).send({ message: "User not found" });
 		// evaluate password
 		const match = await bcrypt.compare(password, foundUser.password);
-		if (!match) return res.status(401).send( {message: "Incorrect password"});
+		if (!match) return res.status(401).send({ message: "Incorrect password" });
 
 		if (!process.env.ACCESS_TOKEN_SECRET || !process.env.REFRESH_TOKEN_SECRET) {
 			return res.status(500).send("Server error: JWT secrets not defined");
@@ -33,12 +33,11 @@ const handleLogin = async (req, res) => {
 		//? Use the httpOnly flag to prevent JavaScript from reading it.
 		//? Use the secure=true flag so it can only be sent over HTTPS.
 		//? Use the SameSite=strict flag whenever possible to prevent CSRF. This can only be used if the Authorization Server has the same site as your front-end.
-		console.log("isProduction:",isProduction);
-		res.cookie("jwt", refreshToken, { httpOnly: true, secure: isProduction, sameSite: isProduction ? "strict" : "None", maxAge: Number(process.env.COOKIE_MAX_AGE) });
+		console.log("isProduction:", isProduction);
+		res.cookie("jwt", refreshToken, { httpOnly: true, secure: isProduction, sameSite: isProduction ? "strict" : "Lax", maxAge: Number(process.env.COOKIE_MAX_AGE) });
 		// Send authorization roles and access token to user
-		res.json({ token:accessToken, user : foundUser });
+		res.json({ token: accessToken, user: foundUser });
 	} catch (error) {
-		
 		console.error(error);
 		res.status(500).send("Server error");
 	}

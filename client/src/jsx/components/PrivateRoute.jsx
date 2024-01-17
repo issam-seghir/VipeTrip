@@ -7,5 +7,5 @@ export default function PrivateOutlet() {
 	console.log(auth);
 	// state={{ from: location }}  : used to redirect the user back to the page they were trying to access after they log in
 	// replace : when the user clicks the browser's back button, they won't go back to the private route they were redirected from, but to whatever page was there before it.
-	return auth.token ? <Outlet /> : <Navigate to="/login"  replace />;
+	return auth.token ? <Outlet /> : <Navigate to="/login" state={{ from: location }} replace />;
 }

@@ -9,7 +9,6 @@ import { Outlet } from "react-router-dom";
 function App() {
 	const mode = useSelector(selectMode);
 	const theme = useMemo(() => createTheme(themeSettings(mode)), [mode]);
-	// const isAuth = Boolean(useSelector((state) => state.global.token));
 
 	return (
 		<ThemeProvider theme={theme}>

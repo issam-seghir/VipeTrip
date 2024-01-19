@@ -1,12 +1,11 @@
 import FlexBetween from "@components/FlexBetween";
 import UserImage from "@components/UserImage";
 import WidgetWrapper from "@components/WidgetWrapper";
-import { EditOutlined, LocationOnOutlined, ManageAccountsOutlined, WorkOutlineOutlined } from "@mui/icons-material";
+import { EditOutlined, LocationOnOutlined, ManageAccountsOutlined, WorkOutlineOutlined, Twitter,LinkedIn } from "@mui/icons-material";
 import { Box, Divider, Typography, useTheme, Skeleton,Button } from "@mui/material";
 import { useGetUserByIdQuery } from "@store/api/userApi";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-
 const UserWidget = ({ userId }) => {
 	const { palette } = useTheme();
 	const navigate = useNavigate();
@@ -99,7 +98,8 @@ const UserWidget = ({ userId }) => {
 
 				<FlexBetween gap="1rem" mb="0.5rem">
 					<FlexBetween gap="1rem">
-						<img src="../assets/twitter.png" alt="twitter" />
+						{/* <img src="assets/twitter.png" alt="twitter" /> */}
+						<Twitter/>
 						<Box>
 							<Typography color={main} fontWeight="500">
 								Twitter
@@ -112,7 +112,8 @@ const UserWidget = ({ userId }) => {
 
 				<FlexBetween gap="1rem">
 					<FlexBetween gap="1rem">
-						<img src="../assets/linkedin.png" alt="linkedin" />
+						{/* <img src="../assets/linkedin.png" alt="linkedin" /> */}
+						<LinkedIn/>
 						<Box>
 							<Typography color={main} fontWeight="500">
 								Linkedin

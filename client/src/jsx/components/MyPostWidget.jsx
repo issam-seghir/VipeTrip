@@ -24,6 +24,7 @@ import WidgetWrapper from "@components/WidgetWrapper";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setPosts } from "@store/slices/globalSlice";
+import { useNewPostMutation } from "@jsx/store/api/postApi";
 
 const MyPostWidget = ({ picturePath }) => {
   const dispatch = useDispatch();
@@ -36,26 +37,24 @@ const MyPostWidget = ({ picturePath }) => {
   const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
   const mediumMain = palette.neutral.mediumMain;
   const medium = palette.neutral.medium;
+  	const [newPost, { error: newPostError, isLoading: isnewPostLoading, isError: isnewPostError }] = useNewPostMutation();
 
-  const handlePost = async () => {
-    const formData = new FormData();
-    formData.append("userId", _id);
-    formData.append("description", post);
-    if (image) {
-      formData.append("picture", image);
-      formData.append("picturePath", image.name);
-    }
+    async function handlePost(data) {
+		try {
+       const formData = new FormData();
+		formData.append("userId", _id);
+		formData.append("description", post);
+		if (image) {
+			formData.append("picture", image);
+			formData.append("picturePath", image.name);
+		}
+		setImage(null);
+    await newPost(formData).unwrap();
+		} catch (error) {
+			console.error(error);
+		}
+	}
 
-    const response = await fetch(`http://localhost:3001/posts`, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${token}` },
-      body: formData,
-    });
-    const posts = await response.json();
-    dispatch(setPosts({ posts }));
-    setImage(null);
-    setPost("");
-  };
 
   return (
     <WidgetWrapper>

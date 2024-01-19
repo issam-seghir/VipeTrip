@@ -29,3 +29,11 @@ export const loginSchema = z.object({
 	email: z.string().min(1, "This is a required field").trim().toLowerCase(),
 	password: z.string().min(1, "This is a required field"),
 });
+
+export const postSchema = z.object({
+	description: z.string().max(500, "Description cannot be more than 500 characters"),
+	picturePath: z.string().optional().url("Must be a valid URL"),
+	userPicturePath: z.string().optional().url("Must be a valid URL"),
+	likes: z.record(z.string()).optional(),
+	comments: z.array(z.string()).optional(),
+});

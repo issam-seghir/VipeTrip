@@ -5,33 +5,45 @@ const Schema = mongoose.Schema;
 const postSchema = new Schema(
 	{
 		userId: {
+			type: Schema.Types.ObjectId,
+			ref: "User",
+			required: true,
+		},
+		description: {
 			type: String,
 			required: true,
 		},
-		firstName: {
-			type: String,
-			required: true,
+		attachments: [
+			{
+				type: String,
+			},
+		],
+		totalLikes: {
+			type: Number,
+			default: 0,
 		},
-		lastName: {
-			type: String,
-			required: true,
+		totalComments: {
+			type: Number,
+			default: 0,
 		},
-		location: String,
-		description: String,
-		picturePath: String,
-		userPicturePath: String,
-		likes: {
-			type: Map,
-			of: Boolean,
+		edited: {
+			type: Boolean,
+			default: false,
 		},
-		comments: {
-			type: Array,
-			default: [],
-		},
+		mentions: [
+			{
+				type: Schema.Types.ObjectId,
+				ref: "User",
+			},
+		],
+		tags: [
+			{
+				type: String,
+				trim: true,
+			},
+		],
 	},
 	{ timestamps: true }
 );
 
 module.exports = mongoose.model("Post", postSchema);
-
-

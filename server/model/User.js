@@ -47,13 +47,14 @@ const userSchema = new Schema(
 			type: String,
 			default: "",
 		},
-		friends: [
-			{
-				type: Schema.Types.ObjectId,
-				default: [],
-				ref: "User",
-			},
-		],
+		coverPath: {
+			type: String,
+			default: "",
+		},
+		totalPosts: {
+			type: Number,
+			default: 0,
+		},
 		location: String,
 		job: String,
 		viewedProfile: {

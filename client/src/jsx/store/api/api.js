@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { setCredentials, setLogout } from "@store/slices/authSlice";
+import { setCredentials, clearCredentials } from "@store/slices/authSlice";
 
 const baseUrl = "http://localhost:3500/";
 const baseQuery = fetchBaseQuery({
@@ -30,7 +30,7 @@ console.log(result);
 			// retry the original query with new access token
 			result = await baseQuery(args, api, extraOptions);
 		} else {
-			api.dispatch(setLogout());
+			api.dispatch(clearCredentials());
 		}
 	}
 

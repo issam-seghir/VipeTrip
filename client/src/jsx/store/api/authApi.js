@@ -1,13 +1,18 @@
 import { api } from "@jsx/store/api/api";
 
-
-export  const authApi = api.injectEndpoints({
+export const authApi = api.injectEndpoints({
 	endpoints: (builder) => ({
 		login: builder.mutation({
 			query: (credentials) => ({
 				url: "/auth/login",
 				method: "POST",
 				body: credentials,
+			}),
+		}),
+		logout: builder.mutation({
+			query: () => ({
+				url: "/logout",
+				method: "POST",
 			}),
 		}),
 		register: builder.mutation({
@@ -20,4 +25,4 @@ export  const authApi = api.injectEndpoints({
 	}),
 });
 
-export const { useLoginMutation, useRegisterMutation } = authApi;
+export const { useLoginMutation, useRegisterMutation,useLogoutMutation } = authApi;

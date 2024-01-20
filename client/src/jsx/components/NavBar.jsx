@@ -1,6 +1,6 @@
 import FlexBetween from "@components/FlexBetween";
 import {  setMode } from "@store/slices/globalSlice";
-import {  setLogout } from "@store/slices/authSlice";
+import {  clearCredentials } from "@store/slices/authSlice";
 import { Close, DarkMode, Help, LightMode, Menu, Message, Notifications, Search } from "@mui/icons-material";
 import { Box, FormControl, IconButton, InputBase, MenuItem, Select, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { useState } from "react";
@@ -79,7 +79,7 @@ return (
 						<MenuItem value={fullName}>
 							<Typography>{fullName}</Typography>
 						</MenuItem>
-						<MenuItem onClick={() => dispatch(setLogout())}>Log Out</MenuItem>
+						<MenuItem onClick={() => dispatch(clearCredentials())}>Log Out</MenuItem>
 					</Select>
 				</FormControl>
 			</FlexBetween>
@@ -128,7 +128,7 @@ return (
 							<MenuItem value={fullName}>
 								<Typography>{fullName}</Typography>
 							</MenuItem>
-							<MenuItem onClick={() => dispatch(setLogout())}>Log Out</MenuItem>
+							<MenuItem onClick={() => dispatch(clearCredentials())}>Log Out</MenuItem>
 						</Select>
 					</FormControl>
 				</FlexBetween>

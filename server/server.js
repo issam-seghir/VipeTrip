@@ -67,16 +67,16 @@ app.post("/upload", upload.single("picture"), (req, res, next) => {
 //* Public routes
 app.use("/", require("@routes/root"));
 //? Authentication : who the user is
-app.use("/auth",  require("@routes/auth"));
-app.use("/refresh", require("@routes/refresh"));
-app.use("/logout", require("@routes/logout"));
+app.use("/auth",  require("@root/routes/auth/auth"));
+app.use("/refresh", require("@root/routes/auth/refresh"));
+app.use("/logout", require("@root/routes/auth/logout"));
 
 //? Authorization: what the user is allowed to access
 //* Protected routes : will check for a valid JWT in the Authorization header, (Authorization: Bearer <token>)
 //*  and if it's present, the user will be allowed to access
 app.use(verifyJWT);
 app.use("/users", require("@routes/api/users"));
-app.use("/posts",upload.single("myFile"), require("@routes/api/posts"));
+app.use("/posts",upload.multiple("picture"), require("@routes/api/posts"));
 
 
 app.use(errorHandler);

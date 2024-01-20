@@ -25,48 +25,8 @@ const getUser = async (req, res) => {
     res.json(user);
 }
 
-
-const getUserFriends = async (req, res) => {
-	try {
-		const user = await User.findById(req.params.id).populate("friends");
-		if (!user) return res.status(404).json({ message: "User not found" });
-		res.json(user.friends);
-	} catch (error) {
-		res.status(500).json({ message: error.message });
-	}
-};
-const addRemoveUserFriend = async (req, res) => {
-	try {
-		const { id, friendId } = req.params;
-		const user = await User.findById(id);
-		const friend = await User.findById(friendId);
-		if (!user) return res.status(404).json({ message: "User not found" });
-		if (!friend) return res.status(404).json({ message: "friend not found" });
-
-		if (user.friends.includes(friendId)) {
-			user.friends.pull(friendId);
-			friend.friends.pull(id);
-		}
-		else{
-			user.friends.push(friendId);
-			friend.friends.push(id);
-		}
-		await user.save();
-		await friend.save();
-
-		const updatedUser = await user.populate("friends");
-		res.json(updatedUser.friends);
-	} catch (error) {
-		res.status(500).json({ message: error.message });
-	}
-};
-
-
-
 module.exports = {
 	getAllUsers,
 	deleteUser,
 	getUser,
-	getUserFriends,
-	addRemoveUserFriend,
 };

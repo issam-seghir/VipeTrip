@@ -23,7 +23,7 @@ const commentSchema = new Schema(
 				ref: "Comment",
 			},
 		],
-		likes: {
+		totalLikes: {
 			type: Number,
 			default: 0,
 		},

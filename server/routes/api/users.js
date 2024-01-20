@@ -1,15 +1,18 @@
 const express = require("express");
 
 const router = express.Router();
-const { getAllUsers, deleteUser, getUser, getUserFriends, addRemoveUserFriend } = require("@controllers/usersController");
+const { getAllUsers, deleteUser, getUser} = require("@controllers/usersController");
+const { getAllFriends, getAllFriendRequests, createFriendRequest, acceptFriendRequest, removeFriend } = require("@controllers/friendShipController");
 
-// Read
-router.route("/").get(getAllUsers).delete(deleteUser);
+router.route("/").get(getAllUsers);
+router.route("/:userId").get(getUser).delete(deleteUser);
 
-router.route("/:id").get(getUser);
-router.route("/:id/friends").get(getUserFriends);
+router.route("/:userId/friends").get(getAllFriends);
+router.route("/:userId/friends/:friendId").delete(removeFriend);
 
-// Update
-router.route("/:id/friends/:friendId").patch(addRemoveUserFriend);
+router.route("/:userId/requests").get(getAllFriendRequests);
+router.route("/:userId/requests/:requestId").post(createFriendRequest);
+
+router.route("/:userId/accept/:requestId").patch(acceptFriendRequest);
 
 module.exports = router;

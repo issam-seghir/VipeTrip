@@ -1,14 +1,11 @@
 const express = require("express");
 
 const router = express.Router();
-const { getFeedPosts, getUserPosts, likePost, createPost } = require("@controllers/postsController");
+const { getFeedPosts, getUserPosts,getSinglePost, createPost, deletePost, updatePost } = require("@controllers/postsController");
 
 /* READ */
-router.get("/", getFeedPosts);
-router.get("/:userId/posts", getUserPosts);
+router.route("/").post(createPost).get(getFeedPosts);
+router.route("/:postId").get(getSinglePost).delete(deletePost).put(updatePost);
 
-/* UPDATE */
-router.patch("/:id/like", likePost);
-router.post("/posts", createPost);
 
 module.exports = router;

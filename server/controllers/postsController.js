@@ -1,7 +1,6 @@
 const Post = require("@model/Post");
 const User = require("@model/User");
 
-/* CREATE */
 const createPost = async (req, res) => {
 	try {
 		const { userId, description, mentions, tags } = req.body;
@@ -22,6 +21,9 @@ const createPost = async (req, res) => {
 			tags,
 		});
 		await newPost.save();
+
+		// Increase the post counts
+		await User.findByIdAndUpdate(userId, { $inc: { totalPosts: 1 } });
 
 		res.status(201).json(newPost);
 	} catch (error) {
@@ -64,7 +66,6 @@ const updatePost = async (req, res) => {
 		// Update the post
 		const updatedPost = await Post.findByIdAndUpdate(postId, updateData, { new: true });
 
-
 		// Update the post
 		// post.description = description || post.description;
 		// post.attachments = attachments || post.attachments;
@@ -78,7 +79,6 @@ const updatePost = async (req, res) => {
 	}
 };
 
-/* READ */
 const getFeedPosts = async (req, res) => {
 	try {
 		const page = Number.parseInt(req.query.page) || 1; // Get the page number from the query parameters, default to 1
@@ -124,59 +124,58 @@ const getUserPosts = async (req, res) => {
 	}
 };
 
-/* UPDATE */
-const likePost = async (req, res) => {
-	try {
-		const { id } = req.params;
-		const { userId } = req.body;
-		const post = await Post.findById(id);
-		const isLiked = post.likes.get(userId);
+const getSinglePost = async (req, res) => {
+	const { postId } = req.params;
 
-		if (isLiked) {
-			post.likes.delete(userId);
-		} else {
-			post.likes.set(userId, true);
+	try {
+		const post = await Post.findById(postId);
+		if (!post) {
+			return res.status(404).json({ message: "Post not found" });
 		}
 
-		const updatedPost = await Post.findByIdAndUpdate(id, { likes: post.likes }, { new: true });
-
-		res.status(200).json(updatedPost);
+		res.status(200).json(post);
 	} catch (error) {
-		res.status(404).json({ message: error.message });
+				res.status(500).json({ message: error.message });
 	}
 };
 
-const Post = require("./Post");
-const Comment = require("./Comment");
-const Like = require("./Like");
+const sharePost = async (req, res) => {
+	const { postId } = req.params;
+	const { userId, description, mentions, tags } = req.body;
+	const attachments = req.files.map((file) => file.path); // Get paths of uploaded files
 
-const addLike = async (userId, postId, commentId) => {
-	let like = new Like({ userId, postId, commentId, type: commentId ? "Comment" : "Post" });
-	like = await like.save();
+	try {
+		const post = await Post.findById(postId);
+		if (!post) {
+			return res.status(404).json({ message: "Post not found" });
+		}
 
-	if (commentId) {
-		await Comment.findByIdAndUpdate(commentId, { $inc: { likesCount: 1 } });
-	} else {
-		await Post.findByIdAndUpdate(postId, { $inc: { likesCount: 1 } });
+		const user = await User.findById(userId);
+		if (!user) {
+			return res.status(404).json({ message: "User not found" });
+		}
+
+		// Create a new post
+		const newPost = new Post({
+			userId,
+			description,
+			attachments,
+			mentions,
+			tags,
+			sharedFrom: post._id,
+		});
+
+		await newPost.save();
+
+		// Increase the share count of the original post
+		await Post.findByIdAndUpdate(postId, { $inc: { totalShares: 1 } });
+
+		res.status(200).json({ message: "Post shared successfully", newPost });
+	} catch (error) {
+		res.status(500).json({ message: error.message });
 	}
-
-	return like;
 };
 
-const removeLike = async (likeId) => {
-	const like = await Like.findById(likeId);
-	if (!like) {
-		throw new Error("Like not found");
-	}
-
-	if (like.commentId) {
-		await Comment.findByIdAndUpdate(like.commentId, { $inc: { likesCount: -1 } });
-	} else {
-		await Post.findByIdAndUpdate(like.postId, { $inc: { likesCount: -1 } });
-	}
-
-	await Like.findByIdAndRemove(likeId);
-};
 
 module.exports = {
 	createPost,
@@ -184,5 +183,6 @@ module.exports = {
 	deletePost,
 	getFeedPosts,
 	getUserPosts,
-	likePost,
+	getSinglePost,
+	sharePost,
 };

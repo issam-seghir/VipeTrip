@@ -9,6 +9,11 @@ const postSchema = new Schema(
 			ref: "User",
 			required: true,
 		},
+		sharedFrom: {
+			type: Schema.Types.ObjectId,
+			ref: "Post",
+			required: true,
+		},
 		description: {
 			type: String,
 			required: true,
@@ -23,6 +28,10 @@ const postSchema = new Schema(
 			default: 0,
 		},
 		totalComments: {
+			type: Number,
+			default: 0,
+		},
+		totalShares: {
 			type: Number,
 			default: 0,
 		},

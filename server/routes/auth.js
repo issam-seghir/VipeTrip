@@ -1,8 +1,8 @@
 const express = require("express");
 
 const router = express.Router();
-const { handleLogin } = require("@controllers/loginController");
-const { handleNewUser } = require("@controllers/registerController");
+const { handleLogin } = require("@root/controllers/auth/loginController");
+const { handleNewUser } = require("@root/controllers/auth/registerController");
 const {upload} = require("@middleware/multerUploader");
 
 

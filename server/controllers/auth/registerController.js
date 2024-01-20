@@ -29,7 +29,7 @@ const handleNewUser = async (req, res) => {
 		// Save user
 		await user.save();
 
-		res.status(201).json({ success: `New user ${firstName + "-" + lastName} created!`, userInfo: user });
+		res.status(201).json({ success: `New user ${firstName + "-" + lastName} created!`, user: user });
 	} catch (error) {
 		if (error instanceof mongoose.Error.ValidationError) {
 			res.status(400).json({ message: error.message });

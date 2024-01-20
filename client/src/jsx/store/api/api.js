@@ -23,7 +23,7 @@ console.log(result);
 		// send refresh token to get new access token
 		const refreshResult = await baseQuery("/refresh", api, extraOptions);
 		if (refreshResult?.data) {
-			const newToken = refreshResult.data.accessToken;
+			const newToken = refreshResult.data.token;
 			const user = api.getState().auth.user;
 			// store the new token
 			api.dispatch(setCredentials({ token: newToken, user }));

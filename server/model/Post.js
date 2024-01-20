@@ -34,12 +34,14 @@ const postSchema = new Schema(
 			{
 				type: Schema.Types.ObjectId,
 				ref: "User",
+				default: [],
 			},
 		],
 		tags: [
 			{
 				type: String,
 				trim: true,
+				default: [],
 			},
 		],
 	},

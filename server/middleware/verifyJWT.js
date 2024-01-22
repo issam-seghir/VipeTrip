@@ -13,7 +13,10 @@ const verifyJWT = (req, res, next) => {
 		if (err) {
 			return res.sendStatus(403);
 		}
-		req.user = decoded.user;
+		// Attach user data to request object
+		req.user = {
+			id: decoded.id,
+		};
 		next();
 	});
 };

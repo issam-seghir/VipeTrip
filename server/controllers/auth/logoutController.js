@@ -14,20 +14,17 @@ const handleLogout = async (req, res) => {
 
 		// Check if refreshToken exists in the database
 		const foundUser = await User.findOne({ refreshToken });
-		if (!foundUser) {
-			// Clear refreshToken from cookies
-			res.clearCookie("jwt", cookieOptions);
-			return res.status(204).send();
+		if (foundUser) {
+			// Delete refreshToken in the database
+			foundUser.refreshToken = "";
+			await foundUser.save();
 		}
 
-		// Delete refreshToken in the database
-		foundUser.refreshToken = "";
-		await foundUser.save();
 
 		// Clear refreshToken from cookies
 		res.clearCookie("jwt", cookieOptions);
 		res.status(204).send();
-		
+
 	} catch (error) {
 		console.error(error);
 		res.status(500).send("Internal Server Error");

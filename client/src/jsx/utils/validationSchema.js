@@ -32,8 +32,8 @@ export const loginSchema = z.object({
 
 export const postSchema = z.object({
 	description: z.string().max(500, "Description cannot be more than 500 characters"),
-	picturePath: z.string().optional().url("Must be a valid URL"),
-	userPicturePath: z.string().optional().url("Must be a valid URL"),
+	picturePath: z.instanceof(FileList).optional().or(z.literal("")), // fix optional for url / email ...,
+	userPicturePath: z.instanceof(FileList).optional().or(z.literal("")), // fix optional for url / email ...,
 	likes: z.record(z.string()).optional(),
 	comments: z.array(z.string()).optional(),
 });

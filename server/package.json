@@ -18,6 +18,7 @@
 		"@controllers": "./controllers",
 		"@middleware": "./middleware",
 		"@model": "./model",
+		"@utils": "./utils",
 		"@routes": "./routes",
 		"@api": "./routes/api"
 	},

@@ -58,28 +58,10 @@ app.use(attachMetadata);
 //serve static files
 app.use(express.static(join(__dirname, "public")));
 
-app.post("/upload", upload.single("picture"), (req, res, next) => {
-	const file = req.file;
-	upload(req, res, function (err) {
-		if (err instanceof multer.MulterError) {
-			if (err.code === "LIMIT_FILE_SIZE") {
-				res.status(413).json({ error: "File too large. Limit is 1MB" });
-			} else {
-				res.status(500).json({ error: err.message });
-			}
-		} else if (err) {
-			res.status(500).json({ error: err.message });
-		} else {
-			res.status(200).json({ message: "File uploaded successfully" });
-		}
-	});
-	if (!file) {
-		const error = new Error("Please upload a file");
-		error.httpStatusCode = 400;
-		return next(error);
-	}
-	res.send(file);
-});
+// Route for testing
+app.post('/upload', upload.single('file'), (req, res) => {
+  res.status(200).send('File uploaded');
+}, multerErrorHandler);
 
 //* Public routes
 //? Authentication : who the user is

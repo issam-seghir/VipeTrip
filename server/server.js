@@ -19,7 +19,7 @@ const credentials = require("@middleware/credentials");
 const errorHandler = require("@middleware/errorHandler");
 const verifyJWT = require("@middleware/verifyJWT");
 const morgan = require("morgan");
-const { upload } = require("@middleware/multerUploader");
+const { upload ,uploadPost} = require("@middleware/multerUploader");
 const attachMetadata = require("@middleware/attachMetadata");
 
 const PORT = process.env.PORT || 3000;
@@ -59,9 +59,12 @@ app.use(attachMetadata);
 app.use(express.static(join(__dirname, "public")));
 
 // Route for testing
-app.post('/upload', upload.single('file'), (req, res) => {
-  res.status(200).send('File uploaded');
-}, multerErrorHandler);
+app.post("/upload", upload.array("picture", 2), multerErrorHandler(upload), (req, res) => {
+	res.status(200).send("File uploaded");
+});
+app.post("/uploadPost", uploadPost.array("picture", 3),multerErrorHandler(uploadPost), (req, res) => {
+	res.status(200).send("File uploaded");
+});
 
 //* Public routes
 //? Authentication : who the user is
@@ -76,7 +79,8 @@ app.use(verifyJWT);
 app.use("/users", require("@routes/api/users"));
 app.use("/posts", upload.array("picture", 25), require("@routes/api/posts"));
 
-app.use(multerErrorHandler);
+// app.use(multerErrorHandler(upload));
+// app.use(multerErrorHandler(uploadPost));
 app.use(errorHandler);
 
 connection.once("open", () => {

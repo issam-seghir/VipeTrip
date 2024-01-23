@@ -16,7 +16,6 @@
 
 */
 
-
 //*   .................... Global Config ...................
 
 const { mbToByte } = require("@utils");
@@ -36,13 +35,16 @@ const storage = multer.diskStorage({
 });
 const fileFilter = (req, file, cb) => {
 	// reject a file
-	if (file.mimetype === "image/jpeg" || file.mimetype === "image/png") {
-		cb(null, true);
-	} else {
-		cb(null, false);
-	}
-};
+	req.acceptedFileTypes = /jpeg|jpg|png/;
+	const mimetype = req.acceptedFileTypes.test(file.mimetype);
+	const extname = req.acceptedFileTypes.test(path.extname(file.originalname).toLowerCase());
 
+	if (mimetype && extname) {
+		return cb(null, true);
+	}
+
+	cb(new Error(`Invalid file type. Only ${req.acceptedFileTypes.toString()} are allowed.`));
+};
 
 const upload = multer({
 	storage: storage,
@@ -50,26 +52,21 @@ const upload = multer({
 	fileFilter: fileFilter,
 });
 
-
-
 //*   .................... Post  Config ...................
 
-
 const fileFilterPost = (req, file, cb) => {
-	// Allow all images types
-	if (file.mimetype === "image/") {
+	// Allow all image types
+	if (file.mimetype.startsWith("image/")) {
 		cb(null, true);
 	} else {
-		cb(null, false);
+		cb(new Error(`Invalid file type. Only image files are allowed.`));
 	}
 };
 
 const uploadPost = multer({
 	storage: storage,
-	limits: { fileSize: mbToByte(3) },
+	limits: { fileSize: mbToByte(5) },
 	fileFilter: fileFilterPost,
 });
-
-
 
 module.exports = { upload, uploadPost };

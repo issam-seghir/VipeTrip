@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const autopopulate = require("mongoose-autopopulate");
 
 const Schema = mongoose.Schema;
 
@@ -8,11 +9,13 @@ const postSchema = new Schema(
 			type: Schema.Types.ObjectId,
 			ref: "User",
 			required: true,
+			autopopulate: true,
 		},
 		sharedFrom: {
 			type: Schema.Types.ObjectId,
 			ref: "Post",
 			required: true,
+			autopopulate: true,
 		},
 		description: {
 			type: String,
@@ -56,5 +59,11 @@ const postSchema = new Schema(
 	},
 	{ timestamps: true }
 );
+
+
+
+
+
+postSchema.plugin(autopopulate);
 
 module.exports = mongoose.model("Post", postSchema);

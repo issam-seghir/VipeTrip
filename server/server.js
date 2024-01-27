@@ -4,7 +4,7 @@ require("module-alias/register");
 const express = require("express");
 const mongoose = require("mongoose");
 const multer = require("multer");
-
+const { isDevelopment } = require("@config/const");
 const { readyStates } = require("@config/const");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
@@ -17,10 +17,9 @@ const connectDB = require("@config/dbConn");
 const { helmetOptions } = require("@config/helmetOptions");
 const credentials = require("@middleware/credentials");
 const errorHandler = require("@middleware/errorHandler");
-const verifyJWT = require("@middleware/verifyJWT");
 const morgan = require("morgan");
-const { upload ,uploadPost} = require("@middleware/multerUploader");
 const attachMetadata = require("@middleware/attachMetadata");
+const errorhandler = require('errorhandler')
 
 const PORT = process.env.PORT || 3000;
 
@@ -58,30 +57,17 @@ app.use(attachMetadata);
 //serve static files
 app.use(express.static(join(__dirname, "public")));
 
-// Route for testing
-app.post("/upload", upload.array("picture", 2), multerErrorHandler(upload), (req, res) => {
-	res.status(200).send("File uploaded");
-});
-app.post("/uploadPost", uploadPost.array("picture", 3),multerErrorHandler(uploadPost), (req, res) => {
-	res.status(200).send("File uploaded");
-});
-
-//* Public routes
-//? Authentication : who the user is
-app.use("/auth", require("@root/routes/auth/auth"));
-app.use("/refresh", require("@root/routes/auth/refresh"));
-app.use("/logout", require("@root/routes/auth/logout"));
-
-//? Authorization: what the user is allowed to access
-//* Protected routes : will check for a valid JWT in the Authorization header, (Authorization: Bearer <token>)
-//*  and if it's present, the user will be allowed to access
-app.use(verifyJWT);
-app.use("/users", require("@routes/api/users"));
-app.use("/posts", upload.array("picture", 25), require("@routes/api/posts"));
+app.use("/api/v1", require("@api/v1"));
 
 // app.use(multerErrorHandler(upload));
 // app.use(multerErrorHandler(uploadPost));
-app.use(errorHandler);
+if (isDevelopment) {
+	// only use in development
+	app.use(errorhandler());
+} else {
+	// use a simpler error handler in production
+	app.use(errorHandler);
+}
 
 connection.once("open", () => {
 	console.log("Connected to MongoDB .... 🐲");

@@ -6,9 +6,9 @@ const userSchema = new Schema(
 	{
 		firstName: {
 			type: String,
-			required: true,
-			minlength: 3,
-			maxlength: 50,
+			required: [true, "firstName is required"],
+			minlength: [3, "firstName must be at least 3 characters , got {VALUE}"],
+			maxlength: [50, "firstName must be at most 50 characters , got {VALUE}"],
 		},
 		lastName: {
 			type: String,
@@ -21,27 +21,10 @@ const userSchema = new Schema(
 			required: true,
 			minlength: 7,
 			unique: true,
-			validate: {
-				//!  Validation will only run when create or save (so is not working with methods like findOneAndUpdate , findOneAndDelete , etc.)
-				validator: function (v) {
-					// Simple regex for email validation
-					const regex = /^\S+@\S+\.\S+$/;
-					return regex.test(v);
-				},
-				message: (props) => `${props.value} is not a valid email!`,
-			},
 		},
 		password: {
 			type: String,
 			required: true,
-			validate: {
-				validator: function (v) {
-					// Regular expression that checks for the rules
-					const regex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[A-Za-z])(?=.*[!#$%&*@^]).{8,}$/;
-					return regex.test(v);
-				},
-				message: (props) => `Password should have at least 8 characters, one uppercase letter, one lowercase letter, one digit, and one special character`,
-			},
 		},
 		picturePath: {
 			type: String,
@@ -69,5 +52,51 @@ const userSchema = new Schema(
 	},
 	{ timestamps: true }
 );
+
+
+
+//? --------- instance method ----------------
+// instance method to transform user object before sending it in response
+userSchema.methods.transform = function () {
+	const obj = this.toObject();
+	delete obj.password;
+	delete obj.email;
+	return obj;
+};
+
+// instance methode to increment viewedProfile
+userSchema.methods.incrementViewedProfile = function () {
+	this.viewedProfile += 1;
+	return this.save();
+};
+
+// instance methode to increment Impressions
+userSchema.methods.incrementImpressions = function () {
+	this.impressions += 1;
+	return this.save();
+};
+
+
+//? --------- Middlewares ----------------
+
+
+//? --------- static methods ----------------
+//? --------- validations methods ----------------
+
+userSchema.path("email").validate(function (v) {
+	// Simple regex for email validation
+	const regex = /^\S+@\S+\.\S+$/;
+	return regex.test(v);
+}, "{VALUE} is not a valid email!");
+
+userSchema.path("password").validate(function (v) {
+	// Regular expression that checks for the rules
+	const regex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[A-Za-z])(?=.*[!#$%&*@^]).{8,}$/;
+	return regex.test(v);
+}, "Password should have at least 8 characters, one uppercase letter, one lowercase letter, one digit, and one special character");
+
+
+
+
 
 module.exports = mongoose.model("User", userSchema);

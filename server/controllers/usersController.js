@@ -1,10 +1,17 @@
 const User = require('@model/User');
+const asyncWrapper = require("@middleware/asyncWrapper");
 
 const getAllUsers = async (req, res) => {
-    const users = await User.find();
-    if (!users) return res.status(204).json({ 'message': 'No users found' });
-    res.json(users);
+	// throw new Error("Test error"); // This line is for testing asyncWrapper only
+	const users = await User.find();
+	if (!users) return res.status(204).json({ message: "No users found" });
+	res.json(users);
 }
+
+// const getAllUsers = asyncWrapper(async (req, res, next) => {
+// 	// Your controller logic here...
+// });
+
 
 const deleteUser = async (req, res) => {
     if (!req?.body?.id) return res.status(400).json({ "message": 'User ID required' });
@@ -26,7 +33,7 @@ const getUser = async (req, res) => {
 }
 
 module.exports = {
-	getAllUsers,
-	deleteUser,
-	getUser,
+	getAllUsers : asyncWrapper(getAllUsers),
+	deleteUser : asyncWrapper(deleteUser),
+	getUser : asyncWrapper(getUser),
 };

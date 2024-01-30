@@ -81,6 +81,13 @@ userSchema.methods.incrementImpressions = function () {
 
 
 //? --------- static methods ----------------
+
+//? --------- virtual (set / get) methods ----------------
+// accuss by user.fullName
+userSchema.virtual("fullName").get(function () {
+	return this.firstName + " " + this.lastName;
+});
+
 //? --------- validations methods ----------------
 
 userSchema.path("email").validate(function (v) {

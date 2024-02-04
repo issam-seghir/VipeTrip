@@ -1,7 +1,7 @@
 const User = require("@model/User");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { isProduction } = require("@config/const");
+const { isProd } = require("@config/const");
 const cookieOptions = require("@config/cookieOptions");
 
 const handleLogin = async (req, res) => {

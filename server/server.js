@@ -5,7 +5,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const multer = require("multer");
 const rateLimiterMiddleware = require("@middleware/rateLimiter");
-const { isDevelopment } = require("@config/const");
+const { isDev } = require("@config/const");
 const { readyStates } = require("@config/const");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
@@ -23,6 +23,8 @@ const errorHandler = require("@middleware/errorHandler");
 const errorhandler = require("errorhandler");
 const pino = require("pino-http")();
 const errorNotification = require("@config/notifier");
+const compression = require("compression");
+
 
 const PORT = process.env.PORT || 3000;
 
@@ -74,6 +76,11 @@ app.use(cookieParser());
 // attach metadata (req time , IP , user agent) to request object
 app.use(attachMetadata);
 
+
+// compress all responses
+app.use(compression())
+
+
 //serve static files
 app.use(express.static(join(__dirname, "public")));
 
@@ -82,7 +89,7 @@ app.use("/api/v1", require("@api/v1"));
 // app.use(multerErrorHandler(upload));
 // app.use(multerErrorHandler(uploadPost));
 
-if (isDevelopment) {
+if (isDev) {
 	// only use in development
 	app.use(errorhandler({ log: errorNotification }));
 } else {

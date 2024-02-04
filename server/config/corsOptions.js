@@ -1,11 +1,11 @@
 const { whitelist } = require("@config/allowedOrigins.js");
-const { isProduction } = require("@config/const.js");
+const { isProd } = require("@config/const.js");
 
 const corsOptions = {
 	origin: function (origin, callback) {
 		//? Allow requests with no origin (non-browser clients )
 		//? (like mobile apps or curl requests / Thunder Client , Postman etc)
-		if (!origin && !isProduction) return callback(null, true);
+		if (!origin && !isProd) return callback(null, true);
 		if (whitelist.includes(origin)) {
 			callback(null, true);
 		} else {

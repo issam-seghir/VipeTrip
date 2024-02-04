@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { isProd } = require("@config/const");
 
 const Schema = mongoose.Schema;
 
@@ -9,12 +10,14 @@ const userSchema = new Schema(
 			required: [true, "firstName is required"],
 			minlength: [3, "firstName must be at least 3 characters , got {VALUE}"],
 			maxlength: [50, "firstName must be at most 50 characters , got {VALUE}"],
+			alias: "fname",
 		},
 		lastName: {
 			type: String,
 			required: true,
 			minlength: 3,
 			maxlength: 50,
+			alias: "lname",
 		},
 		email: {
 			type: String,
@@ -25,10 +28,12 @@ const userSchema = new Schema(
 		password: {
 			type: String,
 			required: true,
+			alias: "pswd",
 		},
 		picturePath: {
 			type: String,
 			default: "",
+			alias: "picPath",
 		},
 		coverPath: {
 			type: String,
@@ -50,18 +55,33 @@ const userSchema = new Schema(
 		},
 		refreshToken: String,
 	},
-	{ timestamps: true }
+	{
+		timestamps: true,
+		// recommanded : disabled autoIndex for production
+		autoIndex: !isProd,
+		autoCreate: !isProd,
+	}
 );
 
-
-
 //? --------- instance method ----------------
-// instance method to transform user object before sending it in response
+
+//* toJSON / toObject Transform method
+// transform user object before sending it in response with toObject()
 userSchema.methods.transform = function () {
 	const obj = this.toObject();
 	delete obj.password;
 	delete obj.email;
 	return obj;
+};
+
+// transform user object before sending it in response with toJSON()
+
+
+userSchema.methods.transform = function () {
+	const json = this.toJSON();
+	delete json.password;
+	delete json.email;
+	return json;
 };
 
 // instance methode to increment viewedProfile
@@ -76,9 +96,7 @@ userSchema.methods.incrementImpressions = function () {
 	return this.save();
 };
 
-
 //? --------- Middlewares ----------------
-
 
 //? --------- static methods ----------------
 
@@ -101,9 +119,5 @@ userSchema.path("password").validate(function (v) {
 	const regex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[A-Za-z])(?=.*[!#$%&*@^]).{8,}$/;
 	return regex.test(v);
 }, "Password should have at least 8 characters, one uppercase letter, one lowercase letter, one digit, and one special character");
-
-
-
-
 
 module.exports = mongoose.model("User", userSchema);

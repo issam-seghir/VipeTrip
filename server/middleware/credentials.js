@@ -1,5 +1,5 @@
 const { whitelist } = require("@config/allowedOrigins");
-const { isProduction } = require("@config/const");
+const { isProd } = require("@config/const");
 
 const credentials = (req, res, next) => {
 	const origin = req.headers.origin;

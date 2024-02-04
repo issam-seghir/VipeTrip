@@ -1,5 +1,5 @@
-const isProduction = process.env.NODE_ENV === "production";
-const isDevelopment = process.env.NODE_ENV === "development";
+const isProd = process.env.NODE_ENV === "production";
+const isDev = process.env.NODE_ENV === "development";
 
 const readyStates = new Map([
 	[0, "disconnected"],
@@ -9,9 +9,8 @@ const readyStates = new Map([
 	[4, "uninitialized"],
 ]);
 
-
 module.exports = {
-	isProduction,
-	isDevelopment,
+	isProd,
+	isDev,
 	readyStates,
 };

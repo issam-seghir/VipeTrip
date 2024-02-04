@@ -1,10 +1,10 @@
 
-const { isProduction } = require("@config/const");
+const { isProd } = require("@config/const");
 
 const cookieOptions = {
 	httpOnly: true,
-	secure: isProduction,
-	sameSite: isProduction ? "strict" : "Lax",
+	secure: isProd,
+	sameSite: isProd ? "strict" : "Lax",
 	maxAge: Number(process.env.COOKIE_MAX_AGE),
 };
 

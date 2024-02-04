@@ -1,5 +1,5 @@
 const User = require("@model/User");
-const { isProduction } = require("@config/const");
+const { isProd } = require("@config/const");
 const cookieOptions = require("@config/cookieOptions");
 
 const handleLogout = async (req, res) => {

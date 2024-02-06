@@ -25,8 +25,11 @@ const pino = require("pino");
 const pinoHttp = require("pino-http");
 const errorNotification = require("@config/notifier");
 const compression = require("compression");
+const {ENV} = require("@config/env");
 
-
+console.log("env");
+console.log(ENV.PORT);
+console.log(typeof ENV.PORT);
 const PORT = process.env.PORT || 3000;
 
 const logger = pino({

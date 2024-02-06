@@ -1,6 +1,6 @@
 const isProd = process.env.NODE_ENV === "production";
 const isDev = process.env.NODE_ENV === "development";
-
+console.log(process.env.NODE_ENV);
 const readyStates = new Map([
 	[0, "disconnected"],
 	[1, "connected"],

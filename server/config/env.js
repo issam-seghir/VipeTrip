@@ -1,16 +1,18 @@
+/* eslint-disable unicorn/no-process-exit */
 const z = require("zod");
-
+const chalk = require("chalk");
 const durationRegex = /^(\d+(\.\d+)?(ms|s|m|h|d|w|y))$/;
 const hexRegex = /^[\da-f]{128}$/i;
 const numberRegex = /^\d+$/;
 const mongodbUriRegex = /^(mongodb:(?:\/{2})?)((?:\w+:\w+@)?[\w.-]+:\d{2,5}(?:\/\w+)?(?:\?[\w%&=-]+)?)/;
 const testValue = "55a20441f1fadf0e865d3656000b04f4aaff69934a42f525ebbac0189eb21934d6d89e09315bb905fbab1f2b19362a5baf86224747e2c16c80b90458d34632e0";
+const log = require("@config/ChalkLogger");
 
 // console.log(hexRegex.test(testValue)); // Should print: true
 
 const tokenSchema = z.coerce // Coerce the value to a string if it's not like : parse(1234) => "1234"
 	.string({ message: "must be a string" })
-    .includes("a")
+	.includes("a")
 	.length(128, { message: "must be a 128-character string" });
 // .regex(/^[\da-f]{122}$/i, { message: "must be a 128-character hexadecimal string" });
 const tokenExpireSchema = z.coerce // Coerce the value to a string if it's not like : parse(1234) => "1234"
@@ -58,12 +60,24 @@ const envSchema = z.object({
 		}),
 	// SOME_BOOLEAN: z.enum(["true", "false"]).transform((v) => v === "true"),
 });
-console.log(process.env.ALLOWED_ORIGINS);
-console.log(process.env.ALLOWED_ORIGINS);
-console.log(process.env.ALLOWED_ORIGINS);
+// console.log(process.env.ALLOWED_ORIGINS);
 
-const ENV = envSchema.parse(process.env);
-// !ENV.success && console.log(ENV.error.issues.map((x) => x.message));
+let ENV;
+try {
+	// ENV = envSchema.parse(process.env);
+
+	ENV = envSchema.parse({ PORT: 680_550 });
+} catch (error) {
+	if (error instanceof z.ZodError) {
+		log.info(`💠💠💠💠💠💠 Environment variable validation error 💠💠💠💠💠💠`);
+		error.errors.forEach((err) => {
+			log.error(`* ${err.path.join(".")}:`, `${err.message}`);
+		});
+	} else {
+		log.error("An unexpected error occurred:", `error`);
+	}
+	process.exit(1);
+}
 
 module.exports = { envSchema, ENV };
 

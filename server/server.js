@@ -30,7 +30,7 @@ const {ENV} = require("@config/env");
 console.log("env");
 console.log(ENV.PORT);
 console.log(typeof ENV.PORT);
-const PORT = process.env.PORT || 3000;
+const PORT = ENV.PORT;
 
 const logger = pino({
 	transport: {

@@ -9,7 +9,7 @@
 		"node": ">=14.16"
 	},
 	"scripts": {
-		"dev": "node --watch --env-file=.env.development.local  server.js | pino-pretty",
+		"dev": "node --watch --env-file=.env.development.local  server.js",
 		"prod": "node --watch --env-file=.env  server.js",
 		"sync-test": "snyk test",
 		"sync-fix": "snyk wizard"
@@ -44,6 +44,7 @@
 	},
 	"dependencies": {
 		"bcrypt": "^5.1.1",
+		"chalk": "^4.1.2",
 		"compression": "^1.7.4",
 		"cookie-parser": "^1.4.6",
 		"cors": "^2.8.5",
@@ -69,6 +70,7 @@
 		"rate-limiter-flexible": "^4.0.1",
 		"safe-regex": "^2.1.1",
 		"snyk": "^1.1275.0",
-		"uuid": "^9.0.1"
+		"uuid": "^9.0.1",
+		"zod_utilz": "^0.7.3"
 	}
 }

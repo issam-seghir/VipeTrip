@@ -1,6 +1,8 @@
 /* eslint-disable unicorn/no-process-exit */
+const zu = require("zod_utilz");
 const z = require("zod");
 const chalk = require("chalk");
+
 const durationRegex = /^(\d+(\.\d+)?(ms|s|m|h|d|w|y))$/;
 const hexRegex = /^[\da-f]{128}$/i;
 const numberRegex = /^\d+$/;
@@ -9,75 +11,86 @@ const testValue = "55a20441f1fadf0e865d3656000b04f4aaff69934a42f525ebbac0189eb21
 const log = require("@config/ChalkLogger");
 
 // console.log(hexRegex.test(testValue)); // Should print: true
+const stringNonEmpty = z.string().min(1, { message: "cannot be empty" });
+const tokenSchema = z;
+stringNonEmpty.length(128, { message: "must be a 128-character string" }).regex(/[\da-f]{128}$/i, { message: "must be a hexadecimal string" });
 
-const tokenSchema = z.coerce // Coerce the value to a string if it's not like : parse(1234) => "1234"
-	.string({ message: "must be a string" })
-	.includes("a")
-	.length(128, { message: "must be a 128-character string" });
-// .regex(/^[\da-f]{122}$/i, { message: "must be a 128-character hexadecimal string" });
-const tokenExpireSchema = z.coerce // Coerce the value to a string if it's not like : parse(1234) => "1234"
-	.string()
-	.min(1)
-	.regex(durationRegex, {
-		errorMap: (error, ctx) => ({
-			message: `'${error.path}' must be a duration string like "2h", "30m", "10s", etc. `,
-		}),
-	});
+const tokenExpireErrorMap = zu.makeErrorMap({
+	invalid_string: (err) => `${err.data} : must be a duration string like "2h", "30m", "10s", etc. `,
+});
+const dataBaseURIErrorMap = zu.makeErrorMap({
+	invalid_string: (err) => `${err.data} : must be a duration string like "2h", "30m", "10s", etc. `,
+});
+
+const numberSchema = z.coerce.number().int({ message: "must be integer number" }).positive({ message: "must be positive number" });
+const tokenExpireSchema = z.string({ errorMap: tokenExpireErrorMap }).min(1, { message: "cannot be empty" }).regex(durationRegex);
+
+const errorMap = zu.makeErrorMap({
+	required: "is required",
+	invalid_type: (err) => `${err.defaultError} : ${err.data}`,
+	invalid_enum_value: ({ data, options }) => `${data} : is not a valid enum value. Valid options: ${options?.join(" | ")} `,
+	too_small: (err) => `value ${err.data}  expected to be  >= ${err.minimum}`,
+	too_big: (err) => `value ${err.data} : expected to be  <= ${err.maximum}`,
+});
+const PortRefineErrorMap = zu.makeErrorMap({
+	custom: (err) => `${err.data} is not a valid port number. Must be a number between 0 and 65536`,
+});
+
+// global error map (for the whole schema)
+z.setErrorMap(errorMap);
 
 const envSchema = z.object({
 	// ACCESS_TOKEN_SECRET: tokenSchema,
 	// REFRESH_TOKEN_SECRET: tokenSchema,
 	// ACCESS_TOKEN_SECRET_EXPIRE: tokenExpireSchema,
 	// REFRESH_TOKEN_SECRET_EXPIRE: tokenExpireSchema,
-	// COOKIE_MAX_AGE: z
-	// 	.string()
-	// 	.min(1000, { errorMap: (error, ctx) => ({ message: `'${error.path}' must be a number greater then 1000` }) })
-	// 	.regex(numberRegex, {
-	// 		errorMap: (error, ctx) => ({
-	// 			message: `'${error.path}' must be a number`,
-	// 		}),
-	// 	})
-	// 	.transform((num) => Number.parseInt(num)),
-	// DATABASE_URI: z
-	// 	.string()
-	// 	.min(1)
-	// 	.regex(mongodbUriRegex, {
-	// 		errorMap: (error, ctx) => ({
-	// 			message: `'${error.path}' must be a valid MongoDB URI`,
-	// 		}),
-	// 	}),
-	// DATABASE_NAME: z.string().min(1),
-	// NODE_ENV: z.enum(["development", "production"], { invalid_type_error: "only development or production are excepted" }).default("development"),
-	// ALLOWED_ORIGINS: z.array(z.string()).transform((origins) => origins.split(",")),
-	PORT: z
-		.string()
-		.min(1, { message: "PORT must not be empty" })
-		.regex(numberRegex, { message: "PORT must be a number" })
-		.default(3000)
-		.transform((num) => Number.parseInt(num))
-		.refine((num) => num > 0 && num < 65_536, {
-			message: "PORT must be a positive integer between 1 and 65535",
-		}),
+	// COOKIE_MAX_AGE: z.preprocess((x) => x || undefined, numberSchema.min(60_000).default(60_000)),
+	// DATABASE_URI: stringNonEmpty.regex(mongodbUriRegex, {
+	// 	message: "must be a valid MongoDB URI",
+	// }),
+	// DATABASE_NAME: stringNonEmpty,
+	// NODE_ENV: z.enum(["development", "production"]).default("development"),
+	ALLOWED_ORIGINS: z.preprocess((origins) => (origins ? origins.split(",") : []), z.array(stringNonEmpty.url({ message: "must be a valid URL" })).default(["http://localhost:3000"])),
+	// .nonempty({ message: "array cannot be empty" })
+	PORT: z.preprocess((x) => x || undefined, numberSchema.min(1).max(65_536).default(3000)),
+	// .refine((num) => num > 0 && num < 65_536, { errorMap: PortRefineErrorMap }),
 	// SOME_BOOLEAN: z.enum(["true", "false"]).transform((v) => v === "true"),
 });
 // console.log(process.env.ALLOWED_ORIGINS);
+
+function formatPath(path) {
+	return path
+		.map((element, index) => {
+			if (Number.isInteger(element) && index > 0 && Number.isInteger(path[index - 1])) {
+				// This is an array index, format it as such
+				return `[${element}]`;
+			} else {
+				// This is not an array index, just convert it to a string
+				return element.toString();
+			}
+		})
+		.join(".");
+}
 
 let ENV;
 try {
 	// ENV = envSchema.parse(process.env);
 
-	ENV = envSchema.parse({ PORT: 680_550 });
+	ENV = envSchema.parse({ PORT: 20, ALLOWED_ORIGINS: "" });
 } catch (error) {
 	if (error instanceof z.ZodError) {
-		log.info(`💠💠💠💠💠💠 Environment variable validation error 💠💠💠💠💠💠`);
+		log.info("\n 💠💠💠💠💠💠 Environment variable validation error 💠💠💠💠💠💠\n");
 		error.errors.forEach((err) => {
-			log.error(`* ${err.path.join(".")}:`, `${err.message}`);
+			const currentPath = formatPath(err.path);
+			log.error(`* ${currentPath}  : ${err.message}`);
 		});
+		console.log("-------------");
 	} else {
-		log.error("An unexpected error occurred:", `error`);
+		log.error("An unexpected error occurred while validating environment variables 💥: \n", error);
 	}
 	process.exit(1);
 }
+console.log(ENV.ALLOWED_ORIGINS);
 
 module.exports = { envSchema, ENV };
 
@@ -86,6 +99,7 @@ module.exports = { envSchema, ENV };
 //*? client side (vite): https://www.bing.com/videos/riverview/relatedvideo?&q=complex+example+with+zod+validator&&mid=371CBA211E2817D7EDB6371CBA211E2817D7EDB6&&FORM=VRDGAR
 
 import { ENV } from "./env.ts";
+import { zu } from "zod_utilz";
 
 //* This will use be fully typed if using Typescript! Will also work for Javascript.
 console.log(ENV.NODE_ENV);

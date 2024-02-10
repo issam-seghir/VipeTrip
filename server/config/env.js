@@ -1,32 +1,38 @@
 /* eslint-disable unicorn/no-process-exit */
 const zu = require("zod_utilz");
 const z = require("zod");
+const log = require("@config/ChalkLogger");
 const chalk = require("chalk");
+const { stringNonEmpty, arrayFromString } = require("@utils");
 
+
+//? -------- REGEX ---------
 const durationRegex = /^(\d+(\.\d+)?(ms|s|m|h|d|w|y))$/;
-const hexRegex = /^[\da-f]{128}$/i;
+const hexRegex = /[\da-f]{128}$/i;
 const numberRegex = /^\d+$/;
 const mongodbUriRegex = /^(mongodb:(?:\/{2})?)((?:\w+:\w+@)?[\w.-]+:\d{2,5}(?:\/\w+)?(?:\?[\w%&=-]+)?)/;
-const testValue = "55a20441f1fadf0e865d3656000b04f4aaff69934a42f525ebbac0189eb21934d6d89e09315bb905fbab1f2b19362a5baf86224747e2c16c80b90458d34632e0";
-const log = require("@config/ChalkLogger");
 
-// console.log(hexRegex.test(testValue)); // Should print: true
-const stringNonEmpty = z.string().min(1, { message: "cannot be empty" });
-const tokenSchema = z;
-stringNonEmpty.length(128, { message: "must be a 128-character string" }).regex(/[\da-f]{128}$/i, { message: "must be a hexadecimal string" });
-
+//? -------- error maps ---------
 const tokenExpireErrorMap = zu.makeErrorMap({
 	invalid_string: (err) => `${err.data} : must be a duration string like "2h", "30m", "10s", etc. `,
 });
-const dataBaseURIErrorMap = zu.makeErrorMap({
-	invalid_string: (err) => `${err.data} : must be a duration string like "2h", "30m", "10s", etc. `,
-});
 
+//? -------- sub schema ---------
+const tokenSchema = stringNonEmpty().length(128, { message: "must be a 128-character string" }).regex(hexRegex, { message: "must be a hexadecimal string" });
+const tokenExpireSchema = stringNonEmpty(tokenExpireErrorMap).regex(durationRegex);
 const numberSchema = z.coerce.number().int({ message: "must be integer number" }).positive({ message: "must be positive number" });
-const tokenExpireSchema = z.string({ errorMap: tokenExpireErrorMap }).min(1, { message: "cannot be empty" }).regex(durationRegex);
+
+
 
 const errorMap = zu.makeErrorMap({
 	required: "is required",
+	invalid_string: (err) => {
+		if (err.validation === "url") {
+			return `(${err.data}) must be a valid URL`;
+		} else if (err.validation === "email") {
+			return `(${err.data}) must be a valid email`;
+		}
+	},
 	invalid_type: (err) => `${err.defaultError} : ${err.data}`,
 	invalid_enum_value: ({ data, options }) => `${data} : is not a valid enum value. Valid options: ${options?.join(" | ")} `,
 	too_small: (err) => `value ${err.data}  expected to be  >= ${err.minimum}`,
@@ -40,21 +46,18 @@ const PortRefineErrorMap = zu.makeErrorMap({
 z.setErrorMap(errorMap);
 
 const envSchema = z.object({
-	// ACCESS_TOKEN_SECRET: tokenSchema,
-	// REFRESH_TOKEN_SECRET: tokenSchema,
-	// ACCESS_TOKEN_SECRET_EXPIRE: tokenExpireSchema,
-	// REFRESH_TOKEN_SECRET_EXPIRE: tokenExpireSchema,
-	// COOKIE_MAX_AGE: z.preprocess((x) => x || undefined, numberSchema.min(60_000).default(60_000)),
-	// DATABASE_URI: stringNonEmpty.regex(mongodbUriRegex, {
-	// 	message: "must be a valid MongoDB URI",
-	// }),
-	// DATABASE_NAME: stringNonEmpty,
-	// NODE_ENV: z.enum(["development", "production"]).default("development"),
-	ALLOWED_ORIGINS: z.preprocess((origins) => (origins ? origins.split(",") : []), z.array(stringNonEmpty.url({ message: "must be a valid URL" })).default(["http://localhost:3000"])),
-	// .nonempty({ message: "array cannot be empty" })
+	ACCESS_TOKEN_SECRET: tokenSchema,
+	REFRESH_TOKEN_SECRET: tokenSchema,
+	ACCESS_TOKEN_SECRET_EXPIRE: tokenExpireSchema,
+	REFRESH_TOKEN_SECRET_EXPIRE: tokenExpireSchema,
+	COOKIE_MAX_AGE: z.preprocess((x) => x || undefined, numberSchema.min(60_000).default(60_000)),
+	DATABASE_URI: stringNonEmpty().regex(mongodbUriRegex, {
+		message: "must be a valid MongoDB URI",
+	}),
+	DATABASE_NAME: stringNonEmpty(),
+	NODE_ENV: z.enum(["development", "production"]).default("development"),
+	ALLOWED_ORIGINS: arrayFromString(z.string().url(), ["http://localhost:3000"]),
 	PORT: z.preprocess((x) => x || undefined, numberSchema.min(1).max(65_536).default(3000)),
-	// .refine((num) => num > 0 && num < 65_536, { errorMap: PortRefineErrorMap }),
-	// SOME_BOOLEAN: z.enum(["true", "false"]).transform((v) => v === "true"),
 });
 // console.log(process.env.ALLOWED_ORIGINS);
 
@@ -74,23 +77,22 @@ function formatPath(path) {
 
 let ENV;
 try {
-	// ENV = envSchema.parse(process.env);
-
-	ENV = envSchema.parse({ PORT: 20, ALLOWED_ORIGINS: "" });
+	ENV = envSchema.parse(process.env);
+	// for testing purposes
+	// ENV = envSchema.parse({ ALLOWED_ORIGINS: "http://127.0.0.1:5500,http://localhost:3000,http://localhost:3500", PORT: 52, DATABASE_NAME: "mydb", DATABASE_URI: "mongodb://localhost:27017/mydb" });
 } catch (error) {
 	if (error instanceof z.ZodError) {
 		log.info("\n 💠💠💠💠💠💠 Environment variable validation error 💠💠💠💠💠💠\n");
 		error.errors.forEach((err) => {
 			const currentPath = formatPath(err.path);
-			log.error(`* ${currentPath}  : ${err.message}`);
+			log.error(`* ${currentPath}  : `, `${err.message}`);
+			console.log("-------------");
 		});
-		console.log("-------------");
 	} else {
 		log.error("An unexpected error occurred while validating environment variables 💥: \n", error);
 	}
 	process.exit(1);
 }
-console.log(ENV.ALLOWED_ORIGINS);
 
 module.exports = { envSchema, ENV };
 

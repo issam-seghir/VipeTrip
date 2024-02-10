@@ -20,8 +20,9 @@
 		"@controllers": "./controllers",
 		"@middleware": "./middleware",
 		"@model": "./model",
-		"@utils": "./utils",
 		"@routes": "./routes",
+		"@utils": "./utils",
+		"@validations": "./validations",
 		"@api": "./routes/api"
 	},
 	"devDependencies": {

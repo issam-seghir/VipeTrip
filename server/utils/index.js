@@ -149,6 +149,33 @@ function defaultInstance(schema, options = {}) {
 	return run();
 }
 
+
+/**
+ * Formats a path array into a string representation. (from zod paths)
+ *
+ * @param {Array} path - The path array to format.
+ * @returns {string} The formatted path string.
+ *
+ */
+
+function formatPath(path) {
+	return path
+		.map((element, index) => {
+			// eslint-disable-next-line unicorn/prefer-ternary
+			if (Number.isInteger(element) && index > 0 && Number.isInteger(path[index - 1])) {
+				// This is an array index, format it as such
+				return `[${element}]`;
+			} else {
+				// This is not an array index, just convert it to a string
+				return element.toString();
+			}
+		})
+		.join(".");
+}
+
+
+
+
 module.exports = {
 	byteToMb,
 	mbToByte,
@@ -156,5 +183,6 @@ module.exports = {
 	signChecker,
 	stringNonEmpty,
 	arrayFromString,
+	formatPath,
 	defaultInstance,
 };

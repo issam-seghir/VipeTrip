@@ -33,6 +33,8 @@ module.exports = {
 					["@controllers", "./controllers"],
 					["@middleware", "./middleware"],
 					["@model", "./model"],
+					["@utils", "./utils"],
+					["@validations", "./validations"],
 					["@routes", "./routes"],
 					["@api", "./routes/api"],
 				],

@@ -25,7 +25,7 @@ const pino = require("pino");
 const pinoHttp = require("pino-http");
 const errorNotification = require("@config/notifier");
 const compression = require("compression");
-const {ENV} = require("@config/env");
+const { ENV } = require("@config/env");
 
 console.log("env");
 console.log(ENV.PORT);
@@ -50,7 +50,6 @@ app.use(helmet(helmetOptions));
 
 // morgan console logger
 app.use(morgan("dev"));
-
 
 // app.get("/", function (req, res) {
 // 	req.log.info("something");
@@ -80,10 +79,8 @@ app.use(cookieParser());
 // attach metadata (req time , IP , user agent) to request object
 app.use(attachMetadata);
 
-
 // compress all responses
 // app.use(compression())
-
 
 //serve static files
 app.use(express.static(join(__dirname, "public")));
@@ -93,13 +90,13 @@ app.use(express.static(join(__dirname, "public")));
 // app.use(multerErrorHandler(upload));
 // app.use(multerErrorHandler(uploadPost));
 
-// if (isDev) {
-// 	// only use in development
-// 	app.use(errorhandler({ log: errorNotification }));
-// } else {
-// 	// use a simpler error handler in production
-// 	app.use(errorHandler);
-// }
+// Add a route that throws an error
+app.get("/error", (req, res, next) => {
+	throw new Error("Test error!");
+});
+
+// only use in development
+isDev && app.use(errorhandler({ log: errorNotification }));
 
 connection.once("open", () => {
 	console.log("Connected to MongoDB .... 🐲");

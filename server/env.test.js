@@ -1,4 +1,4 @@
-const { envSchema } = require("./config/env.js");
+const { envSchema } = require("./validations/envSchema.js");
 
 const mockEnv = {
 	ACCESS_TOKEN_SECRET: "a".repeat(128), // 128-character hexadecimal string

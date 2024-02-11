@@ -1,9 +1,8 @@
-const { whitelist } = require("@config/allowedOrigins");
-const { isProd } = require("@config/const");
+const { ENV } = require("@/validations/envSchema");
 
 const credentials = (req, res, next) => {
 	const origin = req.headers.origin;
-	if (whitelist.includes(origin)) {
+	if (ENV.ALLOWED_ORIGINS.includes(origin)) {
 		res.header("Access-Control-Allow-Credentials", true);
 	}
 	next();

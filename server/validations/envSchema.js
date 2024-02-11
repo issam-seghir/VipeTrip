@@ -2,8 +2,8 @@
 const zu = require("zod_utilz");
 const z = require("zod");
 const createError = require("http-errors");
-const log = require("@config/ChalkLogger");
-const { stringNonEmpty, arrayFromString , formatPath } = require("@utils");
+const log = require("@/utils/chalkLogger");
+const { stringNonEmpty, arrayFromString , formatPath } = require("@/utils");
 
 //? -------- REGEX ---------
 const durationRegex = /^(\d+(\.\d+)?(ms|s|m|h|d|w|y))$/;

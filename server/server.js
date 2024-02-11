@@ -25,7 +25,7 @@ const pino = require("pino");
 const pinoHttp = require("pino-http");
 const errorNotification = require("@config/notifier");
 const compression = require("compression");
-const { ENV } = require("@config/env");
+const { ENV } = require("@/validations/envSchema");
 
 console.log("env");
 console.log(ENV.PORT);
@@ -90,9 +90,12 @@ app.use(express.static(join(__dirname, "public")));
 // app.use(multerErrorHandler(upload));
 // app.use(multerErrorHandler(uploadPost));
 
-// Add a route that throws an error
+// Test errorhandler
+const createError = require("http-errors");
+
 app.get("/error", (req, res, next) => {
-	throw new Error("Test error!");
+	throw createError(404, "Test error!");
+	// throw new Error("Test error!");
 });
 
 // only use in development

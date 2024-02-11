@@ -4,11 +4,12 @@
 const z = require("zod");
 
 /**
- * This function validates a string and ensures it is not empty.
- * @param {Object} errorMap - An optional object that maps error types to error messages.
- * @returns {Object} - Returns a Zod schema that validates strings and ensures they are not empty.
+ * Creates a Zod schema for a non-empty string.
+ * @param {z.ZodErrorMap} errorMap - An optional object that maps error types to error messages.
+ * @returns {z.ZodString} - Returns a Zod schema that validates strings and ensures they are not empty.
  * @example
- * const schema = stringNonEmpty();
+ * const schema = stringNonEmpty().length(5, 255);
+ * const schemaII = stringNonEmpty(myErroMap).min(5).toLower();
  * const result = schema.parse("Hello World"); // "Hello World" ✅
  * const result2 = schema.parse(""); // Throws an error because the string is empty 💢
  */
@@ -19,9 +20,9 @@ const stringNonEmpty = (errorMap = undefined) => {
 
 /**
  * This function converts a string to an array using a provided schema. If the input is already an array, it is returned as is.
- * @param {Object} schema - The Zod schema to validate the array elements.
+ * @param {z.ZodSchema} schema - The Zod schema to validate the array elements.
  * @param {string} defult - An optional default value to use if the input is neither a string nor an array.
- * @returns {Object} - Returns a Zod schema that validates arrays and ensures they are not empty.
+ * @returns {z.ZodArray<z.ZodString>} - Returns a Zod schema that validates arrays of strings and ensures they are not empty.
  * @example
  * const schema = z.string().url();
  * const arraySchema = arrayFromString(schema); // array of url strings
@@ -147,7 +148,6 @@ function formatPath(path) {
 		})
 		.join(".");
 }
-
 
 module.exports = {
 	stringNonEmpty,

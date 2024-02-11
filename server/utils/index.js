@@ -24,7 +24,6 @@ function mbToByte(mb) {
 	return mb * 1024 * 1024;
 }
 
-
 /**
  * Generates a UUID.
  * @returns {string} The generated UUID.
@@ -49,11 +48,35 @@ function signChecker(percent) {
 	return numericPercent > 0;
 }
 
+const safeRegex = require("safe-regex");
 
+/**
+ * Checks if multiple regular expressions are safe.
+ *
+ * @param {...RegExp} regexes - The regular expressions to check.
+ * @returns {{allSafe: boolean, unsafeRegexes: RegExp[]}} - Returns an object with a boolean property 'allSafe' indicating if all regular expressions are safe, and an 'unsafeRegexes' property containing an array of unsafe regular expressions. If all are safe, 'unsafeRegexes' will be an empty array.
+ *
+ * @example
+ * const durationRegex = /^(\d+(\.\d+)?(ms|s|m|h|d|w|y))$/;
+ * const hexRegex = /[\da-f]{128}$/i;
+ *
+ * const result = isRegexSave(durationRegex, hexRegex);
+ * if (!result.allSafe) {
+ *     console.error('The following regular expressions are not safe:', result.unsafeRegexes);
+ * }
+ */
+function isRegexSave(...regexes) {
+	const unsafeRegexes = regexes.filter((regex) => !safeRegex(regex));
+	return {
+		allSafe: unsafeRegexes.length === 0,
+		unsafeRegexes: unsafeRegexes,
+	};
+}
 
 module.exports = {
 	byteToMb,
 	mbToByte,
 	uuid,
 	signChecker,
+	isRegexSave,
 };

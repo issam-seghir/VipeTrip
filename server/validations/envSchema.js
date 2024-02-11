@@ -1,14 +1,26 @@
 /* eslint-disable unicorn/no-process-exit */
+// @ts-check
+
 const zu = require("zod_utilz");
 const z = require("zod");
+const TypeOf = require("zod");
+const { isRegexSave } = require("@/utils");
 const createError = require("http-errors");
 const log = require("@/utils/chalkLogger");
-const { stringNonEmpty, arrayFromString , formatPath } = require("@/utils");
+const { stringNonEmpty, arrayFromString, formatPath } = require("@/utils/zodUtils");
 
 //? -------- REGEX ---------
 const durationRegex = /^(\d+(\.\d+)?(ms|s|m|h|d|w|y))$/;
 const hexRegex = /[\da-f]{128}$/i;
 const mongodbUriRegex = /mongodb?([+rsv]*):\/\/(?:(?<login>[^#/:?@[\]]+)(?::(?<password>[^#/:?@[\]]+))?@)?(?<host>[\w.\-]+(?::\d+)?(?:,[\w.\-]+(?::\d+)?)*)(?:\/(?<dbname>[\w.\-]+))?(?:\?(?<query>[\w.\-]+=[\w.\-]+(?:&[\w.\-]+=[\w.\-]+)*))?/;
+
+// const result = isRegexSave(durationRegex, hexRegex, mongodbUriRegex);
+// if (!result.allSafe) {
+// 	result.unsafeRegexes.forEach((regex) => {
+// 		log.error("Unsafe regex:", regex);
+// 	});
+// 	throw createError(500, "One or more regular expressions are not safe.");
+// }
 
 //? -------- Error Maps ---------
 
@@ -41,6 +53,20 @@ const numberSchema = z.coerce.number().int({ message: "must be integer number" }
 // global error map (for the whole schema)
 z.setErrorMap(errorMap);
 
+/*
+	//*  see : https://catalins.tech/validate-environment-variables-with-zod/
+	//* for typescript OR next js ( add type , autocomplete for ENV , process.env)
+	declare global {
+		namespace NodeJS {
+		interface ProcessEnv extends TypeOf<typeof zodEnv> {}
+		}
+	}
+*/
+
+/**
+ * @typedef {z.infer<typeof envSchema>} Env
+ */
+
 const envSchema = z.object({
 	ACCESS_TOKEN_SECRET: tokenSchema,
 	REFRESH_TOKEN_SECRET: tokenSchema,
@@ -52,16 +78,17 @@ const envSchema = z.object({
 	}),
 	DATABASE_NAME: stringNonEmpty(),
 	NODE_ENV: z.enum(["development", "production"]).default("development"),
+	// @ts-ignore
 	ALLOWED_ORIGINS: arrayFromString(z.string().url(), ["http://localhost:3000"]),
 	PORT: z.preprocess((x) => x || undefined, numberSchema.min(1).max(65_536).default(3000)),
 });
 
-
+/** @type {Env} */
 let ENV;
 try {
-	ENV = envSchema.parse(process.env);
+	// ENV = envSchema.parse(process.env);
 	// for testing purposes
-	// ENV = envSchema.parse({ ALLOWED_ORIGINS: "http://127.0.0.1:5500,http://localhost:3000,http://localhost:3500", PORT: 52, DATABASE_NAME: "mydb", DATABASE_URI: "mongodb://localhost:27017/mydb" });
+	ENV = envSchema.parse({ ALLOWED_ORIGINS: "http://127.0.0.1:5500,http://localhost:3000,http://localhost:3500", PORT: 52, DATABASE_NAME: "mydb", DATABASE_URI: "mongodb://localhost:27017/mydb" });
 } catch (error) {
 	if (error instanceof z.ZodError) {
 		log.info("\n 💠💠💠💠💠💠 Environment variable validation error 💠💠💠💠💠💠\n");
@@ -76,4 +103,5 @@ try {
 		throw createError(500, "Unexpected error", { error });
 	}
 }
+
 module.exports = { envSchema, ENV };

@@ -1,9 +1,9 @@
 const express = require("express");
 
 const router = express.Router();
-const multerErrorHandler = require("@middleware/multerErrorHandler");
-const verifyJWT = require("@middleware/verifyJWT");
-const { upload, uploadPost } = require("@middleware/multerUploader");
+const multerErrorHandler = require("@/middleware/multer/multerErrorHandler");
+const verifyJWT = require("@/middleware/auth/verifyJWT");
+const { upload, uploadPost } = require("@/middleware/multer/multerUploader");
 
 
 // Route for testing

@@ -5,7 +5,7 @@ const { handleLogin } = require("@/controllers/auth/loginController");
 const { handleNewUser } = require("@/controllers/auth/registerController");
 const { handleLogout } = require("@/controllers/auth/logoutController");
 const { handleRefreshToken } = require("@/controllers/auth/refreshTokenController");
-const {upload} = require("@middleware/multerUploader");
+const {upload} = require("@/middleware/multer/multerUploader");
 
 
 router.post("/login", handleLogin);

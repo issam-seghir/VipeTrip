@@ -40,7 +40,6 @@ const storage = multer.diskStorage({
 	},
 	//* If no filename is given, each file will be given a random name that doesn't include any file extension.
 	filename: function (req, file, cb) {
-		const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
 		cb(null, getUniqueFilename(file));
 	},
 });
@@ -50,7 +49,6 @@ const storagePost = multer.diskStorage({
 		cb(null, POSTS_DIR);
 	},
 	filename: function (req, file, cb) {
-		const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
 		cb(null, getUniqueFilename(file));
 	},
 });

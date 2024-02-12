@@ -57,9 +57,6 @@ const userSchema = new Schema(
 	},
 	{
 		timestamps: true,
-		// recommanded : disabled autoIndex for production
-		autoIndex: !isProd,
-		autoCreate: !isProd,
 	}
 );
 
@@ -75,7 +72,6 @@ userSchema.methods.transform = function () {
 };
 
 // transform user object before sending it in response with toJSON()
-
 
 userSchema.methods.transform = function () {
 	const json = this.toJSON();

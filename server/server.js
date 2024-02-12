@@ -72,7 +72,7 @@ app.use(compression())
 //serve static files
 app.use(express.static(join(__dirname, "public")));
 
-// app.use("/api/v1", require("@api/v1"));
+app.use("/api/v1", require("@api/v1"));
 
 // app.use(multerErrorHandler(upload));
 // app.use(multerErrorHandler(uploadPost));

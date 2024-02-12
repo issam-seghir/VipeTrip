@@ -5,7 +5,6 @@ const multerErrorHandler = require("@/middleware/multer/multerErrorHandler");
 const verifyJWT = require("@/middleware/auth/verifyJWT");
 const { upload, uploadPost } = require("@/middleware/multer/multerUploader");
 
-
 // Route for testing
 // router.post("/upload", upload.array("picture", 2), multerErrorHandler(upload), (req, res) => {
 // 	res.status(200).send("File uploaded");
@@ -16,7 +15,7 @@ const { upload, uploadPost } = require("@/middleware/multer/multerUploader");
 
 //* Public routes
 //? Authentication : who the user is
-// router.use("/auth", require("./auth"));
+router.use("/auth", require("./auth"));
 
 //? Authorization: what the user is allowed to access
 //* Protected routes : will check for a valid JWT in the Authorization header, (Authorization: Bearer <token>)
@@ -24,3 +23,5 @@ const { upload, uploadPost } = require("@/middleware/multer/multerUploader");
 // router.use(verifyJWT);
 // router.use("/users", require("./users"));
 // router.use("/posts", upload.array("picture", 25), require("./posts"));
+
+module.exports = router;

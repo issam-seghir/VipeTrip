@@ -66,12 +66,12 @@ async function loginRoute(req, res) {
 	}
 }
 
-const app = express();
+// const app = express();
 
-app.post("/login", async (req, res) => {
-	try {
-		await loginRoute(req, res);
-	} catch {
-		res.status(500).end();
-	}
-});
+// app.post("/login", async (req, res) => {
+// 	try {
+// 		await loginRoute(req, res);
+// 	} catch {
+// 		res.status(500).end();
+// 	}
+// });

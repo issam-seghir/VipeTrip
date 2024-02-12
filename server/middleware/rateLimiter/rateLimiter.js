@@ -5,11 +5,22 @@ const mongoose = require("mongoose");
 const { RateLimiterMongo } = require("rate-limiter-flexible");
 const log = require("@/utils/chalkLogger");
 const createError = require("http-errors");
+const { ENV } = require("@/validations/envSchema");
+
+/* //* Storage options:
+	//* Memory : https://github.com/animir/node-rate-limiter-flexible/wiki/Memory
+	//* Memory Cash : https://github.com/animir/node-rate-limiter-flexible/wiki/Memcache
+
+//* All possible methods here :
+	//* https://github.com/animir/node-rate-limiter-flexible/wiki/Overall-example#minimal-protection-against-password-brute-force
+	//* https://medium.com/@animirr/brute-force-protection-node-js-examples-cd58e8bd9b8d#e516
+*/
 
 const mongoConn = mongoose.connection;
 
 const options = new RateLimiterMongo({
 	storeClient: mongoConn,
+	dbName: ENV.DATABASE_NAME,
 	keyPrefix: "middleware",
 	points: 10, // 10 requests
 	duration: 1, // per 1 second by IP
@@ -26,6 +37,7 @@ const options = new RateLimiterMongo({
  * @param {express.NextFunction} next - The Express next function.
  * @returns {void} - A void return type since the function doesn't return a value.
  */
+
 const rateLimiterMiddleware = (req, res, next) => {
 	options
 		.consume(req.ip) // Consume 1 point for each request

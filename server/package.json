@@ -10,9 +10,7 @@
 	},
 	"scripts": {
 		"dev": "node --watch --env-file=.env.development.local  server.js",
-		"prod": "node --watch --env-file=.env  server.js",
-		"sync-test": "snyk test",
-		"sync-fix": "snyk wizard"
+		"prod": "node --watch --env-file=.env  server.js"
 	},
 	"_moduleAliases": {
 		"@": ".",
@@ -53,7 +51,6 @@
 		"date-fns": "^3.0.6",
 		"errorhandler": "^1.5.1",
 		"express": "^4.18.2",
-		"express-rate-limit": "^7.1.5",
 		"helmet": "^7.1.0",
 		"http-errors": "^2.0.0",
 		"jsonwebtoken": "^9.0.2",
@@ -68,10 +65,8 @@
 		"multer": "^1.4.4",
 		"passport": "^0.7.0",
 		"passport-local-mongoose": "^8.0.0",
-		"pino-http": "^9.0.0",
 		"rate-limiter-flexible": "^4.0.1",
 		"safe-regex": "^2.1.1",
-		"snyk": "^1.1275.0",
 		"uuid": "^9.0.1",
 		"zod_utilz": "^0.7.3"
 	}

@@ -1,5 +1,4 @@
-// multer middleware for  uploading files
-// setup File storage
+// @ts-check
 /*
 
 | Key | Description | Note |
@@ -16,56 +15,57 @@
 
 */
 
-//*   .................... Global Config ...................
-
-const { mbToByte } = require("@utils");
+const { mbToByte } = require("@/utils");
+const { fileFilter, fileFilterPost } = require("@/utils/multerUtils");
 const multer = require("multer");
 const path = require("node:path");
+
+const MAX_FILE_SIZE_MB = 3;
+const MAX_FILE_SIZE_POST_MB = 5;
+const GLOBAL_DIR = "./public/global";
+const POSTS_DIR = "./public/posts";
+
+// Function to generate a unique filename
+const getUniqueFilename = (file) => {
+	const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+	return `${file.fieldname}-${uniqueSuffix}${path.extname(file.originalname)}`;
+};
+
+//? -------- Storage Config -------------
 
 const storage = multer.diskStorage({
 	//* If no destination is given, the operating system's default directory for temporary files is used.
 	destination: function (req, file, cb) {
-		cb(null, "./public/");
+		cb(null, GLOBAL_DIR);
 	},
 	//* If no filename is given, each file will be given a random name that doesn't include any file extension.
 	filename: function (req, file, cb) {
 		const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-		cb(null, file.fieldname + "-" + uniqueSuffix + path.extname(file.originalname));
+		cb(null, getUniqueFilename(file));
 	},
 });
-const fileFilter = (req, file, cb) => {
-	// reject a file
-	req.acceptedFileTypes = /jpeg|jpg|png/;
-	const mimetype = req.acceptedFileTypes.test(file.mimetype);
-	const extname = req.acceptedFileTypes.test(path.extname(file.originalname).toLowerCase());
 
-	if (mimetype && extname) {
-		return cb(null, true);
-	}
+const storagePost = multer.diskStorage({
+	destination: function (req, file, cb) {
+		cb(null, POSTS_DIR);
+	},
+	filename: function (req, file, cb) {
+		const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+		cb(null, getUniqueFilename(file));
+	},
+});
 
-	cb(new Error(`Invalid file type. Only ${req.acceptedFileTypes.toString()} are allowed.`));
-};
+//? --------- uploader middleware config ----------
 
 const upload = multer({
 	storage: storage,
-	limits: { fileSize: mbToByte(3) },
+	limits: { fileSize: mbToByte(MAX_FILE_SIZE_MB) },
 	fileFilter: fileFilter,
 });
 
-//*   .................... Post  Config ...................
-
-const fileFilterPost = (req, file, cb) => {
-	// Allow all image types
-	if (file.mimetype.startsWith("image/")) {
-		cb(null, true);
-	} else {
-		cb(new Error(`Invalid file type. Only image files are allowed.`));
-	}
-};
-
 const uploadPost = multer({
-	storage: storage,
-	limits: { fileSize: mbToByte(5) },
+	storage: storagePost,
+	limits: { fileSize: mbToByte(MAX_FILE_SIZE_POST_MB) },
 	fileFilter: fileFilterPost,
 });
 

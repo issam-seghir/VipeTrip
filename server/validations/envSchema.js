@@ -86,9 +86,9 @@ const envSchema = z.object({
 /** @type {Env} */
 let ENV;
 try {
-	// ENV = envSchema.parse(process.env);
+	ENV = envSchema.parse(process.env);
 	// for testing purposes
-	ENV = envSchema.parse({ ALLOWED_ORIGINS: "http://127.0.0.1:5500,http://localhost:3000,http://localhost:3500", PORT: 52, DATABASE_NAME: "mydb", DATABASE_URI: "mongodb://localhost:27017/mydb" });
+	// ENV = envSchema.parse({ ALLOWED_ORIGINS: "http://127.0.0.1:5500,http://localhost:3000,http://localhost:3500", PORT: 52, DATABASE_NAME: "mydb", DATABASE_URI: "mongodb://localhost:27017/mydb" });
 } catch (error) {
 	if (error instanceof z.ZodError) {
 		log.info("\n 💠💠💠💠💠💠 Environment variable validation error 💠💠💠💠💠💠\n");

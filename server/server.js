@@ -26,10 +26,8 @@ const pinoHttp = require("pino-http");
 const errorNotification = require("@config/notifier");
 const compression = require("compression");
 const { ENV } = require("@/validations/envSchema");
+const log = require("@/utils/chalkLogger");
 
-console.log("env");
-console.log(ENV.PORT);
-console.log(typeof ENV.PORT);
 const PORT = ENV.PORT;
 
 const logger = pino({
@@ -111,5 +109,5 @@ connection.once("open", () => {
 	};
 	console.table(MongoDbInfo);
 
-	app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+	app.listen(PORT, () => log.database(`Server running on port `, `${PORT}`));
 });

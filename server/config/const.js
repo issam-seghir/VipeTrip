@@ -1,9 +1,12 @@
+// @ts-check
+
 const { ENV } = require("@/validations/envSchema");
+const log = require("@/utils/chalkLogger");
 
 const isProd = ENV.NODE_ENV === "production";
 const isDev = ENV.NODE_ENV === "development";
 
-console.log("the mode is in const.js", ENV.NODE_ENV);
+log.debug("the mode is in const.js", ENV.NODE_ENV);
 
 const readyStates = new Map([
 	[0, "disconnected"],

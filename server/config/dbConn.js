@@ -1,3 +1,5 @@
+// @ts-check
+
 const mongoose = require("mongoose");
 const { isProd } = require("@config/const");
 const { ENV } = require("@/validations/envSchema");

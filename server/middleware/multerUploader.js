@@ -23,11 +23,11 @@ const multer = require("multer");
 const path = require("node:path");
 
 const storage = multer.diskStorage({
-	//! If no destination is given, the operating system's default directory for temporary files is used.
+	//* If no destination is given, the operating system's default directory for temporary files is used.
 	destination: function (req, file, cb) {
 		cb(null, "./public/");
 	},
-	//! If no filename is given, each file will be given a random name that doesn't include any file extension.
+	//* If no filename is given, each file will be given a random name that doesn't include any file extension.
 	filename: function (req, file, cb) {
 		const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
 		cb(null, file.fieldname + "-" + uniqueSuffix + path.extname(file.originalname));

@@ -1,6 +1,6 @@
+// @ts-check
 const { isProd } = require("@config/const.js");
 const { ENV } = require("@/validations/envSchema");
-
 
 const corsOptions = {
 	origin: function (origin, callback) {

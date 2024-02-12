@@ -39,7 +39,7 @@ const arrayFromString = (schema, defult = "") => {
 		} else if (typeof obj === "string") {
 			return obj.split(",");
 		} else {
-			return [defult];
+			return defult;
 		}
 	}, z.array(schema).nonempty({ message: "array cannot be empty" }));
 };

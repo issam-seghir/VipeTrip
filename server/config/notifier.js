@@ -1,3 +1,4 @@
+// @ts-check
 const notifier = require("node-notifier");
 
 /**

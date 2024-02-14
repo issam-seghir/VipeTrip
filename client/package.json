@@ -61,7 +61,7 @@
 	},
 	"dependencies": {
 		"@hookform/resolvers": "^3.3.3",
-		"@mui/icons-material": "^5.15.2",
+		"@mui/icons-material": "^5.15.6",
 		"@reduxjs/toolkit": "^2.0.1",
 		"@uidotdev/usehooks": "^2.4.1",
 		"date-fns": "^3.0.5",

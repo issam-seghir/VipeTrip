@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const { isProd } = require("@config/const");
 
 const Schema = mongoose.Schema;
 
@@ -22,7 +21,7 @@ const userSchema = new Schema(
 		email: {
 			type: String,
 			required: true,
-			minlength: 7,
+			// minlength: 7,
 			unique: true,
 		},
 		password: {

@@ -3,8 +3,6 @@ require("module-alias/register");
 
 const express = require("express");
 const mongoose = require("mongoose");
-const multer = require("multer");
-const multerErrorHandler = require("@/middleware/multer/multerErrorHandler");
 const rateLimiterMiddleware = require("@/middleware/rateLimiter/rateLimiter");
 const { isDev } = require("@config/const");
 const { readyStates } = require("@config/const");
@@ -24,14 +22,16 @@ const errorhandler = require("errorhandler");
 const errorNotification = require("@config/notifier");
 const compression = require("compression");
 const { ENV } = require("@/validations/envSchema");
-const {pinoLog} = require("@config/pinoConfig");
+const { pinoLog } = require("@config/pinoConfig");
 const log = require("@/utils/chalkLogger");
+const { faker } = require("@faker-js/faker");
+const { UniqueEnforcer } = require("enforce-unique");
+
+const uniqueEnforcerEmail = new UniqueEnforcer();
 
 const PORT = ENV.PORT;
 
-
 const app = express();
-
 
 // Connect to MongoDB
 connectDB();
@@ -41,7 +41,6 @@ app.use(helmet(helmetOptions));
 
 // morgan console logger
 app.use(morgan("dev"));
-
 
 // Handle options credentials check - before CORS!
 // and fetch cookies credentials requirement
@@ -67,15 +66,33 @@ app.use(cookieParser());
 app.use(attachMetadata);
 
 // compress all responses
-app.use(compression())
+app.use(compression());
 
 //serve static files
 app.use(express.static(join(__dirname, "public")));
 
-app.use("/api/v1", require("@api/v1"));
+const firstName = faker.person.firstName();
+const lastName = faker.person.lastName();
+const email = uniqueEnforcerEmail.enforce(() => {
+	return faker.internet.email({ firstName, lastName });
+});
+const mockUserFaker = {
+	firstName: firstName,
+	lastName: lastName,
+	email: email,
+	password: faker.internet.password(),
+	picturePath: faker.image.avatar(),
+	coverPath: faker.image.urlPlaceholder(),
+	totalPosts: faker.number.int({ min: 0, max: 100 }),
+	location: faker.location.country(),
+	job: faker.person.jobTitle(),
+	viewedProfile: faker.number.int({ min: 1, max: 1000 }),
+	impressions: faker.number.int({ min: 1, max: 1000 }),
+};
 
-// app.use(multerErrorHandler(upload));
-// app.use(multerErrorHandler(uploadPost));
+console.log(mockUserFaker);
+
+// app.use("/api/v1", require("@api/v1"));
 
 // errorhandler for requests  only use in development
 isDev && app.use(errorhandler({ log: errorNotification }));

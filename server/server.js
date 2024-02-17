@@ -24,10 +24,9 @@ const compression = require("compression");
 const { ENV } = require("@/validations/envSchema");
 const { pinoLog } = require("@config/pinoConfig");
 const log = require("@/utils/chalkLogger");
-const { faker } = require("@faker-js/faker");
-const { UniqueEnforcer } = require("enforce-unique");
 
-const uniqueEnforcerEmail = new UniqueEnforcer();
+const {mockUser} = require("@utils/mockSchema");
+
 
 const PORT = ENV.PORT;
 
@@ -71,28 +70,8 @@ app.use(compression());
 //serve static files
 app.use(express.static(join(__dirname, "public")));
 
-const firstName = faker.person.firstName();
-const lastName = faker.person.lastName();
-const email = uniqueEnforcerEmail.enforce(() => {
-	return faker.internet.email({ firstName, lastName });
-});
-const mockUserFaker = {
-	firstName: firstName,
-	lastName: lastName,
-	email: email,
-	password: faker.internet.password(),
-	picturePath: faker.image.avatar(),
-	coverPath: faker.image.urlPlaceholder(),
-	totalPosts: faker.number.int({ min: 0, max: 100 }),
-	location: faker.location.country(),
-	job: faker.person.jobTitle(),
-	viewedProfile: faker.number.int({ min: 1, max: 1000 }),
-	impressions: faker.number.int({ min: 1, max: 1000 }),
-};
 
-console.log(mockUserFaker);
-
-// app.use("/api/v1", require("@api/v1"));
+app.use("/api/v1", require("@api/v1"));
 
 // errorhandler for requests  only use in development
 isDev && app.use(errorhandler({ log: errorNotification }));

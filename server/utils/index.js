@@ -60,9 +60,12 @@ const safeRegex = require("safe-regex");
  * const durationRegex = /^(\d+(\.\d+)?(ms|s|m|h|d|w|y))$/;
  * const hexRegex = /[\da-f]{128}$/i;
  *
- * const result = isRegexSave(durationRegex, hexRegex);
+ * const result = isRegexSave(durationRegex, hexRegex, mongodbUriRegex);
  * if (!result.allSafe) {
- *     console.error('The following regular expressions are not safe:', result.unsafeRegexes);
+ * 	result.unsafeRegexes.forEach((regex) => {
+ * 		log.error("Unsafe regex:", regex);
+ * 	});
+ * 	throw createError(500, "One or more regular expressions are not safe.");
  * }
  */
 function isRegexSave(...regexes) {

@@ -7,21 +7,16 @@ const userSchema = new Schema(
 		firstName: {
 			type: String,
 			required: [true, "firstName is required"],
-			minlength: [3, "firstName must be at least 3 characters , got {VALUE}"],
-			maxlength: [50, "firstName must be at most 50 characters , got {VALUE}"],
 			alias: "fname",
 		},
 		lastName: {
 			type: String,
-			required: true,
-			minlength: 3,
-			maxlength: 50,
+			required: [true, "lastName is required"],
 			alias: "lname",
 		},
 		email: {
 			type: String,
-			required: true,
-			// minlength: 7,
+			required:  [true, "email is required"],
 			unique: true,
 		},
 		password: {

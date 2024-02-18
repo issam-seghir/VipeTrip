@@ -1,0 +1,25 @@
+[
+	{
+		"firstName": "Pauline",
+		"lastName": "Klein",
+		"email": "Pauline.Klein@hotmail.com",
+		"password": "LDylzjxudF5bv?U%J2",
+		"location": "Antigua and Barbuda",
+		"job": "Implementation Specialist"
+	},
+	{
+		"firstName": "Jacey",
+		"lastName": "Miller",
+		"email": "Jacey_Miller@hotmail.com",
+		"password": "4juPfyU#t*$?g",
+		"location": "Somalia"
+	},
+	{
+		"firstName": "Gus",
+		"lastName": "Kertzmann",
+		"email": "Gus.Kertzmann@gmail.com",
+		"password": "ZVY@bDOn&yD15Jv3n2gg",
+		"location": "Iceland",
+		"job": "Legacy Data Architect"
+	}
+]

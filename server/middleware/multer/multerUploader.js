@@ -19,6 +19,7 @@ const { mbToByte } = require("@/utils");
 const { fileFilter, fileFilterPost } = require("@/utils/multerUtils");
 const multer = require("multer");
 const path = require("node:path");
+const fs = require("node:fs");
 
 const MAX_FILE_SIZE_MB = 3;
 const MAX_FILE_SIZE_POST_MB = 5;
@@ -36,7 +37,11 @@ const getUniqueFilename = (file) => {
 const storage = multer.diskStorage({
 	//* If no destination is given, the operating system's default directory for temporary files is used.
 	destination: function (req, file, cb) {
-		cb(null, GLOBAL_DIR);
+		const dir = path.join(__dirname, GLOBAL_DIR);
+		// Create directory if it doesn't exist
+		fs.mkdirSync(dir, { recursive: true });
+
+		cb(null, dir);
 	},
 	//* If no filename is given, each file will be given a random name that doesn't include any file extension.
 	filename: function (req, file, cb) {

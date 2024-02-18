@@ -4,6 +4,11 @@ const z = require("zod");
 const zu = require("zod_utilz");
 const { stringNonEmpty, arrayFromString, formatPath } = require("@/utils/zodUtils");
 
+//? -------- Constant ---------
+
+const MAX_FILE_SIZE = 500_000;
+const ACCEPTED_IMAGE_TYPES = new Set(["image/jpeg", "image/jpg", "image/png", "image/webp"]);
+
 //? -------- REGEX ---------
 const passRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!#$%&*?@])[\d!#$%&*?@A-Za-z]{8,}$/;
 
@@ -20,10 +25,11 @@ const registerSchema = {
 		location: infoSchema,
 		job: infoSchema,
 	})
-}
+};
 /**
  * @typedef {z.infer<typeof registerSchema.body>} RegisterBody
- */
+*/
+
 
 
 module.exports = { registerSchema };

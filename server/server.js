@@ -12,7 +12,7 @@ const helmet = require("helmet");
 const { connection } = require("mongoose");
 const { join } = require("node:path");
 const { corsOptions } = require("@config/corsOptions");
-const {connectDB} = require("@config/dbConn");
+const { connectDB } = require("@config/dbConn");
 const { helmetOptions } = require("@config/helmetOptions");
 const credentials = require("@/middleware/auth/credentials");
 const morgan = require("morgan");
@@ -24,8 +24,8 @@ const compression = require("compression");
 const { ENV } = require("@/validations/envSchema");
 const { pinoLog } = require("@config/pinoConfig");
 const log = require("@/utils/chalkLogger");
+const { generateMockUser } = require("@utils/mockSchema");
 
-const {mockUser} = require("@utils/mockSchema");
 
 
 const PORT = ENV.PORT;
@@ -69,7 +69,6 @@ app.use(compression());
 
 //serve static files
 app.use(express.static(join(__dirname, "public")));
-
 
 app.use("/api/v1", require("@api/v1"));
 

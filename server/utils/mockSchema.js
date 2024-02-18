@@ -18,14 +18,14 @@ function generateMockUser() {
 		firstName: firstName,
 		lastName: lastName,
 		email: email,
-		password: faker.internet.password(),
-		picturePath: faker.image.avatar(),
-		coverPath: faker.image.urlPlaceholder(),
-		totalPosts: faker.number.int({ min: 0, max: 100 }),
-		location: faker.location.country(),
-		job: faker.person.jobTitle(),
-		viewedProfile: faker.number.int({ min: 1, max: 1000 }),
-		impressions: faker.number.int({ min: 1, max: 1000 }),
+		password: faker.internet.password({ min: 8, max: 20 }),
+		// picturePath: faker.image.avatar(),
+		// coverPath: faker.image.urlPlaceholder(),
+		// totalPosts: faker.number.int({ min: 0, max: 100 }),
+		location: faker.location.country({ min: 3, max: 25 }),
+		job: faker.person.jobTitle({ min: 3, max: 25 }),
+		// viewedProfile: faker.number.int({ min: 1, max: 1000 }),
+		// impressions: faker.number.int({ min: 1, max: 1000 }),
 	};
 }
 
@@ -45,7 +45,7 @@ const email = uniqueEnforcerEmail.enforce(() => {
 const location = faker.location.country();
 const job = faker.person.jobTitle();
 
-const mockUser = generateMock(registerSchema, {
+const mockUser = generateMock(registerSchema.body, {
 	stringMap: {
 		firstName: () => firstName,
 		lastName: () => lastName,

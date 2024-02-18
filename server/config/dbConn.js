@@ -31,10 +31,9 @@ async function DB_wait(db) {
     */
 	var state = { 0: "Disconnected", 1: "Connected", 2: "Connecting", 3: "Disconnecting" };
 	while (db.readyState !== 1) {
-		console.log(`Waiting for connection on db: ${db.name} | State: ${state[db.readyState]}`);
+		log.info(`Waiting for connection on db: ${ENV.DATABASE_NAME} `,`=> State: ${state[db.readyState]} ...`);
 		await sleep(1000);
 	}
-	console.log(`Connection established with: ${db.name} | State: ${state[db.readyState]}`);
 	return db;
 }
 var mongo_ratelimit = DB_wait(mongo_db_rt); // this assigns the variable into an unresolved promise

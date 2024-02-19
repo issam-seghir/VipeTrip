@@ -27,7 +27,6 @@ const log = require("@/utils/chalkLogger");
 const { generateMockUser } = require("@utils/mockSchema");
 
 
-
 const PORT = ENV.PORT;
 
 const app = express();

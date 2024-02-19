@@ -23,8 +23,8 @@ const fs = require("node:fs");
 
 const MAX_FILE_SIZE_MB = 3;
 const MAX_FILE_SIZE_POST_MB = 5;
-const GLOBAL_DIR = "./public/global";
-const POSTS_DIR = "./public/posts";
+const GLOBAL_DIR = "public/global";
+const POSTS_DIR = "public/posts";
 
 // Function to generate a unique filename
 const getUniqueFilename = (file) => {
@@ -37,11 +37,11 @@ const getUniqueFilename = (file) => {
 const storage = multer.diskStorage({
 	//* If no destination is given, the operating system's default directory for temporary files is used.
 	destination: function (req, file, cb) {
-		const dir = path.join(__dirname, GLOBAL_DIR);
+		const dir = path.join(process.cwd(), GLOBAL_DIR);
 		// Create directory if it doesn't exist
 		fs.mkdirSync(dir, { recursive: true });
 
-		cb(null, dir);
+		cb(null, GLOBAL_DIR);
 	},
 	//* If no filename is given, each file will be given a random name that doesn't include any file extension.
 	filename: function (req, file, cb) {

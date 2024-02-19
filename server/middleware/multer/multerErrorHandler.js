@@ -9,7 +9,7 @@ const multerErrorHandler = (upload) => {
 		if (err instanceof multer.MulterError) {
 			let message = err.message;
 			log.error(err);
-			log.info(upload);
+			log.info(JSON.stringify(upload));
 			switch (err.code) {
 				case "LIMIT_FILE_SIZE": {
 					const fileSizeLimitInMB = byteToMb(upload.limits.fileSize);

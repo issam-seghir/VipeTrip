@@ -13,7 +13,6 @@ function generateMockUser() {
 	const email = uniqueEnforcerEmail.enforce(() => {
 		return faker.internet.email({ firstName, lastName });
 	});
-
 	return {
 		firstName: firstName,
 		lastName: lastName,
@@ -28,7 +27,7 @@ function generateMockUser() {
 		// impressions: faker.number.int({ min: 1, max: 1000 }),
 	};
 }
-
+console.log(faker.image.urlPlaceholder());
 module.exports = { generateMockUser };
 
 //* ------------------- Mock a user schema  with zod-mock -------------------

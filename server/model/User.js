@@ -26,12 +26,12 @@ const userSchema = new Schema(
 		},
 		picturePath: {
 			type: String,
-			default: "",
+			default: "https://i.imgur.com/zTSAKyM.png",
 			alias: "picPath",
 		},
 		coverPath: {
 			type: String,
-			default: "",
+			default: "https://placehold.co/1200x400/ffe5a6/FFF",
 		},
 		totalPosts: {
 			type: Number,

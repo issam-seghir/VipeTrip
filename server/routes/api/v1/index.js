@@ -1,20 +1,12 @@
 const express = require("express");
 
 const router = express.Router();
-const multerErrorHandler = require("@/middleware/multer/multerErrorHandler");
 const verifyJWT = require("@/middleware/auth/verifyJWT");
-const { upload, uploadPost } = require("@/middleware/multer/multerUploader");
 
-// Route for testing
-// router.post("/upload", upload.array("picture", 2), multerErrorHandler(upload), (req, res) => {
-// 	res.status(200).send("File uploaded");
-// });
-// router.post("/uploadPost", uploadPost.array("picture", 3), multerErrorHandler(uploadPost), (req, res) => {
-// 	res.status(200).send("File uploaded");
-// });
 
 //* Public routes
 //? Authentication : who the user is
+router.use("/test", require("./test"));
 router.use("/auth", require("./auth"));
 
 //? Authorization: what the user is allowed to access

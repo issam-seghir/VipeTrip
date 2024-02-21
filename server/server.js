@@ -18,14 +18,15 @@ const credentials = require("@/middleware/auth/credentials");
 const morgan = require("morgan");
 const attachMetadata = require("@middleware/attachMetadata");
 const errorHandler = require("@middleware/errorHandler");
-const errorhandler = require("errorhandler");
-const errorNotification = require("@config/notifier");
 const compression = require("compression");
 const { ENV } = require("@/validations/envSchema");
 const { pinoLog } = require("@config/pinoConfig");
 const log = require("@/utils/chalkLogger");
 const { generateMockUser } = require("@utils/mockSchema");
+const { normalize } = require("@utils/plugins");
 
+// global mongoose plugins
+mongoose.plugin(normalize);
 
 const PORT = ENV.PORT;
 
@@ -71,10 +72,9 @@ app.use(express.static(join(__dirname, "public")));
 
 app.use("/api/v1", require("@api/v1"));
 
-// errorhandler for requests  only use in development
-isDev && app.use(errorhandler({ log: errorNotification }));
+// errorhandler for requests  only use in development (bcz the error sent to client)
 // global error handling
-app.use(errorHandler);
+isDev && app.use(errorHandler);
 
 connection.once("open", () => {
 	console.log("Connected to MongoDB .... 🐲");

@@ -1,13 +1,12 @@
 // @ts-check
 const notifier = require("node-notifier");
 
-
-function errorNotification(err, str, req) {
-	const title = "Error in " + req.method + " " + req.url;
+function errorNotification(err, req) {
+	const title = "Error in " + req.method + " " + req.url + " " + err.status;
 
 	notifier.notify({
 		title: title,
-		message: str,
+		message: err.message.toString(),
 		sound: true, // Only Notification Center or Windows Toasters
 	});
 }

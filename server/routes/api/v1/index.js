@@ -3,7 +3,6 @@ const express = require("express");
 const router = express.Router();
 const verifyJWT = require("@/middleware/auth/verifyJWT");
 
-
 //* Public routes
 //? Authentication : who the user is
 router.use("/test", require("./test"));

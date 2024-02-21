@@ -24,12 +24,18 @@ const registerSchema = {
 		password: stringNonEmpty().min(8).max(20).regex(passRegex, "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character (!$%&*?@#)"),
 		location: infoSchema,
 		job: infoSchema,
-	})
+	}),
 };
 /**
  * @typedef {z.infer<typeof registerSchema.body>} RegisterBody
-*/
+ */
 
+const loginSchema = {
+	body: registerSchema.body.pick({ email: true, password: true }),
+};
 
+/**
+ * @typedef {z.infer<typeof loginSchema.body>} LoginBody
+ */
 
-module.exports = { registerSchema };
+module.exports = { registerSchema, loginSchema };

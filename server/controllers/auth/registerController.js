@@ -14,9 +14,10 @@ const handleNewUser = asyncWrapper(async (req, res, next) => {
 	const { firstName, lastName, email, password, job, location } = req.body;
 	const picturePath = req?.file?.path; // Get picturePath from req.file
 	console.log(req.file);
+
 	// check for duplicate usernames in the db
 	const duplicate = await User.findOne({ email });
-	if (duplicate) return next(createError.BadRequest("Email already in use")); //Conflict
+	if (duplicate) return next(createError.Conflict("Email already in use")); //Conflict
 
 	// create and store the new user
 	const user = await User.create({
@@ -34,7 +35,8 @@ const handleNewUser = asyncWrapper(async (req, res, next) => {
 	// Save user
 	await user.save();
 
-	res.status(201).json({ success: `New user ${firstName + "-" + lastName} created!`, data: user });
+	// @ts-ignore
+	res.status(201).json({ success: `New user ${user.fullName} created!`,user: user });
 });
 
 module.exports = { handleNewUser };

@@ -8,9 +8,9 @@ const { handleRefreshToken } = require("@/controllers/auth/refreshTokenControlle
 const { upload } = require("@/middleware/multer/multerUploader");
 const multerErrorHandler = require("@/middleware/multer/multerErrorHandler");
 const validate = require("express-zod-safe");
-const { registerSchema } = require("@validations/authSchema");
+const { registerSchema ,loginSchema } = require("@validations/authSchema");
 
-router.post("/login", handleLogin);
+router.post("/login", validate(loginSchema), handleLogin);
 router.post("/register", upload.single("picture"), multerErrorHandler(upload), validate(registerSchema), handleNewUser);
 router.get("/refresh", handleRefreshToken);
 router.get("/logout", handleLogout);

@@ -62,7 +62,7 @@ const handleLogin = asyncWrapper(async (req, res, next) => {
 
 	// Send authorization roles and access token to user
 	// @ts-ignore
-	res.json({ success: `Login : ${foundUser.fullName}!`, token: accessToken, user: foundUser.transform() });
+	res.json({ success: `Login : ${foundUser.fullName}!`, token: accessToken, user: foundUser });
 });
 
 module.exports = { handleLogin };

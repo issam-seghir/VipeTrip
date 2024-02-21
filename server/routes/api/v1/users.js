@@ -1,21 +1,15 @@
 const express = require("express");
 
 const router = express.Router();
-const { getAllUsers, deleteUser, getUser} = require("@controllers/usersController");
-const { getAllFriends, getAllFriendRequests, createFriendRequest, acceptFriendRequest, removeFriend } = require("@controllers/friendShipController");
-const { getUserPosts } = require("@controllers/postsController");
+const { getAllUsers, deleteUser, getUser, updateUser } = require("@controllers/usersController");
+const { checkUserId } = require("@middleware/access/checkUserId");
+const validate = require("express-zod-safe");
+const { registerSchema } = require("@validations/authSchema");
 
-router.route("/").get(getAllUsers);
-router.route("/:userId").get(getUser).delete(deleteUser);
+router.route("/").get(getAllUsers).put(validate(registerSchema), updateUser).delete(deleteUser);
+router.route("/:userId").get(getUser);
 
-router.route("/:userId/posts").get(getUserPosts);
-
-router.route("/:userId/friends").get(getAllFriends);
-router.route("/:userId/friends/:friendId").delete(removeFriend);
-
-router.route("/:userId/requests").get(getAllFriendRequests);
-router.route("/:userId/requests/:requestId").post(createFriendRequest);
-
-router.route("/:userId/accept/:requestId").patch(acceptFriendRequest);
+router.use("/posts", require("./posts"));
+router.use("/friends", require("./friendShipt"));
 
 module.exports = router;

@@ -57,37 +57,7 @@ const userSchema = new Schema(
 
 //? --------- instance method ----------------
 
-//* toJSON / toObject Transform method
-// transform user object before sending it in response with toObject()
-// userSchema.methods.transform = function () {
-// 	const obj = this.toObject();
-// 	delete obj._id;
-// 	delete obj.password;
-// 	delete obj.email;
-// 	delete obj.refreshToken;
-// 	delete obj.__v;
-// 	return obj;
-// };
 
-// transform user object before sending it in response with toJSON()
-
-// userSchema.methods.transform = function () {
-// 	const json = this.toJSON();
-// 	delete json._id;
-// 	delete json.password;
-// 	delete json.email;
-// 	delete json.refreshToken;
-// 	delete json.__v;
-// 	return json;
-// };
-
-// userSchema.set("toJSON", {
-// 	virtuals: true,
-// });
-
-// userSchema.set("toObject", {
-// 	virtuals: true,
-// });
 
 // instance methode to increment viewedProfile
 userSchema.methods.incrementViewedProfile = function () {

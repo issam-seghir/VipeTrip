@@ -1,37 +1,27 @@
 // @ts-check
 const jwt = require("jsonwebtoken");
 const { ENV } = require("@/validations/envSchema");
-const { Unauthorized, InternalServerError, Forbidden } = require("http-errors");
+const createError = require("http-errors");
 const log = require("@/utils/chalkLogger");
 
 const verifyJWT = (req, res, next) => {
-	const authHeaders = [req.headers.authorization || req.headers.Authorization].flat();
-	let token;
+	const authHeader = req.headers["authorization"];
 
-	for (let authHeader of authHeaders) {
-		if (authHeader.startsWith("Bearer ")) {
-			token = authHeader.split(" ")[1];
-			break;
-		}
+	if (!authHeader || !authHeader.startsWith("Bearer ")) {
+		return next(new createError.Unauthorized("Missing or malformed Authorization header"));
 	}
 
-	if (!token) {
-		return next(new Unauthorized("Missing or malformed Authorization header"));
-	}
-
-	if (!ENV.ACCESS_TOKEN_SECRET) {
-		return next(new InternalServerError("Server error: JWT secret not defined"));
-	}
+	const token = authHeader.split(" ")[1];
 
 	try {
-		const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+		const decoded = jwt.verify(token, ENV.ACCESS_TOKEN_SECRET);
 		// Attach user data to request object
 		// @ts-ignore
 		req.user = { id: decoded.id };
 		next();
 	} catch (error) {
 		log.error("JWT verification error:\n", error);
-		return next(new Forbidden("Invalid or expired token"));
+		return next(new createError.Forbidden("Invalid or expired token"));
 	}
 };
 

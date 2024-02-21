@@ -4,7 +4,6 @@ require("module-alias/register");
 const express = require("express");
 const mongoose = require("mongoose");
 const rateLimiterMiddleware = require("@/middleware/rateLimiter/rateLimiter");
-const { isDev } = require("@config/const");
 const { readyStates } = require("@config/const");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
@@ -72,9 +71,8 @@ app.use(express.static(join(__dirname, "public")));
 
 app.use("/api/v1", require("@api/v1"));
 
-// errorhandler for requests  only use in development (bcz the error sent to client)
 // global error handling
-isDev && app.use(errorHandler);
+app.use(errorHandler);
 
 connection.once("open", () => {
 	console.log("Connected to MongoDB .... 🐲");

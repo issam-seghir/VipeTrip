@@ -1,38 +1,49 @@
 const User = require("@model/User");
-const asyncWrapper = require("@middleware/asyncWrapper");
+const { asyncWrapper } = require("@middleware/asyncWrapper");
+const { mongooseIdSchema } = require("@validations/mongooseIdSchema");
+const createError = require("http-errors");
 
-const getAllUsers = asyncWrapper(async (req, res) => {
-	// throw new Error("Test error"); // This line is for testing asyncWrapper only
+const getAllUsers = asyncWrapper(async (req, res, next) => {
 	const users = await User.find();
-	if (!users) return res.status(204).json({ message: "No users found" });
-	res.json(users);
+	if (!users || users.length === 0) return next(new createError.NotFound("No user(s) found"));
+
+	res.json({ success: "get all users success", users });
 });
-
-// const getAllUsers = asyncWrapper(async (req, res, next) => {
-// 	// Your controller logic here...
-// });
-
-const deleteUser = async (req, res) => {
-	if (!req?.body?.id) return res.status(400).json({ message: "User ID required" });
-	const user = await User.findOne({ _id: req.body.id });
-	if (!user) {
-		return res.status(204).json({ message: `User ID ${req.body.id} not found` });
+const getUser = asyncWrapper(async (req, res, next) => {
+	try {
+		mongooseIdSchema.parse(req.params.id); //pass the validation
+	} catch (error) {
+		return next(new createError.BadRequest(error));
 	}
-	const result = await user.deleteOne({ _id: req.body.id });
-	res.json(result);
-};
 
-const getUser = async (req, res) => {
-	if (!req?.params?.id) return res.status(400).json({ message: "User ID required" });
+	if (!req?.params?.id) return next(new createError.BadRequest("User ID required"));
+
 	const user = await User.findById(req.params.id);
 	if (!user) {
-		return res.status(204).json({ message: `User ID ${req.params.id} not found` });
+		return next(new createError.NotFound("User not found"));
 	}
-	res.json(user);
-};
+	res.json({ success: "get user success", user });
+});
+
+const updateUser = asyncWrapper(async (req, res, next) => {
+	const user = await User.findByIdAndUpdate(req.user.id, req.body, { new: true, runValidators: true });
+	if (!user) {
+		return next(new createError.NotFound("User not found"));
+	}
+	res.json({ success: "User updated successfully", user });
+});
+
+const deleteUser = asyncWrapper(async (req, res, next) => {
+	const user = await User.findByIdAndDelete(req.user.id);
+	if (!user) {
+		return next(new createError.NotFound("User not found"));
+	}
+	res.json({ success: "User deleted successfully" });
+});
 
 module.exports = {
 	getAllUsers,
-	deleteUser,
 	getUser,
+	updateUser,
+	deleteUser,
 };

@@ -6,7 +6,7 @@ const { asyncWrapper } = require("@middleware/asyncWrapper");
 const { ENV } = require("@/validations/envSchema");
 
 const handleRefreshToken = asyncWrapper(async (req, res, next) => {
-	log.info("refrech token ...");
+	log.info("refrech token : ", "create new access token if its expire ....");
 	const { jwt: refreshToken } = req.cookies;
 
 	if (!refreshToken) {

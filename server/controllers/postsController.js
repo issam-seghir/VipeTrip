@@ -1,8 +1,10 @@
 const Post = require("@model/Post");
 const User = require("@model/User");
+const { asyncWrapper } = require("@middleware/asyncWrapper");
+const createError = require("http-errors");
 
-const createPost = async (req, res) => {
-	try {
+
+const createPost = asyncWrapper(async (req, res) => {
 		const { userId, description, mentions, tags } = req.body;
 		const attachments = req.files.map((file) => file.path); // Get paths of uploaded files
 
@@ -26,12 +28,11 @@ const createPost = async (req, res) => {
 		await User.findByIdAndUpdate(userId, { $inc: { totalPosts: 1 } });
 
 		res.status(201).json(newPost);
-	} catch (error) {
-		res.status(409).json({ message: error.message });
-	}
-};
-const deletePost = async (req, res) => {
-	try {
+});
+
+
+
+const deletePost = asyncWrapper(async (req, res) => {
 		const { postId } = req.params;
 		// Find the post by ID and delete it
 		const post = await Post.findByIdAndDelete(postId);
@@ -42,12 +43,8 @@ const deletePost = async (req, res) => {
 		}
 
 		res.status(200).json({ message: "Post deleted successfully" });
-	} catch (error) {
-		res.status(500).json({ message: error.message });
-	}
-};
-const updatePost = async (req, res) => {
-	try {
+});
+const updatePost = asyncWrapper(async (req, res) => {
 		const { postId } = req.params;
 		const updateData = req.body;
 		// const { userId, description, attachments, mentions, tags } = req.body;
@@ -74,13 +71,9 @@ const updatePost = async (req, res) => {
 		// const updatedPost = await post.save();
 
 		res.status(200).json(updatedPost);
-	} catch (error) {
-		res.status(500).json({ message: error.message });
-	}
-};
+});
 
-const getFeedPosts = async (req, res) => {
-	try {
+const getFeedPosts = asyncWrapper(async (req, res) => {
 		const page = Number.parseInt(req.query.page) || 1; // Get the page number from the query parameters, default to 1
 		const limit = Number.parseInt(req.query.limit) || 10; // Get the limit from the query parameters, default to 10
 		const skip = (page - 1) * limit;
@@ -99,13 +92,9 @@ const getFeedPosts = async (req, res) => {
 			currentPage: page,
 			posts,
 		});
-	} catch (error) {
-		res.status(500).json({ message: error.message });
-	}
-};
+});
 
-const getUserPosts = async (req, res) => {
-	try {
+const getUserPosts = asyncWrapper(async (req, res) => {
 		const { userId } = req.params;
 		if (!userId) {
 			return res.status(400).json({ message: "User ID is required" });
@@ -119,32 +108,24 @@ const getUserPosts = async (req, res) => {
 		const posts = await Post.find({ userId }).sort({ createdAt: -1 }).exec();
 
 		res.status(200).json(posts);
-	} catch (error) {
-		res.status(500).json({ message: error.message });
-	}
-};
+});
 
-const getSinglePost = async (req, res) => {
+const getSinglePost = asyncWrapper(async (req, res) => {
 	const { postId } = req.params;
 
-	try {
 		const post = await Post.findById(postId);
 		if (!post) {
 			return res.status(404).json({ message: "Post not found" });
 		}
 
 		res.status(200).json(post);
-	} catch (error) {
-				res.status(500).json({ message: error.message });
-	}
-};
+});
 
-const sharePost = async (req, res) => {
+const sharePost = asyncWrapper(async (req, res) => {
 	const { postId } = req.params;
 	const { userId, description, mentions, tags } = req.body;
 	const attachments = req.files.map((file) => file.path); // Get paths of uploaded files
 
-	try {
 		const post = await Post.findById(postId);
 		if (!post) {
 			return res.status(404).json({ message: "Post not found" });
@@ -171,10 +152,7 @@ const sharePost = async (req, res) => {
 		await Post.findByIdAndUpdate(postId, { $inc: { totalShares: 1 } });
 
 		res.status(200).json({ message: "Post shared successfully", newPost });
-	} catch (error) {
-		res.status(500).json({ message: error.message });
-	}
-};
+});
 
 
 module.exports = {

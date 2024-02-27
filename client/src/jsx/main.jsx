@@ -1,20 +1,21 @@
 /* eslint-disable unicorn/prefer-query-selector */
-import ReactDOM from 'react-dom/client'
+import ReactDOM from "react-dom/client";
 import { Provider as ReduxStoreProvider } from "react-redux";
 import { ThemeProvider } from "@mui/material";
 import { createTheme } from "@mui/material/styles";
-import { StrictMode} from "react";
+import { StrictMode } from "react";
 import { PersistGate } from "redux-persist/integration/react";
-import { store,persistor } from "@store/store";
+import { store, persistor } from "@store/store";
 
+// primereact themes and styles
+import "primereact/resources/themes/lara-dark-blue/theme.css";  // theme
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import App from "@jsx/App.jsx";
 import Home from "@pages/Home";
-import Login from "@pages/Login"
-import Register from "@pages/Register"
+import Login from "@pages/Login";
+import Register from "@pages/Register";
 import Profile from "@pages/Profile";
-import PrivateRoute from "@components/PrivateRoute.jsx"
-
+import PrivateRoute from "@components/PrivateRoute.jsx";
 
 import "@scss/main.scss";
 
@@ -70,7 +71,6 @@ export const router = createBrowserRouter(
 	],
 	{ basename: import.meta.env.BASE_URL }
 );
-
 
 ReactDOM.createRoot(document.getElementById("root")).render(
 	<StrictMode>

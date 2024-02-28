@@ -31,11 +31,11 @@ function App() {
 	};
 
 	return (
-		<ThemeProvider theme={theme}>
+		// <ThemeProvider theme={theme}>
 			<PrimeReactProvider value={options}>
 				<Outlet />
 			</PrimeReactProvider>
-		</ThemeProvider>
+		// </ThemeProvider>
 	);
 }
 

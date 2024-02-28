@@ -55,6 +55,9 @@
 			],
 			"@LogininFrom.jsx/*": [
 				"src/jsx/components/LogininFrom.jsx/*"
+			],
+			"@validations/*": [
+				"src/jsx/validations/*"
 			]
 		}
 	}

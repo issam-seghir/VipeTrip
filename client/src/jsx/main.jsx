@@ -8,7 +8,7 @@ import { PersistGate } from "redux-persist/integration/react";
 import { store, persistor } from "@store/store";
 
 // primereact themes and styles
-import "primereact/resources/themes/lara-dark-blue/theme.css";  // theme
+// import "primereact/resources/themes/lara-dark-blue/theme.css";  // theme
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import App from "@jsx/App.jsx";
 import Home from "@pages/Home";
@@ -44,28 +44,28 @@ export const router = createBrowserRouter(
 					index: true,
 					element: <Login />,
 				},
-				{
-					path: "login",
-					element: <Login />,
-				},
-				{
-					path: "register",
-					element: <Register />,
-				},
+				// {
+				// 	path: "login",
+				// 	element: <Login />,
+				// },
+				// {
+				// 	path: "register",
+				// 	element: <Register />,
+				// },
 				//? Private routes
-				{
-					element: <PrivateRoute />,
-					children: [
-						{
-							path: "home",
-							element: <Home />,
-						},
-						{
-							path: "profile/:userId",
-							element: <Profile />,
-						},
-					],
-				},
+				// {
+				// 	element: <PrivateRoute />,
+				// 	children: [
+				// 		{
+				// 			path: "home",
+				// 			element: <Home />,
+				// 		},
+				// 		{
+				// 			path: "profile/:userId",
+				// 			element: <Profile />,
+				// 		},
+				// 	],
+				// },
 			],
 		},
 	],

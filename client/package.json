@@ -13,7 +13,7 @@
 		"dev": "vite",
 		"build": "vite build",
 		"preview": "vite preview",
-		"clean": "rm -rf dist test",
+		"clean": "rm -rf dist test node_modules && npm install",
 		"sass:watch": "sass src/scss/main.scss css/main.css --watch --no-source-map --error-css",
 		"lint:js": "npx eslint \"**/*.{html,js,ts,jsx,tsx}\"",
 		"lint:js:fix": "npm run lint:js -- --fix",

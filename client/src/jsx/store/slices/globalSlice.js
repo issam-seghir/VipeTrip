@@ -3,6 +3,8 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
 	mode: "light",
 	posts: [],
+	local: "en", // default language
+	theme: "lara-dark-blue", // default theme
 };
 
 export const globalSlice = createSlice({
@@ -11,6 +13,12 @@ export const globalSlice = createSlice({
 	reducers: {
 		setMode: (state) => {
 			state.mode = state.mode === "light" ? "dark" : "light";
+		},
+		setLocal: (state, action) => {
+			state.local = action.payload; // set language
+		},
+		setTheme: (state, action) => {
+			state.local = action.payload; // set language
 		},
 		setFriends: (state, action) => {
 			if (state.user) {
@@ -33,5 +41,8 @@ export const globalSlice = createSlice({
 });
 
 export const selectMode = (state) => state.global.mode;
-export const { setMode, setFriends, setPosts, setPost } = globalSlice.actions;
+export const selectLocal = (state) => state.global.local; // selector for language
+export const selectTheme = (state) => state.global.theme; // selector theme
+
+export const { setMode, setLocal,setTheme, setFriends, setPosts, setPost } = globalSlice.actions;
 export default globalSlice.reducer;

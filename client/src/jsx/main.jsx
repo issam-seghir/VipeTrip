@@ -6,17 +6,15 @@ import { createTheme } from "@mui/material/styles";
 import { StrictMode } from "react";
 import { PersistGate } from "redux-persist/integration/react";
 import { store, persistor } from "@store/store";
-
-// primereact themes and styles
-// import "primereact/resources/themes/lara-dark-blue/theme.css";  // theme
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import "primeflex/primeflex.css"
 import App from "@jsx/App.jsx";
 import Home from "@pages/Home";
 import Login from "@pages/Login";
 import Register from "@pages/Register";
 import Profile from "@pages/Profile";
 import PrivateRoute from "@components/PrivateRoute.jsx";
-
+import Error from "./pages/Error";
 import "@scss/main.scss";
 
 // const Loading = React.lazy(() => import("@pages/Loading"));
@@ -36,7 +34,7 @@ export const router = createBrowserRouter(
 		{
 			path: "/",
 			element: <App />,
-			// errorElement: <Error />, // the same as <Route path="*" element={<Error />}>
+			errorElement: <Error />, // the same as <Route path="*" element={<Error />}>
 			children: [
 				//? Public routes
 				{
@@ -44,10 +42,10 @@ export const router = createBrowserRouter(
 					index: true,
 					element: <Login />,
 				},
-				// {
-				// 	path: "login",
-				// 	element: <Login />,
-				// },
+				{
+					path: "login",
+					element: <Login />,
+				},
 				// {
 				// 	path: "register",
 				// 	element: <Register />,

@@ -1,78 +1,50 @@
-import { arLocale } from "@data/localization/ar.js";
-import { themeSettings } from "@data/themes/theme";
-import { selectLocal, selectMode, setLocal, setTheme, selectTheme } from "@jsx/store/slices/globalSlice";
-import { ThemeProvider } from "@mui/material";
-import { createTheme } from "@mui/material/styles";
-import { PrimeReactContext, PrimeReactProvider, addLocale } from "primereact/api";
-import { useContext, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Outlet } from "react-router-dom";
+import { AuthForm } from "@jsx/components/AuthForm";
+import { Settings } from "@pages/Settings";
 import { Checkbox } from "primereact/checkbox";
-import { Calendar } from "primereact/calendar";
-import { DataTable } from "primereact/datatable";
-import { Column } from "primereact/column";
-
-export default function Register() {
-	const mode = useSelector(selectMode);
-	// const theme = useMemo(() => createTheme(themeSettings(mode)), [mode]);
-	const theme = useSelector(selectTheme);
-	const local = useSelector(selectLocal);
-	const dispatch = useDispatch();
-	const [date, setDate] = useState(null);
-	const [checked, setChecked] = useState(false);
-	const [products, setProducts] = useState([{ code: "bla", name: "test", category: "test", quantity: 1 }]);
+import React, { useState } from "react";
 
 
-	const {changeTheme} = useContext(PrimeReactContext);
-	const handleLocalChange = (event) => {
-		dispatch(setLocal(event.target.value));
-	};
-	const handleThemeChange = (event) => {
-		const newTheme = event.target.value;
-		const currentTheme = theme; // assuming `theme` is the current theme
-		const linkElementId = currentTheme; // assuming the id of the link element is the same as the current theme
+export default function Login() {
+	    const [ingredients, setIngredients] = useState([]);
 
-		changeTheme(currentTheme, newTheme, linkElementId, () => {
-			console.log("Theme switched successfully");
-			dispatch(setTheme(newTheme));
-		});
-	};
+		const onIngredientsChange = (e) => {
+			let _ingredients = [...ingredients];
+
+			if (e.checked) _ingredients.push(e.value);
+			else _ingredients.splice(_ingredients.indexOf(e.value), 1);
+
+			setIngredients(_ingredients);
+		};
 	return (
-		<>
-			{/* <div>
-				<label htmlFor="language-select">Choose a language:</label>
-				<select id="language-select" value={local} onChange={handleLocalChange}>
-					<option value="en">English</option>
-					<option value="ar">Arabic</option>
-				</select>
-			</div> */}
-			<div className="card flex justify-content-center">
-				<Calendar value={date} onChange={(e) => setDate(e.value)} />
+		<div className="card flex flex-wrap justify-content-center gap-3">
+			<div className="flex align-items-center">
+				<Checkbox inputId="ingredient1" name="pizza" value="Cheese" onChange={onIngredientsChange} checked={ingredients.includes("Cheese")} />
+				<label htmlFor="ingredient1" className="ml-2">
+					Cheese
+				</label>
 			</div>
-			<div className="card flex justify-content-center">
-				<Checkbox onChange={(e) => setChecked(e.checked)} checked={checked}></Checkbox>
-				<Checkbox onChange={(e) => setChecked(e.checked)} checked={checked}></Checkbox>
-				<Checkbox onChange={(e) => setChecked(e.checked)} checked={checked}></Checkbox>
+			<div className="flex align-items-center">
+				<Checkbox inputId="ingredient2" name="pizza" value="Mushroom" onChange={onIngredientsChange} checked={ingredients.includes("Mushroom")} />
+				<label htmlFor="ingredient2" className="ml-2">
+					Mushroom
+				</label>
 			</div>
-			<div className="card">
-				<DataTable value={products} tableStyle={{ minWidth: "50rem" }}>
-					<Column field="code" header="Code"></Column>
-					<Column field="name" header="Name"></Column>
-					<Column field="category" header="Category"></Column>
-					<Column field="quantity" header="Quantity"></Column>
-				</DataTable>
+			<div className="flex align-items-center">
+				<Checkbox inputId="ingredient3" name="pizza" value="Pepper" onChange={onIngredientsChange} checked={ingredients.includes("Pepper")} />
+				<label htmlFor="ingredient3" className="ml-2">
+					Pepper
+				</label>
 			</div>
-			<div>
-				<label htmlFor="theme-select">Choose a theme:</label>
-				<select id="theme-select" value={theme} onChange={handleThemeChange}>
-					<option value="lara-light-blue">lara-light-blue</option>
-					<option value="lara-dark-blue">lara-dark-blue</option>
-					<option value="luna-blue">luna-blue</option>
-				</select>
+			<div className="flex align-items-center">
+				<Checkbox inputId="ingredient4" name="pizza" value="Onion" onChange={onIngredientsChange} checked={ingredients.includes("Onion")} />
+				<label htmlFor="ingredient4" className="ml-2">
+					Onion
+				</label>
 			</div>
-		</>
+		</div>
+
 		// <FormLayout>
-		// <LoginForm />
+		// <AuthForm />
 		// </FormLayout>
 	);
 }

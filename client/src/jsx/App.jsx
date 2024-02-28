@@ -1,10 +1,6 @@
 import { arLocale } from "@data/localization/ar.js";
-import { themeSettings } from "@data/themes/theme";
-import { selectLocal, selectMode, setLocal, setTheme, selectTheme } from "@jsx/store/slices/globalSlice";
-import { ThemeProvider } from "@mui/material";
-import { createTheme } from "@mui/material/styles";
-import { PrimeReactContext, PrimeReactProvider, addLocale } from "primereact/api";
-import { useContext, useMemo, useState } from "react";
+import { selectLocal, selectMode, selectTheme } from "@jsx/store/slices/globalSlice";
+import { PrimeReactProvider, addLocale } from "primereact/api";
 import { useDispatch, useSelector } from "react-redux";
 import { Outlet } from "react-router-dom";
 
@@ -32,9 +28,9 @@ function App() {
 
 	return (
 		// <ThemeProvider theme={theme}>
-			<PrimeReactProvider value={options}>
-				<Outlet />
-			</PrimeReactProvider>
+		<PrimeReactProvider value={options}>
+			<Outlet />
+		</PrimeReactProvider>
 		// </ThemeProvider>
 	);
 }

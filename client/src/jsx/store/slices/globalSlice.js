@@ -18,7 +18,7 @@ export const globalSlice = createSlice({
 			state.local = action.payload; // set language
 		},
 		setTheme: (state, action) => {
-			state.local = action.payload; // set language
+			state.theme = action.payload; // set language
 		},
 		setFriends: (state, action) => {
 			if (state.user) {

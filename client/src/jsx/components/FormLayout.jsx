@@ -1,6 +1,5 @@
 import { Box, Typography, useTheme, useMediaQuery } from "@mui/material";
-import AuthForm from "@jsx/components/AuthForm";
-import LoginForm from "@components/LoginForm";
+import {AuthForm} from "@jsx/components/AuthForm";
 
 export default function Auth({children}) {
       const theme = useTheme();

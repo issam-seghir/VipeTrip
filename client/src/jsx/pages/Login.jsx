@@ -1,8 +1,9 @@
 import { AuthForm } from "@jsx/components/AuthForm";
 import { Settings } from "@pages/Settings";
 import { Checkbox } from "primereact/checkbox";
+import { Button } from "primereact/button";
 import React, { useState } from "react";
-
+import {  classNames } from "primereact/utils";
 
 export default function Login() {
 	    const [ingredients, setIngredients] = useState([]);
@@ -16,35 +17,22 @@ export default function Login() {
 			setIngredients(_ingredients);
 		};
 	return (
-		<div className="card flex flex-wrap justify-content-center gap-3">
-			<div className="flex align-items-center">
-				<Checkbox inputId="ingredient1" name="pizza" value="Cheese" onChange={onIngredientsChange} checked={ingredients.includes("Cheese")} />
-				<label htmlFor="ingredient1" className="ml-2">
-					Cheese
-				</label>
-			</div>
-			<div className="flex align-items-center">
-				<Checkbox inputId="ingredient2" name="pizza" value="Mushroom" onChange={onIngredientsChange} checked={ingredients.includes("Mushroom")} />
-				<label htmlFor="ingredient2" className="ml-2">
-					Mushroom
-				</label>
-			</div>
-			<div className="flex align-items-center">
-				<Checkbox inputId="ingredient3" name="pizza" value="Pepper" onChange={onIngredientsChange} checked={ingredients.includes("Pepper")} />
-				<label htmlFor="ingredient3" className="ml-2">
-					Pepper
-				</label>
-			</div>
-			<div className="flex align-items-center">
-				<Checkbox inputId="ingredient4" name="pizza" value="Onion" onChange={onIngredientsChange} checked={ingredients.includes("Onion")} />
-				<label htmlFor="ingredient4" className="ml-2">
-					Onion
-				</label>
-			</div>
-		</div>
 
-		// <FormLayout>
-		// <AuthForm />
-		// </FormLayout>
+<div className="grid grid-nogutter surface-0 text-800">
+    <div className="col-12 md:col-6 p-6 text-center md:text-left flex align-items-center ">
+        <section>
+            <span className="block text-6xl font-bold mb-1">Create the screens</span>
+            <div className="text-6xl text-primary font-bold mb-3">your visitors deserve to see</div>
+            <p className="mt-0 mb-4 text-700 line-height-3">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+
+            <Button label="Learn More" type="button" className="mr-3 p-button-raised" />
+            <Button label="Live Demo" type="button" className="p-button-outlined" />
+        </section>
+    </div>
+    <div className="col-12 md:col-6 overflow-hidden">
+        <img src="/demo/images/blocks/hero/hero-1.png" alt="hero-1" className="md:ml-auto block md:h-full" style={{ clipPath: 'polygon(8% 0, 100% 0%, 100% 100%, 0 100%)' }} />
+    </div>
+</div>
+
 	);
 }

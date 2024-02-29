@@ -7,7 +7,7 @@ import { StrictMode } from "react";
 import { PersistGate } from "redux-persist/integration/react";
 import { store, persistor } from "@store/store";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
-import "primeflex/primeflex.css"
+// import "primeflex/primeflex.css"
 import App from "@jsx/App.jsx";
 import Home from "@pages/Home";
 import Login from "@pages/Login";
@@ -40,10 +40,6 @@ export const router = createBrowserRouter(
 				{
 					// default Outlet route , the same as <Route index element={<LogIn/>} />
 					index: true,
-					element: <Login />,
-				},
-				{
-					path: "login",
 					element: <Login />,
 				},
 				// {

@@ -12,7 +12,7 @@ function App() {
 	const theme = useSelector(selectTheme);
 	const local = useSelector(selectLocal);
 	const dispatch = useDispatch();
-	const options = {
+	const primereactConfig = {
 		// inputStyle: "filled",
 		//  zIndex: {
 		//     modal: 1100,    // dialog, sidebar
@@ -28,7 +28,7 @@ function App() {
 
 	return (
 		// <ThemeProvider theme={theme}>
-		<PrimeReactProvider value={options}>
+		<PrimeReactProvider value={primereactConfig}>
 			<Outlet />
 		</PrimeReactProvider>
 		// </ThemeProvider>

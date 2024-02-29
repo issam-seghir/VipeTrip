@@ -20,12 +20,12 @@ export default function Login() {
     setIngredients(_ingredients);
   };
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex viewport">
       <div
-        className=" p-6 text-center md:text-left flex align-items-center"
+        className="flex-center p-6 text-center md:text-left "
         style={{ flex: "50%" }}
       >
-        <section>
+        {/* <section>
           <span className="block text-6xl font-bold mb-1">
             Welcome To VipeTrip
           </span>
@@ -33,31 +33,21 @@ export default function Login() {
             your trip begien here !!
           </div>
           <div className="text-2xl  text-primary font-bold mb-3">Sign In</div>
-        </section>
+        </section> */}
+        <AuthForm />
       </div>
-      <div
+
+      <Image
+        alt="cover"
+        className="cover"
+        src={sectionImg}
         style={{
           flex: "50%",
         }}
-      >
-        <img
-          src={sectionImg}
-          alt="section"
-          style={{
-            clipPath: "polygon(8% 0, 100% 0%, 100% 100%, 0 100%)",
-            objectFit: "cover",
-          }}
-        />
-        {/* <Image
-          style={{ flex: "50%" }}
-          imageStyle={{
-            clipPath: "polygon(8% 0, 100% 0%, 100% 100%, 0 100%)",
-            objectFit: "cover",
-          }}
-          src={sectionImg}
-          alt="section"
-        /> */}
-      </div>
+        imageStyle={{
+          clipPath: "polygon(8% 0, 100% 0%, 100% 100%, 0 100%)",
+        }}
+      />
     </div>
   );
 }

@@ -58,6 +58,9 @@
 			],
 			"@validations/*": [
 				"src/jsx/validations/*"
+			],
+			"@Form/*": [
+				"src/jsx/components/Form/*"
 			]
 		}
 	}

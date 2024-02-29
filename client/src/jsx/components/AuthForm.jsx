@@ -2,6 +2,7 @@ import { useLoginMutation } from "@jsx/store/api/authApi";
 import { Box, Button, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { useForm } from "react-hook-form";
 import { useNavigate, useLocation } from "react-router-dom";
+import React, { useRef } from "react";
 
 import FormTextField from "@components/FormTextField";
 import { DevTool } from "@hookform/devtools";
@@ -10,11 +11,19 @@ import { setCredentials } from "@jsx/store/slices/authSlice";
 import { useFormHandleErrors } from "@utils/hooks/useFormHandleErrors";
 import { loginSchema } from "@utils/validationSchema";
 import { useDispatch } from "react-redux";
+import { isDev } from "@data/constants";
+import { Toast } from "primereact/toast";
+import { PFormTextField } from "./Form/PFormTextField";
 
 export  function AuthForm() {
 	const { palette } = useTheme();
 	const isNonMobile = useMediaQuery("(min-width:600px)");
 	const dispatch = useDispatch();
+	const toast = useRef(null);
+
+	const show = (res) => {
+		toast.current.show({ severity: "success", summary: "Successful Log in 🚀", detail: `Welcome ${res.user.name} 👋` });
+	};
 
 	const navigate = useNavigate();
 	const location = useLocation();
@@ -54,6 +63,7 @@ export  function AuthForm() {
 
 			if (res) {
 				console.log(res);
+				show(res);
 				dispatch(setCredentials({ user: res?.user, token: res?.token }));
 				// reset form when submit is successful (keep default values)
 				reset();
@@ -78,20 +88,14 @@ export  function AuthForm() {
 	return (
 		<>
 			{/* react hook form dev tool  */}
-			{import.meta.env.DEV && <DevTool control={control} placement="top-left" />}
-			{/* login */}
+			{isDev && <DevTool control={control} placement="top-left" />}
+			<Toast ref={toast} />
+
 			<form onSubmit={handleSubmit(onSubmit)}>
-				<Box
-					display="grid"
-					gap="30px"
-					gridTemplateColumns="repeat(4, minmax(0, 1fr))"
-					sx={{
-						"& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
-					}}
-				>
-					<FormTextField defaultValue={"admin@test.com"} name={"email"} label="Email" control={control} errorMessage={getServerErrorMessageForField("email")} sx={{ gridColumn: "span 4" }} />
-					<FormTextField defaultValue={"123456@Admin"} name={"password"} label="Password" type="password" errorMessage={getServerErrorMessageForField("password")} control={control} sx={{ gridColumn: "span 4" }} />
-				</Box>
+
+					<PFormTextField defaultValue={"admin@test.com"} name={"email"} label="Email" control={control} errorMessage={getServerErrorMessageForField("email")} />
+					{/* <FormTextField defaultValue={"admin@test.com"} name={"email"} label="Email" control={control} errorMessage={getServerErrorMessageForField("email")} sx={{ gridColumn: "span 4" }} /> */}
+					{/* <FormTextField defaultValue={"123456@Admin"} name={"password"} label="Password" type="password" errorMessage={getServerErrorMessageForField("password")} control={control} sx={{ gridColumn: "span 4" }} /> */}
 
 				{/* BUTTONS */}
 				<Box>

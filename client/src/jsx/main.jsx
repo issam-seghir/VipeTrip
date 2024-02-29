@@ -7,7 +7,6 @@ import { StrictMode } from "react";
 import { PersistGate } from "redux-persist/integration/react";
 import { store, persistor } from "@store/store";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
-import "primeflex/primeflex.css"
 import App from "@jsx/App.jsx";
 import Home from "@pages/Home";
 import Login from "@pages/Login";
@@ -15,7 +14,10 @@ import Register from "@pages/Register";
 import Profile from "@pages/Profile";
 import PrivateRoute from "@components/PrivateRoute.jsx";
 import Error from "./pages/Error";
+import "primeicons/primeicons.css";
+import "primeflex/primeflex.css"
 import "@scss/main.scss";
+
 
 // const Loading = React.lazy(() => import("@pages/Loading"));
 // const Tracker = React.lazy(() => import("@pages/Tracker"));

@@ -1,7 +1,9 @@
 import { AuthForm } from "@jsx/components/AuthForm";
 import { useState } from "react";
 // import { classNames } from "primereact/utils";
-import sectionImg from "@assets/images/Autumn Biking Companions.png";
+import sectionImg1 from "@assets/images/Autumn Biking Companions.png";
+import sectionImg2 from "@assets/images/Contemplative Urban Dreamer.png";
+import sectionImg3 from "@assets/images/wallpaper.png";
 
 import { Button } from "primereact/button";
 import { Checkbox } from "primereact/checkbox";
@@ -13,14 +15,20 @@ import { Galleria } from "primereact/galleria";
 export default function Login() {
 	const [ingredients, setIngredients] = useState([]);
 	const [checked, setChecked] = useState(false);
-	const images = [sectionImg, logo];
+	const images = [
+		{ svg: sectionImg1, alt: "section1" },
+		{ svg: sectionImg2, alt: "section2" },
+		{ svg: sectionImg3, alt: "section3" },
+	];
 	    const responsiveOptions = [
 			{
 				breakpoint: "767px",
 				numVisible: 1,
 			},
 		];
-
+    const itemTemplate = (item) => {
+		return <img src={item.svg} alt={item.alt} className="cover-fill h-full" style={{clipPath: "polygon(8% 0, 100% 0%, 100% 100%, 0 100%)" ,objectFit:"cover"}} />;
+	};
 	const onIngredientsChange = (e) => {
 		let _ingredients = [...ingredients];
 
@@ -80,7 +88,7 @@ export default function Login() {
 			{/* <Image
 				alt="cover"
 				className="cover"
-				src={sectionImg}
+				src={sectionImg1}
 				style={{
 					flex: "50%",
 				}}
@@ -88,7 +96,31 @@ export default function Login() {
 					clipPath: "polygon(8% 0, 100% 0%, 100% 100%, 0 100%)",
 				}}
 			/> */}
-			<Galleria value={images} responsiveOptions={responsiveOptions} numVisible={4} style={{ maxWidth: "640px" }} item={itemTemplate} thumbnail={thumbnailTemplate} circular autoPlay transitionInterval={2000} />
+			<Galleria
+				value={images}
+				responsiveOptions={responsiveOptions}
+				numVisible={3}
+				item={itemTemplate}
+				circular
+				autoPlay
+				showItemNavigators={false}
+				showIndicators={false}
+				showThumbnails={false}
+				transitionInterval={2000}
+				transitionOptions={{
+					classNames: "fade",
+				}}
+				pt={{
+					content: "h-full",
+					itemWrapper: "h-full",
+					transition: {
+						enterFromClass: "opacity-0 scale-75",
+						enterActiveClass: "transition-all duration-150 ease-in-out",
+						leaveActiveClass: "transition-all duration-150 ease-in",
+						leaveToClass: "opacity-0 scale-75",
+					},
+				}}
+			/>
 		</div>
 	);
 }

@@ -289,6 +289,9 @@
   color: #60a5fa;
 }
 
+/*? fix layer problem : make primereact the last one so no style ovirride it */
+@layer  abstracts,base ,components ,utilities,primereact  ;
+
 @layer primereact {
   * {
     box-sizing: border-box;

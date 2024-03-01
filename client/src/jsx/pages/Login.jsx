@@ -44,14 +44,14 @@ export default function Login() {
 	return (
 		<div className="flex viewport">
 			<div className="flex-center" style={{ flex: "50%" }}>
-				<Logo />
-
-				<div className="surface-card p-4 shadow-2 border-round w-full lg:w-5">
-					<Image alt="logo" src={logo} className="flex-center" />
-					<div className="text-center flex-center flex-column gap-2">
-						<div className="text-900 lg:text-3xl md:text-xl text-sm font-medium mb-3">Welcome Back</div>
-						<div className="text-900 lg:text-3xl md:text-xl text-sm font-medium mb-3">
-							to <span>VipeTrip</span> 📳
+				<div className="surface-card p-4 shadow-2 border-round w-full lg:w-7">
+					<div className="flex-center mb-4">
+						<Logo className={"surface-card logo"} style={{ transition: "all 2s linear" }} />
+					</div>
+					<div className="text-center flex-center flex-column gap-1">
+						<div className="text-900 lg:text-3xl md:text-xl text-sm font-medium">Welcome Back</div>
+						<div className="text-900 lg:text-3xl md:text-xl text-sm font-medium">
+							to <span className="text-primary text-animate">VipeTrip</span>
 						</div>
 					</div>
 					<div>
@@ -102,8 +102,9 @@ export default function Login() {
 				showItemNavigators={false}
 				showIndicators={false}
 				showThumbnails={false}
-				style={{flex:"30%"}}
+				style={{ flex: "30%" }}
 				transitionInterval={4000}
+				transitionOptions={{ classNames: "fade" }}
 				pt={{
 					content: "h-full",
 					itemWrapper: "h-full",

@@ -27,39 +27,47 @@
 	animation: rotate 3s infinite linear;
 }
 
-.fade-enter-active{
-	display: none !important;
+/* transition animation for Galleria Primereact Component  */
+.fade-enter {
+  opacity: 0;
+}
+.fade-enter-active {
+  opacity: 1;
+  transition: opacity 200ms;
+}
+.fade-exit {
+  opacity: 1;
+}
+.fade-exit-active {
+  opacity: 0;
+  transition: opacity 200ms;
 }
 
-.text-animate {
+/* .text-animate {
 	color: transparent;
 	background-image: url("@assets/gifs/giphy-downsized.gif");
 	background-clip: text;
 	background-size: cover;
-	-webkit-text-fill-color: rgba(var(--joy-palette-primary-mainChannel) / 70%);
-}
+	-webkit-text-fill-color: rgba(var(001) / 70%);
+} */
 
-html[data-joy-color-scheme="light"] .text-animate {
-	text-shadow: -3px -3px 10px #ffffff0d;
-	// background-image: url("https://c.tenor.com/OPMJAHXKIU0AAAAd/looking-water.gif");
-	// background-image: url("https://c.tenor.com/4rSybJ_qYGsAAAAC/snow.gif");
-	background-image: url("@assets/gifs/looking-water.gif");
+.text-animate {
+	text-shadow: -1px 2px 5px #61a3f30a;;
+	 background-image: url("https://c.tenor.com/OPMJAHXKIU0AAAAd/looking-water.gif");
+	 /* background-image: url("https://c.tenor.com/4rSybJ_qYGsAAAAC/snow.gif"); */
 	background-repeat: repeat;
-	background-position: center center;
+	background-position: left top;
 	background-clip: text;
-	background-clip: text;
-
-	background-size: contain;
 	-webkit-text-fill-color: #00000042;
-	-webkit-text-stroke-color: var(--joy-palette-primary-500);
-	-webkit-text-stroke-width: 0.3px;
 }
 
 
 // html[data-joy-theme="greenEmerald"] {
 // }
 
-
+.logo:hover{
+	fill:  var(--highlight-text-color) ;
+}
 .cover {
 	position:relative;
 	> img {

@@ -105,6 +105,8 @@ module.exports = {
 		"import/no-duplicates": "error",
 		// Allow empty named blocks in imports (with a warning)
 		"import/no-empty-named-blocks": "warn",
+		// fix import error when using svgr vite plugin or vite features when importing svg
+		"import/no-unresolved": ["error", { ignore: ["\\.svg\\?react$", "\\.svg\\?url$"] }],
 		"sonarjs/no-duplicate-string": "warn",
 		"sonarjs/cognitive-complexity": "warn",
 

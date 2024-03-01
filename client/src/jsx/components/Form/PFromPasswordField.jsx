@@ -33,19 +33,17 @@ export function PFromPasswordField({ control, defaultValue = "", feedback = true
 					<span className={classNames({ "p-float-label": label }, { "p-input-icon-left": iconStart }, { "p-input-icon-right": iconEnd })}>
 						{iconStart && <i className={classNames("pi", iconStart)} />}
 						<Password
-							id={field.name}
-							value={field.value}
 							{...field}
+							id={field.name}
 							inputRef={field.ref}
 							className={classNames({ "p-invalid": fieldState.error }, { [sizeClass]: size })}
 							disabled={disabled}
-							onChange={(e) => field.onChange(e.target.value)}
 							feedback={feedback}
 							toggleMask={toggleMask}
 							header={customeFeedback && header}
 							footer={customeFeedback && footer}
 						/>
-						{iconEnd && <i className={classNames("pi", iconEnd)} />}
+						{iconEnd && false && <i className={classNames("pi", iconEnd)} />}
 						<label htmlFor={field.name}>{label}</label>
 					</span>
 					{/* error label */}

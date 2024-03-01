@@ -20,7 +20,7 @@ export function PFormTextField({ control, defaultValue = "", name, label, type =
 					<span className={classNames({ "p-float-label": label }, { "p-input-icon-left": iconStart }, { "p-input-icon-right": iconEnd })}>
 						{iconStart && <i className={classNames("pi", iconStart)} />}
 						<InputText id={field.name} value={field.value} type={type} className={classNames({ "p-invalid": fieldState.error }, { [sizeClass]: size })} disabled={disabled} onChange={(e) => field.onChange(e.target.value)} />
-						{iconEnd && <i className={classNames("pi", iconEnd)} />}
+						{iconEnd && false && <i className={classNames("pi", iconEnd)} />}
 						<label htmlFor={field.name}>{label}</label>
 					</span>
 					{/* error label */}

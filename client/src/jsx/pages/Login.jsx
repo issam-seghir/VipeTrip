@@ -48,7 +48,7 @@ export default function Login() {
 					<div className="flex-center mb-4">
 						<Logo className={"surface-card logo"} style={{ transition: "all 2s linear" }} />
 					</div>
-					<div className="text-center flex-center flex-column gap-1">
+					<div className="text-center flex-center flex-column gap-1 mb-4">
 						<div className="text-900 lg:text-3xl md:text-xl text-sm font-medium">Welcome Back</div>
 						<div className="text-900 lg:text-3xl md:text-xl text-sm font-medium">
 							to <span className="text-primary text-animate">VipeTrip</span>

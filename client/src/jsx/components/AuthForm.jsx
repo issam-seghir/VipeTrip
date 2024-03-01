@@ -14,6 +14,7 @@ import { useDispatch } from "react-redux";
 import { isDev } from "@data/constants";
 import { Toast } from "primereact/toast";
 import { PFormTextField } from "./Form/PFormTextField";
+import { PFromPasswordField } from "./Form/PFromPasswordField";
 
 export  function AuthForm() {
 	const { palette } = useTheme();
@@ -92,8 +93,10 @@ export  function AuthForm() {
 			<Toast ref={toast} />
 
 			<form onSubmit={handleSubmit(onSubmit)}>
-				<PFormTextField control={control} defaultValue={"admin@test.com"} name={"email"} label="Email" type="email" size={"lg"} iconStart={"pi-user"} iconEnd={"pi-spin pi-spinner"} errorMessage={getServerErrorMessageForField("email")} />
-				<PFormTextField control={control} defaultValue={"123456@Admin"} name={"password"} label="Password" type="password" size={"lg"} iconStart={"pi-lock"} iconEnd={"pi-spin pi-spinner"} errorMessage={getServerErrorMessageForField("password")} />
+				<div className="flex flex-column gap-2">
+					<PFormTextField control={control} defaultValue={"admin@test.com"} name={"email"} label="Email" type="email" size={"lg"} iconStart={"pi-user"} iconEnd={"pi-spin pi-spinner"} errorMessage={getServerErrorMessageForField("email")} />
+					<PFromPasswordField control={control} defaultValue={"123456@Admin"} name={"password"} label="Password" type="password" size={"lg"} iconStart={"pi-lock"} iconEnd={"pi-spin pi-spinner"} errorMessage={getServerErrorMessageForField("password")} />
+				</div>
 
 				{/* BUTTONS */}
 				<Box>

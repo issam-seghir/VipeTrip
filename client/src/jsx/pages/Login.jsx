@@ -7,28 +7,32 @@ import sectionImg3 from "@assets/images/wallpaper.png";
 
 import { Button } from "primereact/button";
 import { Checkbox } from "primereact/checkbox";
-import { Image } from "primereact/image";
-import { InputText } from "primereact/inputtext";
-import logo from "/logo/social-vimeo-svgrepo-com (2).svg?svg";
 import { Galleria } from "primereact/galleria";
+import { InputText } from "primereact/inputtext";
+import { Image } from "primereact/image";
+import logo from "/logo/logo.svg?url";
+import Logo from "../../../public/logo/logo.svg?react";
 
 export default function Login() {
-	const [ingredients, setIngredients] = useState([]);
 	const [checked, setChecked] = useState(false);
+
+	// for Galleria Component
 	const images = [
 		{ svg: sectionImg1, alt: "section1" },
 		{ svg: sectionImg2, alt: "section2" },
 		{ svg: sectionImg3, alt: "section3" },
 	];
-	    const responsiveOptions = [
-			{
-				breakpoint: "767px",
-				numVisible: 1,
-			},
-		];
-    const itemTemplate = (item) => {
-		return <img src={item.svg} alt={item.alt} className="cover-fill h-full" style={{clipPath: "polygon(8% 0, 100% 0%, 100% 100%, 0 100%)" ,objectFit:"cover"}} />;
+	const responsiveOptions = [
+		{
+			breakpoint: "767px",
+			numVisible: 1,
+		},
+	];
+	const itemTemplate = (item) => {
+		return <img src={item.svg} alt={item.alt} className="h-full" style={{ clipPath: "polygon(8% 0, 100% 0%, 100% 100%, 0 100%)", objectFit: "cover" }} />;
 	};
+
+	const [ingredients, setIngredients] = useState([]);
 	const onIngredientsChange = (e) => {
 		let _ingredients = [...ingredients];
 
@@ -40,16 +44,19 @@ export default function Login() {
 	return (
 		<div className="flex viewport">
 			<div className="flex-center" style={{ flex: "50%" }}>
-				<div className="surface-card p-4 shadow-2 border-round w-full lg:w-6">
-					<div className="text-center mb-5">
-						<a href="https://vitejs.dev" target="_blank" rel="noreferrer">
-							<img src={logo} alt="logo" />
-						</a>
-						<div className="text-900 text-3xl font-medium mb-3">Welcome Back</div>
-						<span className="text-600 font-medium line-height-3">Don&apos;t have an account?</span>
-						<a className="font-medium no-underline ml-2 text-blue-500 cursor-pointer" href="#">
-							Create today!
-						</a>
+			<Logo/>
+
+				<div className="surface-card p-4 shadow-2 border-round w-full lg:w-5">
+					{/* <Image
+						alt="logo"
+						src={logo}
+						className="flex-center"
+					/> */}
+					<div className="text-center flex-center flex-column gap-2">
+						<div className="text-900 lg:text-3xl md:text-xl text-sm font-medium mb-3">Welcome Back</div>
+						<div className="text-900 lg:text-3xl md:text-xl text-sm font-medium mb-3">
+							to <span>VipeTrip</span> 📳
+						</div>
 					</div>
 					<div>
 						<label htmlFor="email" className="block text-900 font-medium mb-2">
@@ -75,6 +82,10 @@ export default function Login() {
 					<AuthForm />
 				</div>
 				{/* <section>
+				<span className="text-600 font-medium line-height-3">Don&apos;t have an account?</span>
+						<a className="font-medium no-underline ml-2 text-blue-500 cursor-pointer" href="#">
+							Create today!
+						</a>
           <span className="block text-6xl font-bold mb-1">
             Welcome To VipeTrip
           </span>
@@ -108,7 +119,11 @@ export default function Login() {
 				showThumbnails={false}
 				transitionInterval={2000}
 				transitionOptions={{
+					timeout: 1500,
 					classNames: "fade",
+					onEnter: () => console.log("onEnter"),
+					onEntered: () => console.log("onEntered"),
+					unmountOnExit: false,
 				}}
 				pt={{
 					content: "h-full",

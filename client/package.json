@@ -28,6 +28,8 @@
 		"@hookform/devtools": "^4.3.1",
 		"@iconify/react": "^4.1.1",
 		"@mui/material": "^5.10.11",
+		"@svgr/plugin-jsx": "^8.1.0",
+		"@svgr/plugin-svgo": "^8.1.0",
 		"@vitejs/plugin-react": "^4.2.1",
 		"eslint": "^8.55.0",
 		"eslint-config-prettier": "^9.0.0",

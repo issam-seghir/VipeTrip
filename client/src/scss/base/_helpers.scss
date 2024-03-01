@@ -27,6 +27,10 @@
 	animation: rotate 3s infinite linear;
 }
 
+.fade{
+	display: none !important;
+}
+
 .text-animate {
 	color: transparent;
 	background-image: url("@assets/gifs/giphy-downsized.gif");

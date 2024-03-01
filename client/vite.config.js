@@ -60,10 +60,13 @@ export default defineConfig({
 		svgr({
 			// svgr options: https://react-svgr.com/docs/options/
 			svgrOptions: {
-				// ...
+				plugins: ["@svgr/plugin-svgo", "@svgr/plugin-jsx"],
+				svgoConfig: {
+					plugins: ["preset-default", "removeTitle", "removeDesc", "removeDoctype", "cleanupIds"],
+				},
 			},
 			// A minimatch pattern, or array of patterns, which specifies the files in the build the plugin should include.
-			include: "**/*.svg",
+			include: "**/*.svg?react",
 		}),
 	],
 });

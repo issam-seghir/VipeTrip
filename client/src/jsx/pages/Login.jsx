@@ -5,13 +5,13 @@ import sectionImg1 from "@assets/images/Autumn Biking Companions.png";
 import sectionImg2 from "@assets/images/Contemplative Urban Dreamer.png";
 import sectionImg3 from "@assets/images/wallpaper.png";
 
+import Logo from "@svg/logo.svg?react";
+import logo from "@svg/logo.svg?url";
 import { Button } from "primereact/button";
 import { Checkbox } from "primereact/checkbox";
 import { Galleria } from "primereact/galleria";
-import { InputText } from "primereact/inputtext";
 import { Image } from "primereact/image";
-import logo from "/logo/logo.svg?url";
-import Logo from "../../../public/logo/logo.svg?react";
+import { InputText } from "primereact/inputtext";
 
 export default function Login() {
 	const [checked, setChecked] = useState(false);
@@ -29,7 +29,7 @@ export default function Login() {
 		},
 	];
 	const itemTemplate = (item) => {
-		return <img src={item.svg} alt={item.alt} className="h-full" style={{ clipPath: "polygon(8% 0, 100% 0%, 100% 100%, 0 100%)", objectFit: "cover" }} />;
+		return <img src={item.svg} alt={item.alt} className="h-full w-full" style={{ clipPath: "polygon(8% 0, 100% 0%, 100% 100%, 0 100%)", objectFit: "cover" }} />;
 	};
 
 	const [ingredients, setIngredients] = useState([]);
@@ -44,14 +44,10 @@ export default function Login() {
 	return (
 		<div className="flex viewport">
 			<div className="flex-center" style={{ flex: "50%" }}>
-			<Logo/>
+				<Logo />
 
 				<div className="surface-card p-4 shadow-2 border-round w-full lg:w-5">
-					{/* <Image
-						alt="logo"
-						src={logo}
-						className="flex-center"
-					/> */}
+					<Image alt="logo" src={logo} className="flex-center" />
 					<div className="text-center flex-center flex-column gap-2">
 						<div className="text-900 lg:text-3xl md:text-xl text-sm font-medium mb-3">Welcome Back</div>
 						<div className="text-900 lg:text-3xl md:text-xl text-sm font-medium mb-3">
@@ -96,17 +92,6 @@ export default function Login() {
         </section> */}
 			</div>
 
-			{/* <Image
-				alt="cover"
-				className="cover"
-				src={sectionImg1}
-				style={{
-					flex: "50%",
-				}}
-				imageStyle={{
-					clipPath: "polygon(8% 0, 100% 0%, 100% 100%, 0 100%)",
-				}}
-			/> */}
 			<Galleria
 				value={images}
 				responsiveOptions={responsiveOptions}
@@ -117,23 +102,11 @@ export default function Login() {
 				showItemNavigators={false}
 				showIndicators={false}
 				showThumbnails={false}
-				transitionInterval={2000}
-				transitionOptions={{
-					timeout: 1500,
-					classNames: "fade",
-					onEnter: () => console.log("onEnter"),
-					onEntered: () => console.log("onEntered"),
-					unmountOnExit: false,
-				}}
+				style={{flex:"30%"}}
+				transitionInterval={4000}
 				pt={{
 					content: "h-full",
 					itemWrapper: "h-full",
-					transition: {
-						enterFromClass: "opacity-0 scale-75",
-						enterActiveClass: "transition-all duration-150 ease-in-out",
-						leaveActiveClass: "transition-all duration-150 ease-in",
-						leaveToClass: "opacity-0 scale-75",
-					},
 				}}
 			/>
 		</div>

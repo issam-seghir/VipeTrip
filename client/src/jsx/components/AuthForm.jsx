@@ -92,7 +92,7 @@ export  function AuthForm() {
 			<Toast ref={toast} />
 
 			<form onSubmit={handleSubmit(onSubmit)}>
-				<PFormTextField control={control} defaultValue={"admin@test.com"} name={"email"} label="Email" type="email" size={"p-inputtext-lg"} errorMessage={getServerErrorMessageForField("email")} />
+				<PFormTextField control={control} defaultValue={"admin@test.com"} name={"email"} label="Email" type="email" size={"lg"} errorMessage={getServerErrorMessageForField("email")} />
 				{/* <FormTextField defaultValue={"admin@test.com"} name={"email"} label="Email" control={control} errorMessage={getServerErrorMessageForField("email")} sx={{ gridColumn: "span 4" }} /> */}
 				{/* <FormTextField defaultValue={"123456@Admin"} name={"password"} label="Password" type="password" errorMessage={getServerErrorMessageForField("password")} control={control} sx={{ gridColumn: "span 4" }} /> */}
 

@@ -4,11 +4,29 @@ import { Password } from "primereact/password";
 import { classNames } from "primereact/utils";
 import { Controller } from "react-hook-form";
 
-export function PFromPasswordField({ control, defaultValue = "", feedback = true, customeFeedback = false, toggleMask = true, name, label, size, iconStart, iconEnd, errorMessage, reset, disabled = false }) {
+export function PFromPasswordField({
+	control,
+	defaultValue = "",
+	feedback = false,
+	customeFeedback = false,
+	toggleMask = true,
+	name,
+	label,
+	size,
+	iconStart,
+	iconEnd,
+	errorMessage,
+	reset,
+	disabled = false,
+}) {
 	const errorMessageFormate = errorMessage?.data?.message || errorMessage?.error;
 	const sizeClass = `p-inputtext-${size}`;
 	const getFormErrorMessage = (name) => {
-		return errorMessage[name] ? <small className="p-error">{errorMessage[name].message}</small> : <small className="p-error">&nbsp;</small>;
+		return errorMessage[name] ? (
+			<small className="p-error">{errorMessage[name].message}</small>
+		) : (
+			<small className="p-error">&nbsp;</small>
+		);
 	};
 	const header = <div className="font-bold mb-3">Pick a password</div>;
 	const footer = (
@@ -30,11 +48,10 @@ export function PFromPasswordField({ control, defaultValue = "", feedback = true
 			control={control}
 			render={({ field, fieldState }) => (
 				<>
-					<span className={classNames({ "p-float-label": label }, { "p-input-icon-left": iconStart }, { "p-input-icon-right": iconEnd })}>
-						{iconStart && <i className={classNames("pi", iconStart)} />}
+					<span className={classNames({ "p-float-label": label })}>
 						<Password
 							{...field}
-							id={field.name}
+							inputId={field.name}
 							inputRef={field.ref}
 							className={classNames({ "p-invalid": fieldState.error }, { [sizeClass]: size })}
 							disabled={disabled}
@@ -42,8 +59,11 @@ export function PFromPasswordField({ control, defaultValue = "", feedback = true
 							toggleMask={toggleMask}
 							header={customeFeedback && header}
 							footer={customeFeedback && footer}
-						/>
-						{iconEnd && false && <i className={classNames("pi", iconEnd)} />}
+						>
+						</Password>
+
+						{iconStart && <i className={classNames("pi", iconStart)} />}
+						{iconEnd && <i className={classNames("pi", iconEnd)} />}
 						<label htmlFor={field.name}>{label}</label>
 					</span>
 					{/* error label */}

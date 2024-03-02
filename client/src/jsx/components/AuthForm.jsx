@@ -93,9 +93,29 @@ export  function AuthForm() {
 			<Toast ref={toast} />
 
 			<form onSubmit={handleSubmit(onSubmit)}>
-				<div className="flex flex-column gap-2">
-					<PFormTextField control={control} defaultValue={"admin@test.com"} name={"email"} label="Email" type="email" size={"lg"} iconStart={"pi-user"} iconEnd={"pi-spin pi-spinner"} errorMessage={getServerErrorMessageForField("email")} />
-					<PFromPasswordField control={control} defaultValue={"123456@Admin"} name={"password"} label="Password" type="password" size={"lg"} iconStart={"pi-lock"} iconEnd={"pi-spin pi-spinner"} errorMessage={getServerErrorMessageForField("password")} />
+				<div className="flex flex-column gap-2 align-items-center">
+					<PFormTextField
+						control={control}
+						defaultValue={"admin@test.com"}
+						name={"email"}
+						label="Email"
+						type="email"
+						size={"lg"}
+						iconStart={"pi-user"}
+						iconEnd={"pi-spin pi-spinner"}
+						errorMessage={getServerErrorMessageForField("email")}
+					/>
+					<PFormTextField
+						control={control}
+						defaultValue={"admin@test.com"}
+						name={"Password"}
+						label="password"
+						type="password"
+						size={"lg"}
+						iconStart={"pi-lock"}
+						toogleMask={true}
+						errorMessage={getServerErrorMessageForField("password")}
+					/>
 				</div>
 
 				{/* BUTTONS */}

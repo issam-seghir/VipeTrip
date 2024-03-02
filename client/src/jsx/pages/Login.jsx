@@ -6,12 +6,10 @@ import sectionImg2 from "@assets/images/Contemplative Urban Dreamer.png";
 import sectionImg3 from "@assets/images/wallpaper.png";
 
 import Logo from "@svg/logo.svg?react";
-import logo from "@svg/logo.svg?url";
+// import logo from "@svg/logo.svg?url";
 import { Button } from "primereact/button";
 import { Checkbox } from "primereact/checkbox";
 import { Galleria } from "primereact/galleria";
-import { Image } from "primereact/image";
-import { InputText } from "primereact/inputtext";
 
 export default function Login() {
 	const [checked, setChecked] = useState(false);
@@ -29,7 +27,17 @@ export default function Login() {
 		},
 	];
 	const itemTemplate = (item) => {
-		return <img src={item.svg} alt={item.alt} className="h-full w-full" style={{ clipPath: "polygon(8% 0, 100% 0%, 100% 100%, 0 100%)", objectFit: "cover" }} />;
+		return (
+			<img
+				src={item.svg}
+				alt={item.alt}
+				className="h-full w-full"
+				style={{
+					clipPath: "polygon(8% 0, 100% 0%, 100% 100%, 0 100%)",
+					objectFit: "cover",
+				}}
+			/>
+		);
 	};
 
 	const [ingredients, setIngredients] = useState([]);
@@ -46,10 +54,15 @@ export default function Login() {
 			<div className="flex-center" style={{ flex: "50%" }}>
 				<div className="surface-card p-4 shadow-2 border-round w-full lg:w-7">
 					<div className="flex-center mb-4">
-						<Logo className={"surface-card logo"} style={{ transition: "all 2s linear" }} />
+						<Logo
+							className={"surface-card logo"}
+							style={{ transition: "all 2s linear" }}
+						/>
 					</div>
 					<div className="text-center flex-center flex-column gap-1 mb-4">
-						<div className="text-900 lg:text-3xl md:text-xl text-sm font-medium">Welcome Back</div>
+						<div className="text-900 lg:text-3xl md:text-xl text-sm font-medium">
+							Welcome Back
+						</div>
 						<div className="text-900 lg:text-3xl md:text-xl text-sm font-medium">
 							to <span className="text-primary text-animate">VipeTrip</span>
 						</div>
@@ -58,10 +71,17 @@ export default function Login() {
 					<div>
 						<div className="flex align-items-center justify-content-between mb-6">
 							<div className="flex align-items-center">
-								<Checkbox id="rememberme" onChange={(e) => setChecked(e.checked)} checked={checked} className="mr-2" />
+								<Checkbox
+									id="rememberme"
+									onChange={(e) => setChecked(e.checked)}
+									checked={checked}
+									className="mr-2"
+								/>
 								<label htmlFor="rememberme">Remember me</label>
 							</div>
-							<a className="font-medium no-underline ml-2 text-blue-500 text-right cursor-pointer">Forgot your password?</a>
+							<a className="font-medium no-underline ml-2 text-blue-500 text-right cursor-pointer">
+								Forgot your password?
+							</a>
 						</div>
 
 						<Button label="Sign In" icon="pi pi-user" className="w-full" />
@@ -98,6 +118,13 @@ export default function Login() {
 				pt={{
 					content: "h-full",
 					itemWrapper: "h-full",
+					transition: {
+						enterFromClass: "opacity-0 scale-75",
+						enterActiveClass:
+							"transition-transform transition-opacity duration-150 ease-in",
+						leaveActiveClass: "transition-opacity duration-150 ease-linear",
+						leaveToClass: "opacity-0",
+					},
 				}}
 			/>
 		</div>

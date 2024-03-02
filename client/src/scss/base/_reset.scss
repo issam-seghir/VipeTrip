@@ -66,72 +66,11 @@ img[width][height] {
 	/* Preserve aspect ratio */
 }
 
-/*
-Forms
-=====
-*/
-
-/**
-1. Change the font styles in all browsers.
-*/
-
-
-
-button[disabled],
-html input[disabled] {
-	cursor: default;
-}
-
-[disabled] {
-	pointer-events: none;
-}
-
-
-
-
-pre {
-	font-family: "Fira Code", "Consolas", "Monaco", monospace;
-	line-height: 1.5; /* Adjust the line height for readability */
-	padding: 10px; /* Optional: Add padding for spacing */
-	border: 1px solid #ccc; /* Optional: Add a border */
-	overflow-x: auto; /* Enable horizontal scrolling for code blocks */
-	font-size: 100%;
-}
-
 
 /* fix hidden attribute  */
 [hidden] { display: none; }
 
 
-
-
-/* firefox */
-
-/**
-Remove the inner border and padding in Firefox.
-*/
-
-::-moz-focus-inner {
-	border-style: none;
-	padding: 0;
-}
-
-/**
-Restore the focus styles unset by the previous rule.
-*/
-
-:-moz-focusring {
-	outline: 1px dotted ButtonText;
-}
-
-/**
-Remove the additional ':invalid' styles in Firefox.
-See: https://github.com/mozilla/gecko-dev/blob/2f9eacd9d3d995c937b4251a5557d95d494c9be1/layout/style/res/forms.css#L728-L737
-*/
-
-:-moz-ui-invalid {
-	box-shadow: none;
-}
 
 /* Remove all animations and transitions for people that prefer not to see them */
 @media (prefers-reduced-motion: reduce) {

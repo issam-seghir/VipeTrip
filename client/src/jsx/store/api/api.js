@@ -1,9 +1,10 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { setCredentials, clearCredentials } from "@store/slices/authSlice";
+import { SERVER_URL } from "@jsx/data/constants";
 
-const baseUrl = "http://localhost:3500/";
+
 const baseQuery = fetchBaseQuery({
-	baseUrl,
+	baseUrl: `${SERVER_URL}/api/v1`,
 	credentials: "include", // Include cookies in requests
 	prepareHeaders: (headers, { getState }) => {
 		// Use Redux's useSelector to get the token from the state

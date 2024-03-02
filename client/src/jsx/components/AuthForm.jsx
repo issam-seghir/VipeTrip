@@ -130,18 +130,26 @@ export function AuthForm() {
 					/>
 					<div className="flex gap-2 align-items-center justify-content-between mb-4">
 						<PFormCheckBox control={control} defaultValue={true} name={"rememberme"} label="Remember me" />
-						<a href="#" className=" no-underline ml-2 text-xs md:text-base text-blue-500 text-right cursor-pointer">
+						<a
+							href="#"
+							className=" no-underline ml-2 text-xs md:text-base text-blue-500 text-right cursor-pointer"
+						>
 							Forgot your password?
 						</a>
 					</div>
 
 					<Button
 						label={isLoginLoading ? "Loading..." : "Sign in"}
-						className="w-5"
+						className="btn-sign-in w-17rem lg:w-7"
 						iconPos="right"
-						severity="primary"
+						size={isNonMobile ? "large" : "small"}
 						loading={isSubmitting || isLoginLoading}
-					/>
+					>
+						<svg viewBox="0 0 180 60" className="sign-in border">
+							<polyline points="179,1 179,59 1,59 1,1 179,1" className="bg-line" />
+							<polyline points="179,1 179,59 1,59 1,1 179,1" className="hl-line" />
+						</svg>
+					</Button>
 					<Divider align="center">
 						<span>or you can sign in with </span>
 					</Divider>
@@ -167,13 +175,16 @@ export function AuthForm() {
 							<i className="pi pi-github " style={{ fontSize: "1.5rem" }} />
 						</a>
 					</div>
+					<p>
+
 					<Button
 						link
-						className="font-medium underline ml-2 text-blue-500 text-right cursor-pointer"
+						className="font-small underline ml-2  text-right cursor-pointer"
 						onClick={() => navigate("/register")}
 					>
 						{"Don't have an account? Sign Up here."}
 					</Button>
+					</p>
 				</div>
 			</form>
 		</>

@@ -5,30 +5,53 @@ body {
 	background: var(--surface-0) ;
 }
 
+// sgin in button animation
 
-/*  password meter strenght feedback */
-.password-strength-meter {
-  width: 75%;
-  height: 25px;
-  background-color: #ddd;
+
+.btn-sign-in {
+  transition: 1s ease-in-out;
 }
 
-.password-strength-meter.strength-0 {
-  background-color: #ddd; /* Gray for empty or weak password */
+svg.sign-in {
+  position: absolute;
+  left: 0;
+  top: 0;
+  fill: none;
+  stroke: #bb1383e0;
+  stroke-dasharray: 150 480;
+  stroke-dashoffset: 150;
+  transition: 1s ease-in-out;
 }
 
-.password-strength-meter.strength-1 {
-  background-color: #ff0000; /* Red for very weak password */
+.btn-sign-in:hover {
+  transition: 1s ease-in-out;
+  background: rgba(#1d3249,0.8) !important;
 }
 
-.password-strength-meter.strength-2 {
-  background-color: #ff7700; /* Orange for weak password */
+.btn-sign-in:hover svg.sign-in {
+  stroke-dashoffset: -480;
 }
 
-.password-strength-meter.strength-3 {
-  background-color: #ffbb00; /* Yellow for good password */
+.btn-sign-in:hover span {
+  color: white;
 }
 
-.password-strength-meter.strength-4 {
-  background-color: #00ff00; /* Green for strong password */
+
+// gradiant shadow for garellia images
+
+.galleria-img {
+  position: relative;
+  &::after{
+    content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: rgb(29,50,73);
+background: linear-gradient(94deg, rgba(29,50,73,1) 0%, transparent 100%);
+background: linear-gradient(298deg, rgb(22, 50, 73) -16%, transparent 100%);
+  background: radial-gradient(#1d3249, transparent);
+  }
 }

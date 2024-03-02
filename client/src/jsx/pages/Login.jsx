@@ -80,7 +80,7 @@ export default function Login() {
 				showItemNavigators={false}
 				showIndicators={false}
 				showThumbnails={false}
-				className="lg:block hidden"
+				className="galleria-img lg:block hidden"
 				style={{ flex: "40%" }}
 				transitionInterval={4000}
 				transitionOptions={{ classNames: "fade" }}

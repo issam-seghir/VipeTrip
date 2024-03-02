@@ -176,14 +176,13 @@ export function AuthForm() {
 						</a>
 					</div>
 					<p>
-
-					<Button
-						link
-						className="font-small underline ml-2  text-right cursor-pointer"
-						onClick={() => navigate("/register")}
-					>
-						{"Don't have an account? Sign Up here."}
-					</Button>
+						<Button
+							link
+							className="text-xs sm:text-base font-small px-0 md:px-2 underline ml-2  text-left cursor-pointer"
+							onClick={() => navigate("/register")}
+						>
+							{"Don't have an account? Sign Up here."}
+						</Button>
 					</p>
 				</div>
 			</form>

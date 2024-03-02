@@ -49,6 +49,7 @@ a[role="link"] {
 /* A elements that don't have a class get default styles */
 a:not([class]) {
 	-webkit-text-decoration-skip: ink;
+	color: inherit;
 	text-decoration-skip-ink: auto;
 }
 

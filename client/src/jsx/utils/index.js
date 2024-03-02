@@ -76,6 +76,7 @@ function isRegexSave(...regexes) {
 	};
 }
 
+
 module.exports = {
 	byteToMb,
 	mbToByte,

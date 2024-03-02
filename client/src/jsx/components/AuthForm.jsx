@@ -1,31 +1,29 @@
 import { useLoginMutation } from "@jsx/store/api/authApi";
-import { Box, Typography, useMediaQuery, useTheme } from "@mui/material";
+import { useMediaQuery, useTheme } from "@mui/material";
+import { useRef } from "react";
 import { useForm } from "react-hook-form";
-import { useNavigate, useLocation } from "react-router-dom";
-import React, { useRef } from "react";
-
-import FormTextField from "@components/FormTextField";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useIsAppleDevice } from "@jsx/utils/hooks/useIsAppleDevice";
+import { isDev } from "@data/constants";
 import { DevTool } from "@hookform/devtools";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { setCredentials } from "@jsx/store/slices/authSlice";
 import { useFormHandleErrors } from "@utils/hooks/useFormHandleErrors";
 import { loginSchema } from "@utils/validationSchema";
-import { useDispatch } from "react-redux";
-import { isDev } from "@data/constants";
-import { Toast } from "primereact/toast";
-import { PFormTextField } from "./Form/PFormTextField";
-import { PFormCheckBox } from "./Form/PFormCheckBox";
 import { Button } from "primereact/button";
+import { Toast } from "primereact/toast";
+import { useDispatch } from "react-redux";
+import { PFormCheckBox } from "./Form/PFormCheckBox";
+import { PFormTextField } from "./Form/PFormTextField";
+import { Divider } from "primereact/divider";
 
-export  function AuthForm() {
+
+export function AuthForm() {
 	const { palette } = useTheme();
 	const isNonMobile = useMediaQuery("(min-width:600px)");
+	const isAppleDevice = useIsAppleDevice();
 	const dispatch = useDispatch();
 	const toast = useRef(null);
-
-	const show = (res) => {
-		toast.current.show({ severity: "success", summary: "Successful Log in 🚀", detail: `Welcome ${res.user.name} 👋` });
-	};
 
 	const navigate = useNavigate();
 	const location = useLocation();
@@ -43,7 +41,11 @@ export  function AuthForm() {
 	});
 
 	const errorMessage = useFormHandleErrors(isLoginError, loginError);
-	const errorMessageFormat = errorMessage && `${errorMessage?.originalStatus || errorMessage?.status} : ${errorMessage?.data?.message || errorMessage?.error}`;
+	const errorMessageFormat =
+		errorMessage &&
+		`${errorMessage?.originalStatus || errorMessage?.status} : ${
+			errorMessage?.data?.message || errorMessage?.error
+		}`;
 
 	const getServerErrorMessageForField = (fieldName) => {
 		switch (fieldName) {
@@ -65,7 +67,11 @@ export  function AuthForm() {
 
 			if (res) {
 				console.log(res);
-				show(res);
+				toast.current.show({
+					severity: "success",
+					summary: "Successful Log in 🚀",
+					detail: `Welcome ${res.user.name} 👋`,
+				});
 				dispatch(setCredentials({ user: res?.user, token: res?.token }));
 				// reset form when submit is successful (keep default values)
 				reset();
@@ -79,6 +85,11 @@ export  function AuthForm() {
 			}
 		} catch (error) {
 			console.error(error);
+			toast.current.show({
+				severity: "error",
+				summary: "Something Wrong 💢",
+				detail: JSON.stringify(error),
+			});
 		}
 	}
 
@@ -119,7 +130,7 @@ export  function AuthForm() {
 					/>
 					<div className="flex gap-2 align-items-center justify-content-between mb-4">
 						<PFormCheckBox control={control} defaultValue={true} name={"rememberme"} label="Remember me" />
-						<a href="#" className="font-medium no-underline ml-2 text-blue-500 text-right cursor-pointer">
+						<a href="#" className=" no-underline ml-2 text-xs md:text-base text-blue-500 text-right cursor-pointer">
 							Forgot your password?
 						</a>
 					</div>
@@ -131,38 +142,39 @@ export  function AuthForm() {
 						severity="primary"
 						loading={isSubmitting || isLoginLoading}
 					/>
-					<div>or you can join with </div>
-					<div>
-						<i className="pi pi-google" />
-						<i className="pi pi-facebook" />
-						<i className="pi pi-linkedin" />
-						<i className="pi pi-apple" />
-						<i className="pi pi-twitter" />
-						<i className="pi pi-github" />
+					<Divider align="center">
+						<span>or you can sign in with </span>
+					</Divider>
+					<div className="flex gap-4 justify-content-center">
+						<a href="">
+							<i className="pi pi-google " style={{ fontSize: "1.5rem" }} />
+						</a>
+						<a href="">
+							<i className="pi pi-facebook " style={{ fontSize: "1.5rem" }} />
+						</a>
+						{isAppleDevice && (
+							<a href="">
+								<i className="pi pi-apple " style={{ fontSize: "1.5rem" }} />
+							</a>
+						)}
+						<a href="">
+							<i className="pi pi-twitter " style={{ fontSize: "1.5rem" }} />
+						</a>
+						<a href="">
+							<i className="pi pi-linkedin " style={{ fontSize: "1.5rem" }} />
+						</a>
+						<a href="">
+							<i className="pi pi-github " style={{ fontSize: "1.5rem" }} />
+						</a>
 					</div>
-				</div>
-
-				{/* BUTTONS */}
-				<Box>
-					{/* Switch between login and register form */}
-					<Typography
+					<Button
+						link
+						className="font-medium underline ml-2 text-blue-500 text-right cursor-pointer"
 						onClick={() => navigate("/register")}
-						sx={{
-							textDecoration: "underline",
-							color: palette.primary.main,
-							"&:hover": {
-								cursor: "pointer",
-								color: palette.primary.light,
-							},
-						}}
 					>
 						{"Don't have an account? Sign Up here."}
-					</Typography>
-					{/* error message */}
-					<Typography align="center" variant="h3" sx={{ color: palette.error.main, mt: 5 }}>
-						<div>{errorMessageFormat}</div>
-					</Typography>
-				</Box>
+					</Button>
+				</div>
 			</form>
 		</>
 	);

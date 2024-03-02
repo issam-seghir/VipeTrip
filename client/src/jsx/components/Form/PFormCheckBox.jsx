@@ -38,7 +38,9 @@ export function PFormCheckBox({
 						disabled={disabled}
 						onChange={(e) => field.onChange(e.checked)}
 					/>
-					<label htmlFor={field.name}>{label}</label>
+					<label htmlFor={field.name} className="md:text-base text-xs">
+						{label}
+					</label>
 					{/* error label */}
 					<label htmlFor={field.name} className={classNames({ "p-error": errorMessage || fieldState.error })}>
 						{/* {getFormErrorMessage(field.name)} */}

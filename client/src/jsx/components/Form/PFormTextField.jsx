@@ -3,6 +3,7 @@ import { InputText } from "primereact/inputtext";
 import { classNames } from "primereact/utils";
 import { useState } from "react";
 import { Controller } from "react-hook-form";
+import { useMediaQuery } from "@uidotdev/usehooks";
 
 export function PFormTextField({
 	control,
@@ -21,6 +22,11 @@ export function PFormTextField({
 	const errorMessageFormate = errorMessage?.data?.message || errorMessage?.error;
 	const sizeClass = `p-inputtext-${size}`;
 	const [showPassword, setShowPassword] = useState(false);
+	const isMobile = useMediaQuery("only screen and (max-width : 460px)");
+	const isSmallDevice = useMediaQuery("only screen and (max-width : 768px)");
+	const isMediumDevice = useMediaQuery("only screen and (min-width : 769px) and (max-width : 992px)");
+
+	console.log("isSmallDevice", isSmallDevice);
 	const getFormErrorMessage = (name) => {
 		return errorMessage[name] ? (
 			<small className="p-error">{errorMessage[name].message}</small>
@@ -51,7 +57,12 @@ export function PFormTextField({
 							id={field.name}
 							value={field.value}
 							type={showPassword ? "text" : type}
-							className={classNames({ "p-invalid": fieldState.error }, { [sizeClass]: size })}
+							className={classNames(
+								{ "p-invalid": fieldState.error },
+								{ "p-inputtext-sm": isMobile },
+								{ "p-inputtext-md": isSmallDevice },
+								{ [sizeClass]: !isSmallDevice && size }
+							)}
 							disabled={disabled}
 							onChange={(e) => {
 								field.onChange(e.target.value);

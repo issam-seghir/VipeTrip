@@ -13,7 +13,7 @@ export function PFormTextField({
 	size,
 	iconStart,
 	iconEnd,
-	toogleMask=false,
+	toogleMask = false,
 	errorMessage,
 	reset,
 	disabled = false,
@@ -31,6 +31,7 @@ export function PFormTextField({
 	const togglePassword = () => {
 		setShowPassword(!showPassword);
 	};
+
 	return (
 		<Controller
 			defaultValue={defaultValue} // rules={{ required: "Name - Surname is required." }}
@@ -42,7 +43,7 @@ export function PFormTextField({
 						className={classNames(
 							{ "p-float-label": label },
 							{ "p-input-icon-left": iconStart },
-							{ "p-input-icon-right": iconEnd || toogleMask },
+							{ "p-input-icon-right": iconEnd || toogleMask }
 						)}
 					>
 						{iconStart && <i className={classNames("pi", iconStart)} />}
@@ -52,7 +53,9 @@ export function PFormTextField({
 							type={showPassword ? "text" : type}
 							className={classNames({ "p-invalid": fieldState.error }, { [sizeClass]: size })}
 							disabled={disabled}
-							onChange={(e) => field.onChange(e.target.value)}
+							onChange={(e) => {
+								field.onChange(e.target.value);
+							}}
 						/>
 						{toogleMask && type === "password" ? (
 							// eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions

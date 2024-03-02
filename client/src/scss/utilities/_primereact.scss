@@ -4,3 +4,31 @@
 body {
 	background: var(--surface-0) ;
 }
+
+
+/*  password meter strenght feedback */
+.password-strength-meter {
+  width: 75%;
+  height: 25px;
+  background-color: #ddd;
+}
+
+.password-strength-meter.strength-0 {
+  background-color: #ddd; /* Gray for empty or weak password */
+}
+
+.password-strength-meter.strength-1 {
+  background-color: #ff0000; /* Red for very weak password */
+}
+
+.password-strength-meter.strength-2 {
+  background-color: #ff7700; /* Orange for weak password */
+}
+
+.password-strength-meter.strength-3 {
+  background-color: #ffbb00; /* Yellow for good password */
+}
+
+.password-strength-meter.strength-4 {
+  background-color: #00ff00; /* Green for strong password */
+}

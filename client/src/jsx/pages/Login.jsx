@@ -59,7 +59,7 @@ export default function Login() {
 							style={{ transition: "all 2s linear" }}
 						/>
 					</div>
-					<div className="text-center flex-center flex-column gap-1 mb-4">
+					<div className="text-center flex-center flex-column gap-1 mb-6">
 						<div className="text-900 lg:text-3xl md:text-xl text-sm font-medium">
 							Welcome Back
 						</div>
@@ -68,24 +68,7 @@ export default function Login() {
 						</div>
 					</div>
 					<AuthForm />
-					<div>
-						<div className="flex align-items-center justify-content-between mb-6">
-							<div className="flex align-items-center">
-								<Checkbox
-									id="rememberme"
-									onChange={(e) => setChecked(e.checked)}
-									checked={checked}
-									className="mr-2"
-								/>
-								<label htmlFor="rememberme">Remember me</label>
-							</div>
-							<a className="font-medium no-underline ml-2 text-blue-500 text-right cursor-pointer">
-								Forgot your password?
-							</a>
-						</div>
 
-						<Button label="Sign In" icon="pi pi-user" className="w-full" />
-					</div>
 				</div>
 				{/* <section>
 				<span className="text-600 font-medium line-height-3">Don&apos;t have an account?</span>

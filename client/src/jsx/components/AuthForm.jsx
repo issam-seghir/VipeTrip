@@ -1,5 +1,5 @@
 import { useLoginMutation } from "@jsx/store/api/authApi";
-import { Box, Button, Typography, useMediaQuery, useTheme } from "@mui/material";
+import { Box, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { useForm } from "react-hook-form";
 import { useNavigate, useLocation } from "react-router-dom";
 import React, { useRef } from "react";
@@ -14,7 +14,8 @@ import { useDispatch } from "react-redux";
 import { isDev } from "@data/constants";
 import { Toast } from "primereact/toast";
 import { PFormTextField } from "./Form/PFormTextField";
-import { PFromPasswordField } from "./Form/PFromPasswordField";
+import { PFormCheckBox } from "./Form/PFormCheckBox";
+import { Button } from "primereact/button";
 
 export  function AuthForm() {
 	const { palette } = useTheme();
@@ -116,25 +117,33 @@ export  function AuthForm() {
 						toogleMask={true}
 						errorMessage={getServerErrorMessageForField("password")}
 					/>
+					<div className="flex gap-2 align-items-center justify-content-between mb-4">
+						<PFormCheckBox control={control} defaultValue={true} name={"rememberme"} label="Remember me" />
+						<a href="#" className="font-medium no-underline ml-2 text-blue-500 text-right cursor-pointer">
+							Forgot your password?
+						</a>
+					</div>
+
+					<Button
+						label={isLoginLoading ? "Loading..." : "Sign in"}
+						className="w-5"
+						iconPos="right"
+						severity="primary"
+						loading={isSubmitting || isLoginLoading}
+					/>
+					<div>or you can join with </div>
+					<div>
+						<i className="pi pi-google" />
+						<i className="pi pi-facebook" />
+						<i className="pi pi-linkedin" />
+						<i className="pi pi-apple" />
+						<i className="pi pi-twitter" />
+						<i className="pi pi-github" />
+					</div>
 				</div>
 
 				{/* BUTTONS */}
 				<Box>
-					{/* Submit button */}
-					<Button
-						fullWidth
-						disabled={isSubmitting || isLoginLoading} // disabled the button when submitting
-						type="submit"
-						sx={{
-							m: "2rem 0",
-							p: "1rem",
-							backgroundColor: palette.primary.main,
-							color: palette.background.alt,
-							"&:hover": { color: palette.primary.main },
-						}}
-					>
-						{isLoginLoading ? "Loading..." : "LOGIN"}
-					</Button>
 					{/* Switch between login and register form */}
 					<Typography
 						onClick={() => navigate("/register")}

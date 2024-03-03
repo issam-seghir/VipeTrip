@@ -21,7 +21,13 @@ const registerSchema = {
 		firstName: credinalSchema,
 		lastName: credinalSchema,
 		email: stringNonEmpty().email().trim().toLowerCase(),
-		password: stringNonEmpty().min(8).max(20).regex(passRegex, "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character (!$%&*?@#)"),
+		password: stringNonEmpty()
+			.min(8)
+			.max(20)
+			.regex(
+				passRegex,
+				"Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character (!$%&*?@#)"
+			),
 		location: infoSchema,
 		job: infoSchema,
 	}),

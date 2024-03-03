@@ -1,28 +1,31 @@
 import { useRegisterMutation } from "@jsx/store/api/authApi";
-import { Box, Button, Typography, useMediaQuery, useTheme } from "@mui/material";
-import { useForm,Controller } from "react-hook-form";
+import { useMediaQuery } from "@uidotdev/usehooks";
+import { useRef } from "react";
+import { useForm } from "react-hook-form";
 import useFormPersist from "react-hook-form-persist";
 import { useNavigate } from "react-router-dom";
 
-import DropZone from "@components/DropZone";
-import FormTextField from "@components/FormTextField";
-import FormPickImage from "@components/FormPickImage"
+import FormPickImage from "@components/FormPickImage";
+import { isDev } from "@data/constants";
 import { DevTool } from "@hookform/devtools";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { logFormData } from "@jsx/utils/logFormData";
-import { mbToByte } from "@jsx/utils/mbToByte";
-import { useFormHandleErrors } from "@utils/hooks/useFormHandleErrors";
-import { registerSchema } from "@utils/validationSchema";
-import { useDropzone } from "react-dropzone";
+// import { useFormHandleErrors } from "@utils/hooks/useFormHandleErrors";
+import { PFormTextField } from "@components/Form/PFormTextField";
+import { registerSchema } from "@validations/authSchema";
+import { Button } from "primereact/button";
+import { Divider } from "primereact/divider";
+import { Toast } from "primereact/toast";
 import { useDispatch } from "react-redux";
-import { setCredentials } from "@jsx/store/slices/authSlice";
 
 export default function AuthForm() {
-	const { palette } = useTheme();
-	const dispatch = useDispatch();
 	const navigate = useNavigate();
+	const dispatch = useDispatch();
+
 	const isNonMobile = useMediaQuery("(min-width:600px)");
-	const [register, { error: registerError, isLoading: isRegisterLoading, isError: isRegisterError }] = useRegisterMutation();
+	const toast = useRef(null);
+
+	const [register, { error: registerError, isLoading: isRegisterLoading }] = useRegisterMutation();
 	const {
 		handleSubmit,
 		reset,
@@ -32,11 +35,12 @@ export default function AuthForm() {
 		getValues,
 		register: formRegister,
 		trigger,
-		formState: { errors, isSubmitSuccessful, isSubmitting },
+		formState: { errors, isSubmitting },
 	} = useForm({
-		mode: "onBlur", // when to validate the form
+		mode: "onBlur",
 		resolver: zodResolver(registerSchema),
 	});
+
 	useFormPersist("registerForm", {
 		watch,
 		setValue,
@@ -46,22 +50,22 @@ export default function AuthForm() {
 
 	const picture = watch("picture");
 	console.log(picture);
-	const errorMessage = useFormHandleErrors(isRegisterError, registerError);
-	const errorMessageFormat = errorMessage && `${errorMessage?.originalStatus || errorMessage?.status} : ${errorMessage?.data?.message || errorMessage?.error}`;
+	// const errorMessage = useFormHandleErrors(isRegisterError, registerError);
+	// const errorMessageFormat = errorMessage && `${errorMessage?.originalStatus || errorMessage?.status} : ${errorMessage?.data?.message || errorMessage?.error}`;
 
-	const getServerErrorMessageForField = (fieldName) => {
-		switch (fieldName) {
-			case "email": {
-				return errorMessage?.status === 409 && errorMessage;
-			}
-			case "password": {
-				return errorMessage?.status === 400 && errorMessage;
-			}
-			default: {
-				return null;
-			}
-		}
-	};
+	// const getServerErrorMessageForField = (fieldName) => {
+	// 	switch (fieldName) {
+	// 		case "email": {
+	// 			return errorMessage?.status === 409 && errorMessage;
+	// 		}
+	// 		case "password": {
+	// 			return errorMessage?.status === 400 && errorMessage;
+	// 		}
+	// 		default: {
+	// 			return null;
+	// 		}
+	// 	}
+	// };
 
 	async function handleRegister(data) {
 		try {
@@ -86,13 +90,22 @@ export default function AuthForm() {
 			const res = await register(formData).unwrap();
 
 			if (res) {
-				// reset form when submit is successful (keep default values)
+				console.log(res);
+				toast.current.show({
+					severity: "success",
+					summary: "Successful Log in 🚀",
+					detail: `Welcome ${res.user.name} 👋`,
+				});
 				reset();
-				// redirect to home page after successful login
 				navigate("/home");
 			}
 		} catch (error) {
 			console.error(error);
+			toast.current.show({
+				severity: "error",
+				summary: "Something Wrong 💢",
+				detail: JSON.stringify(error),
+			});
 		}
 	}
 
@@ -105,64 +118,145 @@ export default function AuthForm() {
 	return (
 		<>
 			{/* react hook form dev tool  */}
-			{import.meta.env.DEV && <DevTool control={control} placement="top-left" />}
-			{/* login / register FORM */}
-			<form onSubmit={handleSubmit(onSubmit)}>
-				<Box
-					display="grid"
-					gap="30px"
-					gridTemplateColumns="repeat(4, minmax(0, 1fr))"
-					sx={{
-						"& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
-					}}
-				>
-					<FormTextField defaultValue="" name={"firstName"} label="First Name" control={control} sx={{ gridColumn: "span 2" }} />
-					<FormTextField defaultValue="" name={"lastName"} label="last Name" control={control} sx={{ gridColumn: "span 2" }} />
-					<FormTextField defaultValue="" name={"location"} label="Location" control={control} sx={{ gridColumn: "span 4" }} />
-					<FormTextField defaultValue="" name={"job"} label="Job" control={control} sx={{ gridColumn: "span 4" }} />
-					<FormPickImage name="picture" errors={errors} type={"image/*"} multiple={false} register={formRegister} />
-					{/* <DropZone getInputProps={getInputProps} getRootProps={getRootProps} fileRejections={fileRejections} picture={picture} state={state} /> */}
-					<FormTextField defaultValue={""} name={"email"} label="Email" control={control} errorMessage={getServerErrorMessageForField("email")} sx={{ gridColumn: "span 4" }} />
-					<FormTextField defaultValue={""} name={"password"} label="Password" type="password" errorMessage={getServerErrorMessageForField("password")} control={control} sx={{ gridColumn: "span 4" }} />
-					<FormTextField defaultValue="" name={"confirmPassword"} label="Confirm Password" type="password" control={control} sx={{ gridColumn: "span 4" }} />
-				</Box>
+			{isDev && <DevTool control={control} placement="top-left" />}
+			<Toast ref={toast} />
 
-				{/* BUTTONS */}
-				<Box>
-					{/* Submit button */}
+			<form onSubmit={handleSubmit(onSubmit)}>
+				<div className="flex flex-column gap-2 align-items-center">
+					<PFormTextField
+						control={control}
+						defaultValue={""}
+						name={"firstName"}
+						label="First Name"
+						size={"lg"}
+						iconStart={"pi-user"}
+						iconEnd={"pi-spin pi-spinner"}
+						// errorMessage={getServerErrorMessageForField("email")}
+						errorMessage={errors}
+					/>
+					<PFormTextField
+						control={control}
+						defaultValue={""}
+						name={"lastName"}
+						label="Last Name"
+						size={"lg"}
+						iconStart={"pi-user"}
+						iconEnd={"pi-spin pi-spinner"}
+						// errorMessage={getServerErrorMessageForField("email")}
+						errorMessage={errors}
+					/>
+					<PFormTextField
+						control={control}
+						defaultValue={""}
+						name={"location"}
+						label="Location"
+						size={"lg"}
+						iconStart={"pi-user"}
+						iconEnd={"pi-spin pi-spinner"}
+						// errorMessage={getServerErrorMessageForField("email")}
+						errorMessage={errors}
+					/>
+					<PFormTextField
+						control={control}
+						defaultValue={""}
+						name={"job"}
+						label="Job"
+						size={"lg"}
+						iconStart={"pi-user"}
+						iconEnd={"pi-spin pi-spinner"}
+						// errorMessage={getServerErrorMessageForField("email")}
+						errorMessage={errors}
+					/>
+
+					<FormPickImage
+						name="picture"
+						errors={errors}
+						type={"image/*"}
+						multiple={false}
+						register={formRegister}
+					/>
+					{/* <DropZone getInputProps={getInputProps} getRootProps={getRootProps} fileRejections={fileRejections} picture={picture} state={state} /> */}
+					<PFormTextField
+						control={control}
+						defaultValue={""}
+						name={"email"}
+						label="Email"
+						type="email"
+						size={"lg"}
+						iconStart={"pi-user"}
+						iconEnd={"pi-spin pi-spinner"}
+						// errorMessage={getServerErrorMessageForField("email")}
+						errorMessage={errors}
+					/>
+					<PFormTextField
+						control={control}
+						defaultValue={""}
+						name={"Password"}
+						label="password"
+						type="password"
+						size={"lg"}
+						iconStart={"pi-lock"}
+						toogleMask={true}
+						// errorMessage={getServerErrorMessageForField("password")}
+						errorMessage={errors}
+					/>
+					<PFormTextField
+						control={control}
+						defaultValue={""}
+						name={"confirmPassword"}
+						label="Confirm Password"
+						type="password"
+						size={"lg"}
+						iconStart={"pi-lock"}
+						toogleMask={true}
+						// errorMessage={getServerErrorMessageForField("password")}
+						errorMessage={errors}
+					/>
+				</div>
+				<Button
+					label={isRegisterLoading ? "Loading..." : "Sign Up"}
+					className="btn-sign-in w-17rem lg:w-7"
+					iconPos="right"
+					size={isNonMobile ? "large" : "small"}
+					loading={isSubmitting || isRegisterLoading}
+				>
+					<svg viewBox="0 0 180 60" className="sign-in border">
+						<polyline points="179,1 179,59 1,59 1,1 179,1" className="bg-line" />
+						<polyline points="179,1 179,59 1,59 1,1 179,1" className="hl-line" />
+					</svg>
+				</Button>
+				<Divider align="center">
+					<span>or you can sign up with </span>
+				</Divider>
+				<div className="flex gap-4 justify-content-center">
+					<a href="">
+						<i className="pi pi-google " style={{ fontSize: "1.5rem" }} />
+					</a>
+					<a href="">
+						<i className="pi pi-facebook " style={{ fontSize: "1.5rem" }} />
+					</a>
+					{isAppleDevice && (
+						<a href="">
+							<i className="pi pi-apple " style={{ fontSize: "1.5rem" }} />
+						</a>
+					)}
+					<a href="">
+						<i className="pi pi-twitter " style={{ fontSize: "1.5rem" }} />
+					</a>
+					<a href="">
+						<i className="pi pi-linkedin " style={{ fontSize: "1.5rem" }} />
+					</a>
+					<a href="">
+						<i className="pi pi-github " style={{ fontSize: "1.5rem" }} />
+					</a>
 					<Button
-						fullWidth
-						disabled={isSubmitting || isRegisterLoading} // disabled the button when submitting
-						type="submit"
-						sx={{
-							m: "2rem 0",
-							p: "1rem",
-							backgroundColor: palette.primary.main,
-							color: palette.background.alt,
-							"&:hover": { color: palette.primary.main },
-						}}
-					>
-						{isRegisterLoading ? "Loading..." : "REGISTER"}
-					</Button>
-					{/* Switch between login and register form */}
-					<Typography
+						link
+						className="text-xs sm:text-base font-small px-0 md:px-2 underline ml-2  text-left cursor-pointer"
 						onClick={() => navigate("/login")}
-						sx={{
-							textDecoration: "underline",
-							color: palette.primary.main,
-							"&:hover": {
-								cursor: "pointer",
-								color: palette.primary.light,
-							},
-						}}
 					>
 						{"Already have an account? Login here."}
-					</Typography>
-					{/* error message */}
-					<Typography align="center" variant="h3" sx={{ color: palette.error.main, mt: 5 }}>
-						<div>{errorMessageFormat}</div>
-					</Typography>
-				</Box>
+					</Button>
+				</div>
 			</form>
 		</>
 	);

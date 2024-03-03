@@ -14,13 +14,13 @@ export function PFormCheckBox({
 	disabled = false,
 }) {
 	const errorMessageFormate = errorMessage?.data?.message || errorMessage?.error;
-	// const getFormErrorMessage = (name) => {
-	// 	return errorMessage[name] ? (
-	// 		<small className="p-error">{errorMessage[name].message}</small>
-	// 	) : (
-	// 		<small className="p-error">&nbsp;</small>
-	// 	);
-	// };
+	const getFormErrorMessage = (name) => {
+		return errorMessage[name] ? (
+			<small className="p-error">{errorMessage[name].message}</small>
+		) : (
+			<small className="p-error">&nbsp;</small>
+		);
+	};
 
 	return (
 		<Controller
@@ -43,7 +43,7 @@ export function PFormCheckBox({
 					</label>
 					{/* error label */}
 					<label htmlFor={field.name} className={classNames({ "p-error": errorMessage || fieldState.error })}>
-						{/* {getFormErrorMessage(field.name)} */}
+						{getFormErrorMessage(field.name)}
 					</label>
 				</>
 			)}

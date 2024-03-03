@@ -76,7 +76,7 @@ export default function Login() {
 				numVisible={3}
 				item={itemTemplate}
 				circular
-				autoPlay
+				// autoPlay
 				showItemNavigators={false}
 				showIndicators={false}
 				showThumbnails={false}

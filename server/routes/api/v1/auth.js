@@ -11,9 +11,8 @@ const validate = require("express-zod-safe");
 const { registerSchema, loginSchema } = require("@validations/authSchema");
 
 router.post("/login", validate(loginSchema), handleLogin);
-router
-    .post("/register", upload.single("picture"), multerErrorHandler(upload), validate(registerSchema), handleNewUser);
-    
+router.post("/register", upload.single("picture"), multerErrorHandler(upload), validate(registerSchema), handleNewUser);
+
 router.get("/refresh", handleRefreshToken);
 router.post("/logout", handleLogout);
 

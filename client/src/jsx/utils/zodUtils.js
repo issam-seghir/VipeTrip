@@ -1,7 +1,17 @@
 /* eslint-disable unicorn/no-useless-undefined */
 //?  ***************************** Zod Utils   **********************************  */
 
-const z = require("zod");
+import { z } from "zod";
+// import { zu } from "zod_utilz";
+
+/**
+ * @summary Function generate error map for  Zod schema
+ * An object mapping error types to error messages or functions that generate error messages.
+ * @example
+ * z.setErrorMap(errorMap);
+ *
+ */
+
 
 /**
  * Creates a Zod schema for a non-empty string.
@@ -15,33 +25,24 @@ const z = require("zod");
  */
 
 const stringNonEmpty = (errorMap = undefined) => {
-	return z.string({ errorMap: errorMap }).min(1, { message: "cannot be empty" });
+	return z.string({ errorMap: errorMap }).min(1, { message: "this field is required" });
 };
 
-const zu = require("zod_utilz");
-
-/**
- * @summary Function generate error map for  Zod schema
- * An object mapping error types to error messages or functions that generate error messages.
- * @example
- * z.setErrorMap(errorMap);
- *
- */
-
-const errorMap = zu.makeErrorMap({
-	required: "is required",
-	invalid_string: (err) => {
-		if (err.validation === "url") {
-			return `(${err.data}) must be a valid URL`;
-		} else if (err.validation === "email") {
-			return `(${err.data}) must be a valid email`;
-		}
-	},
-	invalid_type: (err) => `${err.defaultError} : ${err.data}`,
-	invalid_enum_value: ({ data, options }) => `${data} : is not a valid enum value. Valid options: ${options?.join(" | ")} `,
-	too_small: (err) => `value ${err.data}  expected to be  >= ${err.minimum}`,
-	too_big: (err) => `value ${err.data} : expected to be  <= ${err.maximum}`,
-});
+// const errorMap = zu.makeErrorMap({
+// 	required: "is required",
+// 	invalid_string: (err) => {
+// 		if (err.validation === "url") {
+// 			return `(${err.data}) must be a valid URL`;
+// 		} else if (err.validation === "email") {
+// 			return `(${err.data}) must be a valid email`;
+// 		}
+// 	},
+// 	invalid_type: (err) => `${err.defaultError} : ${err.data}`,
+// 	invalid_enum_value: ({ data, options }) =>
+// 		`${data} : is not a valid enum value. Valid options: ${options?.join(" | ")} `,
+// 	too_small: (err) => `value ${err.data}  expected to be  >= ${err.minimum}`,
+// 	too_big: (err) => `value ${err.data} : expected to be  <= ${err.maximum}`,
+// });
 
 /**
  * This function converts a string to an array using a provided schema. If the input is already an array, it is returned as is.
@@ -105,7 +106,8 @@ function defaultInstance(schema, options = {}) {
 			let the_shape = schema.shape; // eliminates 'undefined' issue
 			let entries = Object.entries(the_shape);
 			let temp = entries.map(([key, value]) => {
-				let this_default = value instanceof z.ZodEffects ? defaultInstance(value, options) : getDefaultValue(value);
+				let this_default =
+					value instanceof z.ZodEffects ? defaultInstance(value, options) : getDefaultValue(value);
 				return [key, this_default];
 			});
 			return Object.fromEntries(temp);
@@ -132,7 +134,13 @@ function defaultInstance(schema, options = {}) {
 				return dschema.minValue ?? 0;
 			}
 			if (dschema instanceof z.ZodDate) {
-				return defaultDateEmpty ? "" : defaultDateNull ? null : defaultDateUndefined ? undefined : dschema.minDate;
+				return defaultDateEmpty
+					? ""
+					: defaultDateNull
+					? null
+					: defaultDateUndefined
+					? undefined
+					: dschema.minDate;
 			}
 			if (dschema instanceof z.ZodSymbol) return "";
 			if (dschema instanceof z.ZodBoolean) return false;
@@ -174,10 +182,4 @@ function formatPath(path) {
 		.join(".");
 }
 
-module.exports = {
-	stringNonEmpty,
-	errorMap,
-	arrayFromString,
-	formatPath,
-	defaultInstance,
-};
+export { arrayFromString, defaultInstance, formatPath, stringNonEmpty };

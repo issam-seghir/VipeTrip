@@ -15,3 +15,11 @@ const postSchema = z.object({
 });
 
 module.exports = postSchema;
+
+// export const postSchema = z.object({
+// 	description: z.string().max(500, "Description cannot be more than 500 characters"),
+// 	picturePath: z.instanceof(FileList).optional().or(z.literal("")), // fix optional for url / email ...,
+// 	userPicturePath: z.instanceof(FileList).optional().or(z.literal("")), // fix optional for url / email ...,
+// 	likes: z.record(z.string()).optional(),
+// 	comments: z.array(z.string()).optional(),
+// });

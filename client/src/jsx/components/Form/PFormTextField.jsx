@@ -27,6 +27,7 @@ export function PFormTextField({
 	const isMediumDevice = useMediaQuery("only screen and (min-width : 769px) and (max-width : 992px)");
 
 	console.log("isSmallDevice", isSmallDevice);
+	console.log(errorMessage);
 	const getFormErrorMessage = (name) => {
 		return errorMessage[name] ? (
 			<small className="p-error">{errorMessage[name].message}</small>
@@ -40,11 +41,11 @@ export function PFormTextField({
 
 	return (
 		<Controller
-			defaultValue={defaultValue} // rules={{ required: "Name - Surname is required." }}
+			defaultValue={defaultValue}
 			name={name}
 			control={control}
 			render={({ field, fieldState }) => (
-				<>
+				<div className="flex flex-column align-items-center ">
 					<span
 						className={classNames(
 							{ "p-float-label": label },
@@ -84,7 +85,7 @@ export function PFormTextField({
 					<label htmlFor={field.name} className={classNames({ "p-error": errorMessage || fieldState.error })}>
 						{getFormErrorMessage(field.name)}
 					</label>
-				</>
+				</div>
 			)}
 		/>
 	);

@@ -30,13 +30,15 @@ export function PFormTextField({
   );
 
   console.log(errorMessage);
-  const getFormErrorMessage = (name) => {
-    return errorMessage[name] ? (
-      <small className="p-error">{errorMessage[name].message}</small>
-    ) : (
-      <small className="p-error">&nbsp;</small>
-    );
-  };
+const getFormErrorMessage = (name) => {
+	if (errorMessage[name]) { // react-hook-form error
+		return <small className="p-error">{errorMessage[name].message}</small>;
+	} else if (errorMessage?.data) { // server error 
+		return <small className="p-error">{errorMessage?.data}</small>;
+	} else {
+		return <small className="p-error">&nbsp;</small>;
+	}
+};
   const togglePassword = () => {
     setShowPassword(!showPassword);
   };

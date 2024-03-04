@@ -1,9 +1,9 @@
-// @ts-check
 const jwt = require("jsonwebtoken");
 const { ENV } = require("@/validations/envSchema");
 const createError = require("http-errors");
 const log = require("@/utils/chalkLogger");
 
+//* This is a middlware
 const verifyJWT = (req, res, next) => {
 	const authHeader = req.headers["authorization"];
 

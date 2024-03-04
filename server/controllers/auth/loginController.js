@@ -65,14 +65,12 @@ const handleLogin = asyncWrapper(async (req, res, next) => {
 	res.json({ success: `Login : ${foundUser.fullName}!`, token: accessToken, user: foundUser });
 });
 
-
 const checkEmailExists = asyncWrapper(async (req, res, next) => {
-	const {email} = req.params
+	const { email } = req.query;
 	// verifie user existence in database
 	const foundUser = await User.findOne({ email });
-	if (!foundUser) return next(createError.NotFound("User not found"));
-	res.json({ success: `User found!` });
-})
-
+	// if (!foundUser) return next(createError.NotFound("User not found"));
+	res.json({ exists: !!foundUser });
+});
 
 module.exports = { handleLogin, checkEmailExists };

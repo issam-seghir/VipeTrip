@@ -18,7 +18,7 @@ import { Divider } from "primereact/divider";
 import { Toast } from "primereact/toast";
 import { useDispatch } from "react-redux";
 import { useIsAppleDevice } from "@jsx/utils/hooks/useIsAppleDevice";
-import { AutoCompleteContries } from "@components/AutoCompleteContries";
+import { AutoCompleteContries } from "@jsx/components/Form/PFormAutoCompleteContries";
 
 export function RegisterForm() {
   const navigate = useNavigate();
@@ -131,7 +131,16 @@ export function RegisterForm() {
             iconEnd={"pi-spin pi-spinner"}
             errorMessage={errors}
           />
-          <AutoCompleteContries />
+          <AutoCompleteContries
+            control={control}
+            getValues={getValues}
+            defaultValue={""}
+            name={"location"}
+            iconStart={"pi-user"}
+            label="Location"
+            size={"lg"}
+            errorMessage={errors}
+          />
 
           <PFormTextField
             control={control}

@@ -1,14 +1,14 @@
 import { isDev } from "@data/constants";
 import { DevTool } from "@hookform/devtools";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useLoginMutation } from "@jsx/store/api/authApi";
+import { useLoginMutation, useCheckEmailExistsQuery } from "@jsx/store/api/authApi";
 import { setCredentials } from "@jsx/store/slices/authSlice";
 import { useIsAppleDevice } from "@jsx/utils/hooks/useIsAppleDevice";
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useLocation, useNavigate } from "react-router-dom";
 // import { useFormHandleErrors } from "@utils/hooks/useFormHandleErrors";
-import { useMediaQuery } from "@uidotdev/usehooks";
+import { useMediaQuery ,useDebounce} from "@uidotdev/usehooks";
 import { loginSchema } from "@validations/authSchema";
 import { Button } from "primereact/button";
 import { Divider } from "primereact/divider";
@@ -31,13 +31,38 @@ export function AuthForm() {
 	const [login, { error: errorLogin, isLoading: isLoginLoading }] = useLoginMutation();
 	const {
 		handleSubmit,
+		watch,
 		reset,
+		setError,
+		clearErrors,
 		control,
 		formState: { errors, isSubmitting },
 	} = useForm({
 		mode: "onSubmit",
 		resolver: zodResolver(loginSchema),
 	});
+
+	const email = watch("email");
+	const debouncedEmail = useDebounce(email, 500); // Debounce the email input by 500ms
+
+	const {
+		data: chekcEmailExistance,
+		isLoading : isEmailChecking,
+		isError : isEmailCheckError,
+	} = useCheckEmailExistsQuery(debouncedEmail, {
+		skip: !debouncedEmail, // Skip the query if the email is empty
+	});
+
+	useEffect(() => {
+		if (chekcEmailExistance) {
+			setError("email", {
+				type: "manual",
+				message: "This email already exists",
+			});
+		} else {
+			clearErrors("email");
+		}
+	}, [chekcEmailExistance, setError, clearErrors]);
 
 	async function handleLogin(data) {
 		try {
@@ -78,8 +103,6 @@ export function AuthForm() {
 
 			<form onSubmit={handleSubmit(onSubmit)}>
 				<div className="flex flex-column gap-2 align-items-center">
-					/* The `<PFormTextField>` component is rendering a text input field for entering an email address
-					in a form. Here is a breakdown of its props: */
 					<PFormTextField
 						control={control}
 						defaultValue={""}
@@ -88,7 +111,13 @@ export function AuthForm() {
 						type="email"
 						size={"lg"}
 						iconStart={"pi-user"}
-						iconEnd={"pi-spin pi-spinner"}
+						iconEnd={
+							isEmailChecking
+								? "pi-spin pi-spinner"
+								: chekcEmailExistance
+								? "pi-times"
+								: "pi-check"
+						}
 						errorMessage={errors}
 					/>
 					<PFormTextField

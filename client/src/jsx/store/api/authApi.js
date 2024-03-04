@@ -11,7 +11,7 @@ export const authApi = api.injectEndpoints({
 		}),
 		logout: builder.mutation({
 			query: () => ({
-				url: "/logout",
+				url: "/auth/logout",
 				method: "POST",
 			}),
 		}),
@@ -22,7 +22,13 @@ export const authApi = api.injectEndpoints({
 				body: userData,
 			}),
 		}),
+		checkEmailExists: builder.query({
+			query: (email) => ({
+				url: `/auth/check-email?email=${email}`,
+				method: "GET",
+			}),
+		}),
 	}),
 });
 
-export const { useLoginMutation, useRegisterMutation,useLogoutMutation } = authApi;
+export const { useLoginMutation, useRegisterMutation, useLogoutMutation ,useCheckEmailExistsQuery } = authApi;

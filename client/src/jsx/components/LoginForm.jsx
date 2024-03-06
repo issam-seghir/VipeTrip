@@ -28,7 +28,7 @@ export function LoginForm() {
 	const dispatch = useDispatch();
 	const toast = useRef(null);
 
-	const [login, { error: errorLogin, isLoading: isLoginLoading ,isError:isLoginError}] = useLoginMutation();
+	const [login, { error: errorLogin, isLoading: isLoginLoading, isError: isLoginError }] = useLoginMutation();
 	const {
 		handleSubmit,
 		watch,
@@ -36,13 +36,15 @@ export function LoginForm() {
 		setError,
 		clearErrors,
 		control,
-		formState: { errors : errorsForm, isSubmitting },
+		formState: { errors: errorsForm, isSubmitting },
 	} = useForm({
 		mode: "onSubmit",
 		resolver: zodResolver(loginSchema),
 	});
 
-  const errorMessage = isLoginError ? errorLogin : errorsForm;
+	const errorMessage = isLoginError ? errorLogin : errorsForm;
+
+	// check if use email exist when typing ...
 	const email = watch("email");
 	const debouncedEmail = useDebounce(email, 500); // Debounce the email input by 500ms
 
@@ -55,7 +57,7 @@ export function LoginForm() {
 	});
 	console.log(errorLogin);
 	useEffect(() => {
-		if (chekcEmailExistance?.exists && !errorsForm.email) {
+		if (!chekcEmailExistance?.exists) {
 			setError("email", {
 				type: "manual",
 				message: "User Not found",

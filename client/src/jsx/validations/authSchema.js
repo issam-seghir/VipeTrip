@@ -1,7 +1,7 @@
 /* eslint-disable unicorn/better-regex */
 
-import { z } from "zod";
 import { stringNonEmpty } from "@utils/zodUtils";
+import { z } from "zod";
 
 //? -------- Constant ---------
 const MAX_FILE_SIZE = 500_000;
@@ -13,7 +13,6 @@ const passRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!#$%&*?@])[\d!#$%&*?@A-Z
 //? -------- Sub Schema ---------
 const credinalSchema = stringNonEmpty().trim().min(3).max(25);
 const infoSchema = z.string().trim().min(3).max(25).optional();
-
 
 const baseRegisterSchema = z.object({
 	firstName: credinalSchema,
@@ -31,7 +30,6 @@ const baseRegisterSchema = z.object({
 	job: infoSchema,
 	picture: z.instanceof(FileList).optional().or(z.literal("")), // fix optional for url / email ...,
 });
-
 
 export const registerSchema = baseRegisterSchema.refine((data) => data.password === data.confirmPassword, {
 	//For advanced features - multiple issues ,  see (superRefine)

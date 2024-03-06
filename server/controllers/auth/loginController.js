@@ -70,7 +70,7 @@ const checkEmailExists = asyncWrapper(async (req, res, next) => {
 	// verifie user existence in database
 	const foundUser = await User.findOne({ email });
 	// if (!foundUser) return next(createError.NotFound("User not found"));
-	res.json({ exists: !!foundUser });
+	res.json({ invalid: !foundUser });
 });
 
 module.exports = { handleLogin, checkEmailExists };

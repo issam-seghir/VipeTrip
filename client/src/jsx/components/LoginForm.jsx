@@ -1,14 +1,14 @@
 import { isDev } from "@data/constants";
 import { DevTool } from "@hookform/devtools";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useCheckEmailExistsQuery, useLoginMutation } from "@jsx/store/api/authApi";
+import { useLoginMutation } from "@jsx/store/api/authApi";
 import { setCredentials } from "@jsx/store/slices/authSlice";
 import { useIsAppleDevice } from "@jsx/utils/hooks/useIsAppleDevice";
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import { useForm } from "react-hook-form";
 import { useLocation, useNavigate } from "react-router-dom";
 // import { useFormHandleErrors } from "@utils/hooks/useFormHandleErrors";
-import { useDebounce, useMediaQuery } from "@uidotdev/usehooks";
+import { useMediaQuery } from "@uidotdev/usehooks";
 import { loginSchema } from "@validations/authSchema";
 import { Button } from "primereact/button";
 import { Divider } from "primereact/divider";
@@ -38,41 +38,39 @@ export function LoginForm() {
 		control,
 		formState: { errors: errorsForm, isSubmitting },
 	} = useForm({
-		mode: "onSubmit",
+		mode: "onChange",
 		resolver: zodResolver(loginSchema),
 	});
 
 	const errorMessage = isLoginError ? errorLogin : errorsForm;
 
 	// check if use email exist when typing ...
-	const email = watch("email");
-	const debouncedEmail = useDebounce(email, 500); // Debounce the email input by 500ms
+	// const email = watch("email");
+	// const debouncedEmail = useDebounce(email, 500); // Debounce the email input by 500ms
 
-	const {
-		data: chekcEmailExistance,
-		isLoading: isEmailChecking,
-		isError: isEmailCheckError,
-	} = useCheckEmailExistsQuery(debouncedEmail, {
-		skip: !debouncedEmail || errorsForm.email, // Skip the query if the email is empty
-	});
+	// const {
+	// 	data: chekcEmailExistance,
+	// 	isLoading: isEmailChecking,
+	// 	isError: isEmailCheckError,
+	// } = useCheckEmailExistsQuery(debouncedEmail, {
+	// 	skip: !debouncedEmail || errorsForm.email, // Skip the query if the email is empty
+	// });
 	console.log(errorLogin);
-	useEffect(() => {
-		if (!chekcEmailExistance?.exists) {
-			setError("email", {
-				type: "manual",
-				message: "User Not found",
-			});
-		} else {
-			clearErrors("email");
-		}
-	}, [chekcEmailExistance?.exists, setError, clearErrors]);
+	// useEffect(() => {
+	// 	if (chekcEmailExistance && chekcEmailExistance.invalid) {
+	// 		setError("email", {
+	// 			type: "manual",
+	// 			message: "User Not found",
+	// 		});
+	// 	} else {
+	// 		clearErrors("email");
+	// 	}
+	// }, [chekcEmailExistance?.invalid, setError, clearErrors]);
 
 	async function handleLogin(data) {
 		try {
 			const res = await login(data).unwrap();
-
 			if (res) {
-				console.log(res);
 				toast.current.show({
 					severity: "success",
 					summary: "Successful Log in 🚀",
@@ -80,21 +78,19 @@ export function LoginForm() {
 				});
 				dispatch(setCredentials({ user: res?.user, token: res?.token }));
 				reset();
-
 				navigate(from, { replace: true });
 			}
 		} catch (error) {
 			console.error(error);
 			toast.current.show({
 				severity: "error",
-				summary: "Something Wrong 💢",
+				summary: "Login Failed 💢",
 				detail: error?.data,
 			});
 		}
 	}
 
 	const onSubmit = (data) => {
-		console.log(data);
 		handleLogin(data);
 	};
 
@@ -114,14 +110,14 @@ export function LoginForm() {
 						type="email"
 						size={"lg"}
 						iconStart={"pi-user"}
-						iconEnd={
-							isEmailChecking
-								? "pi-spin pi-spinner"
-								: chekcEmailExistance?.exists
-								? "pi-times"
-								: "pi-check"
-						}
-						errorMessage={errorMessage}
+						// iconEnd={
+						// 	isEmailChecking
+						// 		? "pi-spin pi-spinner"
+						// 		: chekcEmailExistance?.exists
+						// 		? "pi-times"
+						// 		: "pi-check"
+						// }
+						errorMessage={errorsForm}
 					/>
 					<PFormTextField
 						control={control}
@@ -132,7 +128,7 @@ export function LoginForm() {
 						size={"lg"}
 						iconStart={"pi-lock"}
 						toogleMask={true}
-						errorMessage={errorMessage}
+						errorMessage={errorsForm}
 					/>
 					<div className="flex gap-2 align-items-center justify-content-between mb-4">
 						<PFormCheckBox

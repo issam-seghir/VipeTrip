@@ -18,7 +18,8 @@ const handleRefreshToken = asyncWrapper(async (req, res, next) => {
 
 	// Verify the refresh token
 	jwt.verify(refreshToken, ENV.REFRESH_TOKEN_SECRET, async (err, decoded) => {
-		if (err || foundUser.email !== decoded.email || foundUser.id !== decoded.id) return next(createError.Forbidden("Token verification failed"));
+		if (err || foundUser.email !== decoded.email || foundUser.id !== decoded.id)
+			return next(createError.Forbidden("Token verification failed"));
 
 		// If the verification is successful, create a new access token
 		const accessToken = jwt.sign(
@@ -27,7 +28,11 @@ const handleRefreshToken = asyncWrapper(async (req, res, next) => {
 				email: decoded.email,
 			},
 			ENV.ACCESS_TOKEN_SECRET,
-			{ expiresIn: ENV.ACCESS_TOKEN_SECRET_EXPIRE }
+			{
+				expiresIn: foundUser.rememberMe
+					? ENV.ACCESS_TOKEN_SECRET_EXPIRE_REMEMBER_ME
+					: ENV.ACCESS_TOKEN_SECRET_EXPIRE,
+			}
 		);
 
 		res.json({ token: accessToken });

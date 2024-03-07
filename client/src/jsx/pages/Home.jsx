@@ -5,11 +5,19 @@ import Navbar from "@components/NavBar";
 import UserWidget from "@components/UserWidget";
 import { Box, useMediaQuery } from "@mui/material";
 import { useSelector } from "react-redux";
+import { Toast } from "primereact/toast";
+import { useRef } from "react";
 
 const HomePage = () => {
 	const isNonMobileScreens = useMediaQuery("(min-width:1000px)");
-	const { _id, picturePath } = useSelector((state) => state.store.auth.user);
+	const { _id, picturePath, fullName } = useSelector((state) => state.store.auth.user);
+	const toast = useRef(null);
 
+toast.current.show({
+	severity: "success",
+	summary: "Successful Log in 🚀",
+	detail: `Welcome ${fullName} 👋`,
+});
 	return (
 		<Box>
 			<Navbar />

@@ -3,11 +3,11 @@
 const { isProd } = require("@config/const");
 const { ENV } = require("@/validations/envSchema");
 
-const cookieOptions = {
+const getCookieOptions = (rememberMe = true) => ({
 	httpOnly: true,
 	secure: isProd,
 	sameSite: isProd ? "strict" : "Lax",
-	maxAge: ENV.COOKIE_MAX_AGE,
-};
+	maxAge: rememberMe ? ENV.COOKIE_MAX_AGE_REMEMBER_ME : ENV.COOKIE_MAX_AGE,
+});
 
-module.exports = cookieOptions;
+module.exports = {getCookieOptions};

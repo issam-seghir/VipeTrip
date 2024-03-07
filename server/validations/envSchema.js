@@ -50,7 +50,10 @@ const envSchema = z.object({
 	REFRESH_TOKEN_SECRET: tokenSchema,
 	ACCESS_TOKEN_SECRET_EXPIRE: tokenExpireSchema,
 	REFRESH_TOKEN_SECRET_EXPIRE: tokenExpireSchema,
+	ACCESS_TOKEN_SECRET_EXPIRE_REMEMBER_ME: tokenExpireSchema,
+	REFRESH_TOKEN_SECRET_EXPIRE_REMEMBER_ME: tokenExpireSchema,
 	COOKIE_MAX_AGE: z.preprocess((x) => x || undefined, numberSchema.min(60_000).default(60_000)),
+	COOKIE_MAX_AGE_REMEMBER_ME: z.preprocess((x) => x || undefined, numberSchema.min(60_000).default(60_000)),
 	DATABASE_URI: stringNonEmpty().regex(mongodbUriRegex, {
 		message: "must be a valid MongoDB URI",
 	}),

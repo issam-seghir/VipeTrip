@@ -64,11 +64,8 @@ export function LoginForm() {
 		}
 	}, [isChekcEmailLoading, isChekcEmailFetching]);
 
-	console.log(chekcEmailExistance);
 	useEffect(() => {
-		console.log("trying to set new error");
 		if (chekcEmailExistance && chekcEmailExistance.invalid && !isEmailCheckError) {
-			console.log("set new error");
 			setError("email", {
 				type: "manual",
 				message: "User Not found",
@@ -82,15 +79,9 @@ export function LoginForm() {
 		try {
 			const res = await login(data).unwrap();
 			if (res) {
-				toast.current.show({
-					severity: "success",
-					summary: "Successful Log in 🚀",
-					detail: `Welcome ${res.user.name} 👋`,
-				});
 				dispatch(setCredentials({ user: res?.user, token: res?.token }));
 				reset();
-
-					navigate(from, { replace: true });
+				navigate(from, { replace: true });
 			}
 		} catch (error) {
 			console.error(error);
@@ -141,7 +132,7 @@ export function LoginForm() {
 						<PFormCheckBox
 							control={control}
 							defaultValue={true}
-							name={"rememberme"}
+							name={"rememberMe"}
 							label="Remember me"
 							errorMessage={errorsForm}
 						/>

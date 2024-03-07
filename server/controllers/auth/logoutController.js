@@ -1,5 +1,5 @@
 const User = require("@model/User");
-const cookieOptions = require("@config/cookieOptions");
+const { getCookieOptions } = require("@config/cookieOptions");
 
 const { asyncWrapper } = require("@middleware/asyncWrapper");
 const createError = require("http-errors");
@@ -22,7 +22,7 @@ const handleLogout = asyncWrapper(async (req, res) => {
 	}
 
 	// Clear refreshToken from cookies
-	res.clearCookie("jwt", cookieOptions);
+	res.clearCookie("jwt", getCookieOptions(foundUser.rememberMe));
 	res.status(204).send();
 });
 

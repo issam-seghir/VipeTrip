@@ -16,7 +16,6 @@ export function PFormTextField({
 	iconEnd,
 	toogleMask = false,
 	errorMessage,
-	reset,
 	disabled = false,
 }) {
 	const sizeClass = `p-inputtext-${size}`;
@@ -24,7 +23,6 @@ export function PFormTextField({
 	const isMobile = useMediaQuery("only screen and (max-width : 460px)");
 	const isSmallDevice = useMediaQuery("only screen and (max-width : 768px)");
 	const isMediumDevice = useMediaQuery("only screen and (min-width : 769px) and (max-width : 992px)");
-console.log(errorMessage);
 	const getFormErrorMessage = (name) => {
 		if (errorMessage[name]) {
 			// react-hook-form error

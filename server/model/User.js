@@ -23,6 +23,10 @@ const userSchema = new Schema(
 			required: [true, "password is required"],
 			private: true,
 		},
+		rememberMe: {
+			type: Boolean,
+			default: true,
+		},
 		picturePath: {
 			type: String,
 			default: "https://i.imgur.com/zTSAKyM.png",
@@ -56,8 +60,6 @@ const userSchema = new Schema(
 );
 
 //? --------- instance method ----------------
-
-
 
 // instance methode to increment viewedProfile
 userSchema.methods.incrementViewedProfile = function () {

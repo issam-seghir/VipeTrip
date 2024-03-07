@@ -40,7 +40,9 @@ export const registerSchema = baseRegisterSchema.refine((data) => data.password 
  * @typedef {z.infer<typeof registerSchema>} RegisterBody
  */
 
-export const loginSchema = baseRegisterSchema.pick({ email: true, password: true });
+export const loginSchema = baseRegisterSchema.pick({ email: true, password: true }).extend({
+	rememberMe: z.boolean().optional(),
+});
 /**
  * @typedef {z.infer<typeof loginSchema>} LoginBody
  */

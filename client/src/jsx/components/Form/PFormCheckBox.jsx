@@ -10,10 +10,8 @@ export function PFormCheckBox({
 	label,
 	icon,
 	errorMessage,
-	reset,
 	disabled = false,
 }) {
-	const errorMessageFormate = errorMessage?.data?.message || errorMessage?.error;
 	const getFormErrorMessage = (name) => {
 		return errorMessage[name] ? (
 			<small className="p-error">{errorMessage[name].message}</small>

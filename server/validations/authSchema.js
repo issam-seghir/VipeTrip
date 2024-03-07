@@ -37,7 +37,9 @@ const registerSchema = {
  */
 
 const loginSchema = {
-	body: registerSchema.body.pick({ email: true, password: true }),
+	body: registerSchema.body.pick({ email: true, password: true }).extend({
+		rememberMe: z.boolean().optional(),
+	}),
 };
 
 /**

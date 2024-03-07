@@ -27,6 +27,9 @@ export const authApi = api.injectEndpoints({
 				url: `/auth/check-email?email=${email}`,
 				method: "GET",
 			}),
+			extraOptions: {
+				skipCache: true,
+			},
 		}),
 	}),
 });

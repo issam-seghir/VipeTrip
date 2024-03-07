@@ -1,12 +1,10 @@
-import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { setPosts } from "@store/slices/globalSlice";
 import PostWidget from "@components/PostWidget";
+import { useDispatch, useSelector } from "react-redux";
 
 const PostsWidget = ({ userId, isProfile = false }) => {
   const dispatch = useDispatch();
-  const posts = useSelector((state) => state.global.posts);
-  const token = useSelector((state) => state.auth.token);
+  const posts = useSelector((state) => state.store.global.posts);
+  const token = useSelector((state) => state.store.auth.token);
 
   const getPosts = async () => {
     const response = await fetch("http://localhost:3500/posts", {
@@ -14,7 +12,6 @@ const PostsWidget = ({ userId, isProfile = false }) => {
       headers: { Authorization: `Bearer ${token}` },
     });
     const data = await response.json();
-    dispatch(setPosts({ posts: data }));
   };
 
   const getUserPosts = async () => {
@@ -26,7 +23,6 @@ const PostsWidget = ({ userId, isProfile = false }) => {
       }
     );
     const data = await response.json();
-    dispatch(setPosts({ posts: data }));
   };
 
   // useEffect(() => {

@@ -1,3 +1,4 @@
+import FlexBetween from "@components/FlexBetween";
 import {
   ChatBubbleOutlineOutlined,
   FavoriteBorderOutlined,
@@ -5,13 +6,11 @@ import {
   ShareOutlined,
 } from "@mui/icons-material";
 import { Box, Divider, IconButton, Typography, useTheme } from "@mui/material";
-import FlexBetween from "@components/FlexBetween";
 
 import Friend from "@components/Friend";
 import WidgetWrapper from "@components/WidgetWrapper";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setPost } from "@store/slices/globalSlice";
 
 const PostWidget = ({
   postId,
@@ -26,8 +25,8 @@ const PostWidget = ({
 }) => {
   const [isComments, setIsComments] = useState(false);
   const dispatch = useDispatch();
-  const token = useSelector((state) => state.auth.token);
-  const loggedInUserId = useSelector((state) => state.auth.user._id);
+  const token = useSelector((state) => state.store.auth.token);
+  const loggedInUserId = useSelector((state) => state.store.auth.user._id);
   const isLiked = Boolean(likes[loggedInUserId]);
   const likeCount = Object.keys(likes).length;
 
@@ -45,7 +44,6 @@ const PostWidget = ({
       body: JSON.stringify({ userId: loggedInUserId }),
     });
     const updatedPost = await response.json();
-    dispatch(setPost({ post: updatedPost }));
   };
 
   return (

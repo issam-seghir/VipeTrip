@@ -24,14 +24,14 @@ export function PFormTextField({
 	const isMobile = useMediaQuery("only screen and (max-width : 460px)");
 	const isSmallDevice = useMediaQuery("only screen and (max-width : 768px)");
 	const isMediumDevice = useMediaQuery("only screen and (min-width : 769px) and (max-width : 992px)");
-
+console.log(errorMessage);
 	const getFormErrorMessage = (name) => {
 		if (errorMessage[name]) {
 			// react-hook-form error
 			return <small className="p-error">{errorMessage[name].message}</small>;
-		} else if (errorMessage?.data) {
+		} else if (errorMessage?.data?.field === name) {
 			// server error
-			return <small className="p-error">{errorMessage?.data}</small>;
+			return <small className="p-error">{errorMessage?.data?.message}</small>;
 		} else {
 			return <small className="p-error">&nbsp;</small>;
 		}

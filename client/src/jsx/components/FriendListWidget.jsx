@@ -1,14 +1,11 @@
+import WidgetWrapper from "@components/WidgetWrapper";
 import { Box, Typography, useTheme } from "@mui/material";
-import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import WidgetWrapper  from "@components/WidgetWrapper";
-import Friend from "@components/Friend";
-import { setFriends } from "@store/slices/globalSlice";
 
 const FriendListWidget = ({ userId }) => {
   const dispatch = useDispatch();
   const { palette } = useTheme();
-  const friends = useSelector((state) => state.auth.user.friends);
+  const friends = useSelector((state) => state.store.auth.user.friends);
 
   // const getFriends = async () => {
   //   const response = await fetch(
@@ -19,7 +16,6 @@ const FriendListWidget = ({ userId }) => {
   //     }
   //   );
   //   const data = await response.json();
-  //   dispatch(setFriends({ friends: data }));
   // };
 
   // useEffect(() => {

@@ -1,7 +1,11 @@
+import FlexBetween from "@components/FlexBetween";
+import UserImage from "@components/UserImage";
+import WidgetWrapper from "@components/WidgetWrapper";
+import { useNewPostMutation } from "@jsx/store/api/postApi";
 import {
-  EditOutlined,
-  DeleteOutlined,
   AttachFileOutlined,
+  DeleteOutlined,
+  EditOutlined,
   GifBoxOutlined,
   ImageOutlined,
   MicOutlined,
@@ -9,22 +13,17 @@ import {
 } from "@mui/icons-material";
 import {
   Box,
-  Divider,
-  Typography,
-  InputBase,
-  useTheme,
   Button,
+  Divider,
   IconButton,
+  InputBase,
+  Typography,
   useMediaQuery,
+  useTheme,
 } from "@mui/material";
-import FlexBetween from "@components/FlexBetween";
-import Dropzone from "react-dropzone";
-import UserImage from "@components/UserImage";
-import WidgetWrapper from "@components/WidgetWrapper";
 import { useState } from "react";
+import Dropzone from "react-dropzone";
 import { useDispatch, useSelector } from "react-redux";
-import { setPosts } from "@store/slices/globalSlice";
-import { useNewPostMutation } from "@jsx/store/api/postApi";
 
 const MyPostWidget = ({ picturePath }) => {
   const dispatch = useDispatch();
@@ -32,8 +31,8 @@ const MyPostWidget = ({ picturePath }) => {
   const [image, setImage] = useState(null);
   const [post, setPost] = useState("");
   const { palette } = useTheme();
-  const { _id } = useSelector((state) => state.auth.user);
-  const token = useSelector((state) => state.auth.token);
+  const { _id } = useSelector((state) => state.store.auth.user);
+  const token = useSelector((state) => state.store.auth.token);
   const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
   const mediumMain = palette.neutral.mediumMain;
   const medium = palette.neutral.medium;
@@ -94,13 +93,13 @@ const MyPostWidget = ({ picturePath }) => {
                   sx={{ "&:hover": { cursor: "pointer" } }}
                 >
                   <input {...getInputProps()} />
-                  {!image ? (
-                    <p>Add Image Here</p>
-                  ) : (
+                  {image ? (
                     <FlexBetween>
                       <Typography>{image.name}</Typography>
                       <EditOutlined />
                     </FlexBetween>
+                  ) : (
+                    <p>Add Image Here</p>
                   )}
                 </Box>
                 {image && (

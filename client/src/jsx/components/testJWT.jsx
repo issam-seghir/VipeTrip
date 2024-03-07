@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 
 export default function TestJWT() {
 	const [trigger, { data, error, isLoading }] = useLazyGetUserByIdQuery();
-	const userId = useSelector((state) => state.auth.user._id);
+	const userId = useSelector((state) => state.store.auth.user._id);
 
 	const testJWT = () => {
 		trigger(userId);

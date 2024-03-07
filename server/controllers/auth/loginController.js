@@ -19,12 +19,14 @@ const handleLogin = asyncWrapper(async (req, res, next) => {
 
 	// verifie user existence in database
 	const foundUser = await User.findOne({ email });
-	if (!foundUser) return next(createError.NotFound("User not found"));
+	// if (!foundUser) return next(createError.NotFound("User not found"));
+	if (!foundUser) return res.status(404).json({ field: "email", message: "User not found" });
 
 	// evaluate password
 	// @ts-ignore
 	const match = await bcrypt.compare(password, foundUser.password);
-	if (!match) return next(createError.Unauthorized("Incorrect password"));
+	// if (!match) return next(createError.Unauthorized("Incorrect password"));
+	if (!match) return res.status(401).json({ field: "password", message: "Incorrect password" }); //Unauthorized
 
 	// create JWT Refresh Token
 	const newRefreshToken = jwt.sign(

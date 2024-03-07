@@ -1,14 +1,14 @@
 import { isDev } from "@data/constants";
 import { DevTool } from "@hookform/devtools";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useLoginMutation } from "@jsx/store/api/authApi";
+import { useCheckEmailExistsQuery, useLoginMutation } from "@jsx/store/api/authApi";
 import { setCredentials } from "@jsx/store/slices/authSlice";
 import { useIsAppleDevice } from "@jsx/utils/hooks/useIsAppleDevice";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { useLocation, useNavigate } from "react-router-dom";
 // import { useFormHandleErrors } from "@utils/hooks/useFormHandleErrors";
-import { useMediaQuery } from "@uidotdev/usehooks";
+import { useDebounce, useMediaQuery } from "@uidotdev/usehooks";
 import { loginSchema } from "@validations/authSchema";
 import { Button } from "primereact/button";
 import { Divider } from "primereact/divider";
@@ -36,7 +36,7 @@ export function LoginForm() {
 		setError,
 		clearErrors,
 		control,
-		formState: { errors: errorsForm, isSubmitting },
+		formState: { errors: errorsForm, isSubmitting, isDirty, isValid },
 	} = useForm({
 		mode: "onChange",
 		resolver: zodResolver(loginSchema),
@@ -45,27 +45,27 @@ export function LoginForm() {
 	const errorMessage = isLoginError ? errorLogin : errorsForm;
 
 	// check if use email exist when typing ...
-	// const email = watch("email");
-	// const debouncedEmail = useDebounce(email, 500); // Debounce the email input by 500ms
-
-	// const {
-	// 	data: chekcEmailExistance,
-	// 	isLoading: isEmailChecking,
-	// 	isError: isEmailCheckError,
-	// } = useCheckEmailExistsQuery(debouncedEmail, {
-	// 	skip: !debouncedEmail || errorsForm.email, // Skip the query if the email is empty
-	// });
+	const email = watch("email");
+	const debouncedEmail = useDebounce(errorsForm?.email ? null : email, 1500); // Debounce the email input by 500ms
+	console.log(errorsForm);
+	const {
+		data: chekcEmailExistance,
+		isLoading: isEmailChecking,
+		isError: isEmailCheckError,
+	} = useCheckEmailExistsQuery(debouncedEmail, {
+		skip: !debouncedEmail || errorsForm?.email, // Skip the query if the email is empty
+	});
 	console.log(errorLogin);
-	// useEffect(() => {
-	// 	if (chekcEmailExistance && chekcEmailExistance.invalid) {
-	// 		setError("email", {
-	// 			type: "manual",
-	// 			message: "User Not found",
-	// 		});
-	// 	} else {
-	// 		clearErrors("email");
-	// 	}
-	// }, [chekcEmailExistance?.invalid, setError, clearErrors]);
+	useEffect(() => {
+		if (chekcEmailExistance && !isEmailCheckError) {
+			setError("email", {
+				type: "manual",
+				message: "User Not found",
+			});
+		} else {
+			clearErrors("email");
+		}
+	}, [chekcEmailExistance, setError, clearErrors]);
 
 	async function handleLogin(data) {
 		try {
@@ -110,13 +110,15 @@ export function LoginForm() {
 						type="email"
 						size={"lg"}
 						iconStart={"pi-user"}
-						// iconEnd={
-						// 	isEmailChecking
-						// 		? "pi-spin pi-spinner"
-						// 		: chekcEmailExistance?.exists
-						// 		? "pi-times"
-						// 		: "pi-check"
-						// }
+						iconEnd={
+							errorsForm?.email
+								? null
+								: isEmailChecking
+								? "pi-spin pi-spinner"
+								: chekcEmailExistance
+								? "pi-times"
+								: "pi-check"
+						}
 						errorMessage={errorsForm}
 					/>
 					<PFormTextField

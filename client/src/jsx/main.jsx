@@ -47,19 +47,19 @@ export const router = createBrowserRouter(
           element: <Register />,
         },
         //? Private routes
-        // {
-        // 	element: <PrivateRoute />,
-        // 	children: [
-        // 		{
-        // 			path: "home",
-        // 			element: <Home />,
-        // 		},
-        // 		{
-        // 			path: "profile/:userId",
-        // 			element: <Profile />,
-        // 		},
-        // 	],
-        // },
+        {
+        	element: <PrivateRoute />,
+        	children: [
+        		{
+        			path: "home",
+        			element: <Home />,
+        		},
+        		{
+        			path: "profile/:userId",
+        			element: <Profile />,
+        		},
+        	],
+        },
       ],
     },
   ],

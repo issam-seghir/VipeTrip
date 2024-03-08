@@ -22,7 +22,7 @@ export function PFormCheckBox({
 
 	return (
 		<Controller
-			defaultValue={defaultValue} // rules={{ required: "Name - Surname is required." }}
+			defaultValue={defaultValue} 
 			name={name}
 			control={control}
 			render={({ field, fieldState }) => (

@@ -7,13 +7,13 @@ const TypeOf = require("zod");
 const { isRegexSave } = require("@/utils");
 const createError = require("http-errors");
 const log = require("@/utils/chalkLogger");
-const { stringNonEmpty,errorMap, arrayFromString, formatPath } = require("@/utils/zodUtils");
+const { stringNonEmpty, errorMap, arrayFromString, formatPath } = require("@/utils/zodUtils");
 
 //? -------- REGEX ---------
 const durationRegex = /^(\d+(\.\d+)?(ms|s|m|h|d|w|y))$/;
 const hexRegex = /[\da-f]{128}$/i;
-const mongodbUriRegex = /mongodb?([+rsv]*):\/\/(?:(?<login>[^#/:?@[\]]+)(?::(?<password>[^#/:?@[\]]+))?@)?(?<host>[\w.\-]+(?::\d+)?(?:,[\w.\-]+(?::\d+)?)*)(?:\/(?<dbname>[\w.\-]+))?(?:\?(?<query>[\w.\-]+=[\w.\-]+(?:&[\w.\-]+=[\w.\-]+)*))?/;
-
+const mongodbUriRegex =
+	/mongodb?([+rsv]*):\/\/(?:(?<login>[^#/:?@[\]]+)(?::(?<password>[^#/:?@[\]]+))?@)?(?<host>[\w.\-]+(?::\d+)?(?:,[\w.\-]+(?::\d+)?)*)(?:\/(?<dbname>[\w.\-]+))?(?:\?(?<query>[\w.\-]+=[\w.\-]+(?:&[\w.\-]+=[\w.\-]+)*))?/;
 
 //? -------- Error Maps ---------
 
@@ -22,9 +22,14 @@ const tokenExpireErrorMap = zu.makeErrorMap({
 });
 
 //? -------- Sub Schema ---------
-const tokenSchema = stringNonEmpty().length(128, { message: "must be a 128-character string" }).regex(hexRegex, { message: "must be a hexadecimal string" });
+const tokenSchema = stringNonEmpty()
+	.length(128, { message: "must be a 128-character string" })
+	.regex(hexRegex, { message: "must be a hexadecimal string" });
 const tokenExpireSchema = stringNonEmpty(tokenExpireErrorMap).regex(durationRegex);
-const numberSchema = z.coerce.number().int({ message: "must be integer number" }).positive({ message: "must be positive number" });
+const numberSchema = z.coerce
+	.number()
+	.int({ message: "must be integer number" })
+	.positive({ message: "must be positive number" });
 
 //? -------- Zod Global Config ---------
 
@@ -52,8 +57,8 @@ const envSchema = z.object({
 	REFRESH_TOKEN_SECRET_EXPIRE: tokenExpireSchema,
 	ACCESS_TOKEN_SECRET_EXPIRE_REMEMBER_ME: tokenExpireSchema,
 	REFRESH_TOKEN_SECRET_EXPIRE_REMEMBER_ME: tokenExpireSchema,
-	COOKIE_MAX_AGE: z.preprocess((x) => x || undefined, numberSchema.min(60_000).default(60_000)),
-	COOKIE_MAX_AGE_REMEMBER_ME: z.preprocess((x) => x || undefined, numberSchema.min(60_000).default(60_000)),
+	COOKIE_MAX_AGE: z.preprocess((x) => x || undefined, numberSchema),
+	COOKIE_MAX_AGE_REMEMBER_ME: z.preprocess((x) => x || undefined, numberSchema),
 	DATABASE_URI: stringNonEmpty().regex(mongodbUriRegex, {
 		message: "must be a valid MongoDB URI",
 	}),

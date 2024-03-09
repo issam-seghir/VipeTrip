@@ -1,12 +1,15 @@
 const User = require("@model/User");
+const ResetToken = require("@model/ResetToken");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { isProd } = require("@config/const");
-const {getCookieOptions} = require("@config/cookieOptions");
+const { getCookieOptions } = require("@config/cookieOptions");
 const { ENV } = require("@/validations/envSchema");
-
 const { asyncWrapper } = require("@middleware/asyncWrapper");
 const createError = require("http-errors");
+const mailer = require("@config/nodemailConfig");
+const log = require("@/utils/chalkLogger");
+const { generateResetToken } = require("@utils/index");
 
 /**
  * @typedef {import('@validations/authSchema').LoginBody} LoginBody
@@ -66,4 +69,94 @@ const checkEmailExists = asyncWrapper(async (req, res, next) => {
 	res.json({ invalid: !foundUser });
 });
 
-module.exports = { handleLogin, checkEmailExists };
+/**
+ * @typedef {import('@validations/authSchema').resetPasswordRequestBody} resetPasswordRequestBody
+ */
+//  Password reset flow
+// Step 1: User requests a password reset
+const resetPasswordRequest = asyncWrapper(async (req, res, next) => {
+	/** @type {resetPasswordRequestBody} */
+	const { email } = req.body;
+
+	// Hash the reset token and set it in the user's document, along with an expiry time
+	const user = await User.findOne({ email });
+	if (!user) return res.status(404).json({ message: "No account with that email exists" });
+
+	// Delete any existing reset tokens
+	let token = await ResetToken.findOne({ userId: user._id });
+	if (token) await token.deleteOne();
+
+	// Generate a reset token
+	const resetToken = generateResetToken();
+	const hashedToken = await bcrypt.hash(resetToken, 10);
+
+	// Create a new reset token document
+	const tokenDocument = new ResetToken({
+		userId: user._id,
+		token: hashedToken,
+		createdAt: Date.now(),
+	});
+	await tokenDocument.save();
+
+	const resetPasswordlink = `${clientURL}/reset/${resetToken}`;
+	const resetEmail = {
+		to: user.email,
+		from: process.env.RESET_EMAIL_ADDRESS,
+		subject: "Password Reset Request",
+		text: `
+		Welcome ${user.fullName}
+      You are receiving this because you (or someone else) have requested the reset of the password for your account.
+      Please click on the following link, or paste this into your browser to complete the process:
+      ${resetPasswordlink}
+      If you did not request this, please ignore this email and your password will remain unchanged.
+    `,
+	};
+
+	const mailInfo = await mailer.sendEmail(resetEmail);
+
+	console.log("Message : %s", JSON.stringify(mailInfo));
+	log.info(`An e-mail has been sent to ${user.email} with further instructions.`);
+	res.status(200).send("Check your email for further instructions");
+});
+
+// Step 2: User enters a new password
+const resetPassword = asyncWrapper(async (req, res, next) => {
+	const { token } = req.params;
+	const { password } = req.body;
+	// Find the reset token document
+	const tokenDocument = await ResetToken.findOne({ token });
+	if (!tokenDocument) return res.status(404).send("Password reset token is invalid or has expired");
+
+	// Find the user
+	const user = await User.findById(tokenDocument.userId);
+	if (!user) return res.status(404).send("Password reset token is invalid or has expired");
+
+	// Verify the token
+	const isValid = await bcrypt.compare(token, tokenDocument.token);
+	if (!isValid) return res.status(400).send("Password reset token is invalid or has expired");
+
+	// Hash the new password and update the user's password
+	const hashedPassword = await bcrypt.hash(password, 10);
+	user.password = hashedPassword;
+	await user.save();
+
+	// Delete the reset token document
+	await tokenDocument.deleteOne();
+
+	const resetEmail = {
+		to: user.email,
+		from: process.env.RESET_EMAIL_ADDRESS,
+		subject: "Password Reset Successfully",
+		text: `
+        Your password has been successfully reset. If you did not request this change, please contact our support immediately.
+    `,
+	};
+
+	const mailInfo = await mailer.sendEmail(resetEmail);
+
+	console.log("Message : %s", JSON.stringify(mailInfo));
+	log.info(`An e-mail has been sent to ${user.email} with further instructions.`);
+	res.status(200).send("Your password has been changed");
+});
+
+module.exports = { handleLogin, checkEmailExists, resetPasswordRequest, resetPassword };

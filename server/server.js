@@ -69,6 +69,10 @@ app.use(compression());
 //serve static files
 app.use(express.static(join(__dirname, "public")));
 
+// disable "x-powered-by Express" in the req header 
+app.disable("x-powered-by");
+
+
 app.use("/api/v1", require("@api/v1"));
 
 // global error handling

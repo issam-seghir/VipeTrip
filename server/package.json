@@ -46,6 +46,7 @@
 	"dependencies": {
 		"@anatine/zod-mock": "^3.13.3",
 		"@rimiti/express-async": "^1.2.0",
+		"@sendgrid/mail": "^8.1.1",
 		"bcrypt": "^5.1.1",
 		"chalk": "^4.1.2",
 		"compression": "^1.7.4",
@@ -67,6 +68,7 @@
 		"mongoose-update-versioning": "^0.4.0",
 		"morgan": "^1.10.0",
 		"multer": "^1.4.4",
+		"nodemailer": "^6.9.12",
 		"passport": "^0.7.0",
 		"passport-local-mongoose": "^8.0.0",
 		"rate-limiter-flexible": "^4.0.1",

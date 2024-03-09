@@ -1,4 +1,5 @@
 /* eslint-disable unicorn/no-useless-undefined */
+const crypto = require("node:crypto");
 
 /**
  * Converts bytes to megabytes.
@@ -33,6 +34,15 @@ function mbToByte(mb) {
  */
 function uuid() {
 	return crypto.randomUUID();
+}
+
+
+/**
+ * Generates a reset token.
+ * @returns {string} The generated reset token.
+ */
+function generateResetToken() {
+	return crypto.randomBytes(20).toString("hex");
 }
 
 /**
@@ -80,6 +90,7 @@ module.exports = {
 	byteToMb,
 	mbToByte,
 	uuid,
+	generateResetToken,
 	signChecker,
 	isRegexSave,
 };

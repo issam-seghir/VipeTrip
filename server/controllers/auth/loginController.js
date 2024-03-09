@@ -111,7 +111,12 @@ const resetPasswordRequest = asyncWrapper(async (req, res, next) => {
       ${resetPasswordlink}
       If you did not request this, please ignore this email and your password will remain unchanged.
     `,
-		html: 'Embedded image: <img src="cid:logo.png" alt="logo"/>',
+		html: `<img src="cid:logo.png" alt="logo"/>
+		<h1>Welcome ${user.fullName}</h1>
+		<p>You are receiving this because you (or someone else) have requested the reset of the password for your account.</p>
+		<p>Please click on the following link, or paste this into your browser to complete the process:</p>
+		<a href="${resetPasswordlink}">${resetPasswordlink}</a>
+		<p>If you did not request this, please ignore this email and your password will remain unchanged.</p>`,
 		attachments: [
 			{
 				filename: "image.png",

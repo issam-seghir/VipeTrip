@@ -102,18 +102,11 @@ const resetPasswordRequest = asyncWrapper(async (req, res, next) => {
 	const resetPasswordlink = `${ENV.CLEINT_URL}/reset-password/${resetToken}`;
 	const resetEmail = {
 		to: user.email,
-		from: ENV.EMAIL_USERNAME,
+		from: `VipeTrip <${ENV.EMAIL_USERNAME}>`,
 		subject: "Password Reset Request",
-		text: `
-		Welcome ${user.fullName}
-      You are receiving this because you (or someone else) have requested the reset of the password for your account.
-      Please click on the following link, or paste this into your browser to complete the process:
-      ${resetPasswordlink}
-      If you did not request this, please ignore this email and your password will remain unchanged.
-    `,
 		html: `<img src="cid:logo.png" alt="logo"/>
 		<h1>Welcome ${user.fullName}</h1>
-		<p>You are receiving this because you (or someone else) have requested the reset of the password for your account.</p>
+		<p>You are receiving this because you (or someone else) have requested the <strong>reset of the password</strong> for your account.</p>
 		<p>Please click on the following link, or paste this into your browser to complete the process:</p>
 		<a href="${resetPasswordlink}">${resetPasswordlink}</a>
 		<p>If you did not request this, please ignore this email and your password will remain unchanged.</p>`,

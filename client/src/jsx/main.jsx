@@ -11,6 +11,7 @@ import App from "@jsx/App.jsx";
 import Home from "@pages/Home";
 import { Login } from "@pages/Login";
 import { Register } from "@pages/Register";
+import { ForgetPassword } from "@pages/ForgetPassword";
 import Profile from "@pages/Profile";
 import PrivateRoute from "@components/PrivateRoute.jsx";
 import Error from "./pages/Error";
@@ -31,39 +32,47 @@ import "@scss/main.scss";
 // const Customers = React.lazy(() => import("@pages/Customers"));
 // const Analytics = React.lazy(() => import("@pages/Analytics"));
 export const router = createBrowserRouter(
-  [
-    {
-      path: "/",
-      element: <App />,
-      errorElement: <Error />,
-      children: [
-        //? Public routes
-        {
-          index: true,
-          element: <Login />,
-        },
-        {
-          path: "register",
-          element: <Register />,
-        },
-        //? Private routes
-        {
-        	element: <PrivateRoute />,
-        	children: [
-        		{
-        			path: "home",
-        			element: <Home />,
-        		},
-        		{
-        			path: "profile/:userId",
-        			element: <Profile />,
-        		},
-        	],
-        },
-      ],
-    },
-  ],
-  { basename: import.meta.env.BASE_URL }
+	[
+		{
+			path: "/",
+			element: <App />,
+			errorElement: <Error />,
+			children: [
+				//? Public routes
+				{
+					index: true,
+					element: <Login />,
+				},
+				{
+					path: "register",
+					element: <Register />,
+				},
+				{
+					path: "forgot-password",
+					element: <ForgetPassword />,
+				},
+				{
+					path: "reset-password/:resetToken",
+					element: <ForgetPassword />,
+				},
+				//? Private routes
+				{
+					element: <PrivateRoute />,
+					children: [
+						{
+							path: "home",
+							element: <Home />,
+						},
+						{
+							path: "profile/:userId",
+							element: <Profile />,
+						},
+					],
+				},
+			],
+		},
+	],
+	{ basename: import.meta.env.BASE_URL }
 );
 
 ReactDOM.createRoot(document.getElementById("root")).render(

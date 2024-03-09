@@ -6,7 +6,7 @@ import { setCredentials } from "@jsx/store/slices/authSlice";
 import { useIsAppleDevice } from "@jsx/utils/hooks/useIsAppleDevice";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate ,Link} from "react-router-dom";
 import { useDebounce, useMediaQuery } from "@uidotdev/usehooks";
 import { loginSchema } from "@validations/authSchema";
 import { Button } from "primereact/button";
@@ -15,6 +15,7 @@ import { Toast } from "primereact/toast";
 import { useDispatch } from "react-redux";
 import { PFormCheckBox } from "./Form/PFormCheckBox";
 import { PFormTextField } from "./Form/PFormTextField";
+
 
 export function LoginForm() {
 	const navigate = useNavigate();
@@ -136,12 +137,12 @@ export function LoginForm() {
 							label="Remember me"
 							errorMessage={errorsForm}
 						/>
-						<a
-							href="#"
-							className=" no-underline ml-2 text-xs md:text-base text-blue-500 text-right cursor-pointer"
+						<Link
+							to="/forgot-password"
+							className="no-underline ml-2 text-xs md:text-base text-blue-500 text-right cursor-pointer"
 						>
 							Forgot your password?
-						</a>
+						</Link>
 					</div>
 
 					<Button

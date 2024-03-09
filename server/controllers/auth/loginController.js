@@ -98,10 +98,11 @@ const resetPasswordRequest = asyncWrapper(async (req, res, next) => {
 	});
 	await tokenDocument.save();
 
-	const resetPasswordlink = `${clientURL}/reset/${resetToken}`;
+	// use gmail account
+	const resetPasswordlink = `${ENV.CLEINT_URL}/reset-password/${resetToken}`;
 	const resetEmail = {
 		to: user.email,
-		from: process.env.RESET_EMAIL_ADDRESS,
+		from: ENV.EMAIL_USERNAME,
 		subject: "Password Reset Request",
 		text: `
 		Welcome ${user.fullName}
@@ -110,9 +111,28 @@ const resetPasswordRequest = asyncWrapper(async (req, res, next) => {
       ${resetPasswordlink}
       If you did not request this, please ignore this email and your password will remain unchanged.
     `,
+		html: 'Embedded image: <img src="cid:logo.png" alt="logo"/>',
+		attachments: [
+			{
+				filename: "image.png",
+				path: "https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png",
+				cid: "logo.png",
+			},
+		],
 	};
 
 	const mailInfo = await mailer.sendEmail(resetEmail);
+
+	// use mailgun
+	// const resetEmailMailgun = {
+	// 	to: user.email,
+	// 	from: `noreply@${ENV.MAILGUN_DOMIAN_NAME}`,
+	// 	subject: "Password Reset Request",
+	// 	template: "reset password",
+	// 	"h:X-Mailgun-Variables": { test: "test" },
+	// };
+
+	// const mailgunInfo = await mailer.sendEmailMailgun(resetEmailMailgun);
 
 	console.log("Message : %s", JSON.stringify(mailInfo));
 	log.info(`An e-mail has been sent to ${user.email} with further instructions.`);
@@ -145,7 +165,7 @@ const resetPassword = asyncWrapper(async (req, res, next) => {
 
 	const resetEmail = {
 		to: user.email,
-		from: process.env.RESET_EMAIL_ADDRESS,
+		from: ENV.EMAIL_USERNAME,
 		subject: "Password Reset Successfully",
 		text: `
         Your password has been successfully reset. If you did not request this change, please contact our support immediately.

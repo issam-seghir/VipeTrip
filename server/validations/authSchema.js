@@ -20,7 +20,6 @@ const tokenSchema = stringNonEmpty()
 	.length(40, { message: "must be a 40-character string" })
 	.regex(hexRegex, { message: "must be a hexadecimal string" });
 
-
 const registerSchema = {
 	body: z.object({
 		firstName: credinalSchema,
@@ -51,15 +50,13 @@ const loginSchema = {
  * @typedef {z.infer<typeof loginSchema.body>} LoginBody
  */
 
-
 const resetPasswordRequestSchema = {
-	body: registerSchema.body.pick({ email: true})
+	body: registerSchema.body.pick({ email: true }),
 };
 
 /**
  * @typedef {z.infer<typeof resetPasswordRequestSchema.body>} resetPasswordRequestBody
  */
-
 
 const resetPasswordSchema = {
 	body: registerSchema.body.pick({ password: true }),

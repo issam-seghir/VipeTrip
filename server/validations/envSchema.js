@@ -66,6 +66,11 @@ const envSchema = z.object({
 	NODE_ENV: z.enum(["development", "production"]).default("development"),
 	// @ts-ignore
 	ALLOWED_ORIGINS: arrayFromString(z.string().url(), ["http://localhost:3000"]),
+	EMAIL_USERNAME: stringNonEmpty().email().trim().toLowerCase(),
+	EMAIL_PASSWORD: stringNonEmpty(),
+	MAILGUN_API_KEY: stringNonEmpty(),
+	MAILGUN_DOMIAN_NAME: stringNonEmpty(),
+	CLEINT_URL: stringNonEmpty().url(),
 	PORT: z.preprocess((x) => x || undefined, numberSchema.min(1).max(65_536).default(3000)),
 });
 

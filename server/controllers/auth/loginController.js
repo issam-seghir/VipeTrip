@@ -80,7 +80,7 @@ const resetPasswordRequest = asyncWrapper(async (req, res, next) => {
 
 	// Hash the reset token and set it in the user's document, along with an expiry time
 	const user = await User.findOne({ email });
-	if (!user) return res.status(404).json({ message: "No account with that email exists" });
+	if (!user) return res.status(404).json({field: "email", message: "No account with that email exists" });
 
 	// Delete any existing reset tokens
 	let token = await ResetToken.findOne({ userId: user._id });
@@ -105,15 +105,15 @@ const resetPasswordRequest = asyncWrapper(async (req, res, next) => {
 		from: `VipeTrip <${ENV.EMAIL_USERNAME}>`,
 		subject: "Password Reset Request",
 		html: `<img src="cid:logo.png" alt="logo"/>
-		<h1>Welcome ${user.fullName}</h1>
+		<h1>Hey ${user.fullName} !</h1>
 		<p>You are receiving this because you (or someone else) have requested the <strong>reset of the password</strong> for your account.</p>
 		<p>Please click on the following link, or paste this into your browser to complete the process:</p>
-		<a href="${resetPasswordlink}">${resetPasswordlink}</a>
+		<a href="${resetPasswordlink}">reset password</a>
 		<p>If you did not request this, please ignore this email and your password will remain unchanged.</p>`,
 		attachments: [
 			{
-				filename: "image.png",
-				path: "https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png",
+				filename: "logo.svg",
+				path: "public/email/logo.svg",
 				cid: "logo.png",
 			},
 		],
@@ -121,20 +121,9 @@ const resetPasswordRequest = asyncWrapper(async (req, res, next) => {
 
 	const mailInfo = await mailer.sendEmail(resetEmail);
 
-	// use mailgun
-	// const resetEmailMailgun = {
-	// 	to: user.email,
-	// 	from: `noreply@${ENV.MAILGUN_DOMIAN_NAME}`,
-	// 	subject: "Password Reset Request",
-	// 	template: "reset password",
-	// 	"h:X-Mailgun-Variables": { test: "test" },
-	// };
-
-	// const mailgunInfo = await mailer.sendEmailMailgun(resetEmailMailgun);
-
 	console.log("Message : %s", JSON.stringify(mailInfo));
 	log.info(`An e-mail has been sent to ${user.email} with further instructions.`);
-	res.status(200).send("Check your email for further instructions");
+	res.status(200).json({message:"Check your email for further instructions"});
 });
 
 // Step 2: User enters a new password

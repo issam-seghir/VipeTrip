@@ -31,7 +31,20 @@ export const authApi = api.injectEndpoints({
 				skipCache: true,
 			},
 		}),
+		passwordResetRequest: builder.mutation({
+			query: (email) => ({
+				url: "/auth/forget",
+				method: "POST",
+				body: email,
+			}),
+		}),
 	}),
 });
 
-export const { useLoginMutation, useRegisterMutation, useLogoutMutation, useCheckEmailExistsQuery } = authApi;
+export const {
+	useLoginMutation,
+	useRegisterMutation,
+	useLogoutMutation,
+	useCheckEmailExistsQuery,
+	usePasswordResetRequestMutation,
+} = authApi;

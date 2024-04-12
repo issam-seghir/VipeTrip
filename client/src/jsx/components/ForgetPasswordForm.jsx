@@ -1,32 +1,23 @@
 import { isDev } from "@data/constants";
 import { DevTool } from "@hookform/devtools";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useCheckEmailExistsQuery, useLoginMutation } from "@jsx/store/api/authApi";
-import { setCredentials } from "@jsx/store/slices/authSlice";
-import { useIsAppleDevice } from "@jsx/utils/hooks/useIsAppleDevice";
+import { useCheckEmailExistsQuery, usePasswordResetRequestMutation } from "@jsx/store/api/authApi";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import { useDebounce, useMediaQuery } from "@uidotdev/usehooks";
-import { loginSchema } from "@validations/authSchema";
+import { passwordResetReaquestSchema } from "@validations/authSchema";
 import { Button } from "primereact/button";
-import { Divider } from "primereact/divider";
 import { Toast } from "primereact/toast";
-import { useDispatch } from "react-redux";
-import { PFormCheckBox } from "./Form/PFormCheckBox";
 import { PFormTextField } from "./Form/PFormTextField";
 
-export function LoginForm() {
+export function ForgetPasswordForm() {
 	const navigate = useNavigate();
-	const location = useLocation();
-	let from = location.state?.from?.pathname || "/home";
-
 	const isNonMobile = useMediaQuery("(min-width:600px)");
-
-	const dispatch = useDispatch();
 	const toast = useRef(null);
 
-	const [login, { error: errorLogin, isLoading: isLoginLoading, isError: isLoginError }] = useLoginMutation();
+	const [passwordResetRequest, { error: errorPasswordResetRequest, isLoading: isPasswordResetRequestLoading, isError: isPasswordResetRequestError }] =
+		usePasswordResetRequestMutation();
 	const {
 		handleSubmit,
 		watch,
@@ -37,10 +28,10 @@ export function LoginForm() {
 		formState: { errors: errorsForm, isSubmitting },
 	} = useForm({
 		mode: "onChange",
-		resolver: zodResolver(loginSchema),
+		resolver: zodResolver(passwordResetReaquestSchema),
 	});
 
-	const errorMessage = isLoginError ? errorLogin : errorsForm;
+	const errorMessage = isPasswordResetRequestError ? errorPasswordResetRequest : errorsForm;
 
 	// check if use email exist when typing ...
 	const email = watch("email");
@@ -74,26 +65,29 @@ export function LoginForm() {
 		}
 	}, [chekcEmailExistance, setError, clearErrors]);
 
-	async function handleLogin(data) {
+	async function handlePasswordResetRequest(data) {
 		try {
-			const res = await login(data).unwrap();
+			const res = await passwordResetRequest(data).unwrap();
 			if (res) {
-				dispatch(setCredentials({ user: res?.user, token: res?.token }));
 				reset();
-				navigate(from, { replace: true });
+				toast.current.show({
+					severity: "success",
+					summary: "Email has been sent successfully",
+					detail: "Please Check your inbox  and click in the received link to reset the password",
+				});
 			}
 		} catch (error) {
 			console.error(error);
 			toast.current.show({
 				severity: "error",
-				summary: "Login Failed 💢",
-				detail: error?.data?.message || "email or password not correct",
+				summary: "Password Reset Request Failed",
+				detail: error?.data?.message || "An error occurred while sending the password reset request",
 			});
 		}
 	}
 
 	const onSubmit = (data) => {
-		handleLogin(data);
+		handlePasswordResetRequest(data);
 	};
 
 	return (
@@ -115,31 +109,13 @@ export function LoginForm() {
 						iconEnd={showSpinner ? "pi-spin pi-spinner" : "pi-time"}
 						errorMessage={errorMessage}
 					/>
-					<PFormTextField
-						control={control}
-						defaultValue={""}
-						name={"password"}
-						label="Password"
-						type="password"
-						size={"lg"}
-						iconStart={"pi-lock"}
-						toogleMask={true}
-						errorMessage={errorMessage}
-					/>
-
-						<Link
-							to="/forgot-password"
-							className="no-underline ml-2 text-xs md:text-base text-blue-500 text-right cursor-pointer"
-						>
-							Forgot your password?
-						</Link>
 
 					<Button
-						label={isLoginLoading ? "Loading..." : "Sign in"}
-						className="btn-sign-in w-17rem lg:w-7"
+						label={isPasswordResetRequestLoading ? "Sending..." : "Send"}
+						className="btn-sign-in w-17rem lg:w-6"
 						iconPos="right"
 						size={isNonMobile ? "large" : "small"}
-						loading={isSubmitting || isLoginLoading}
+						loading={isSubmitting || isPasswordResetRequestLoading}
 						onClick={handleSubmit}
 					>
 						<svg viewBox="0 0 180 60" className="sign-in border">
@@ -147,6 +123,16 @@ export function LoginForm() {
 							<polyline points="179,1 179,59 1,59 1,1 179,1" className="hl-line" />
 						</svg>
 					</Button>
+
+					<p>
+						<Button
+							link
+							className="text-xs sm:text-base font-small px-0 md:px-2 underline ml-2  text-left cursor-pointer"
+							onClick={() => navigate("..")}
+						>
+							{"Back to Sign in"}
+						</Button>
+					</p>
 				</div>
 			</form>
 		</>

@@ -63,4 +63,11 @@ const resetPasswordSchema = {
 	params: z.object({ token: tokenSchema }),
 };
 
+
+/**
+ * @typedef {z.infer<typeof resetPasswordSchema.body>} resetPasswordBody
+ * @typedef {z.infer<typeof resetPasswordSchema.params>} resetPasswordParams
+ */
+
+
 module.exports = { registerSchema, loginSchema, resetPasswordRequestSchema, resetPasswordSchema };

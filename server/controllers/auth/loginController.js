@@ -126,9 +126,15 @@ const resetPasswordRequest = asyncWrapper(async (req, res, next) => {
 	res.status(200).json({message:"Check your email for further instructions"});
 });
 
+/**
+ * @typedef {import('@validations/authSchema').resetPasswordBody} resetPasswordBody
+ * @typedef {import('@validations/authSchema').resetPasswordParams} resetPasswordParams
+ */
 // Step 2: User enters a new password
 const resetPassword = asyncWrapper(async (req, res, next) => {
+	/** @type {resetPasswordParams} */
 	const { token } = req.params;
+	/** @type {resetPasswordBody} */
 	const { password } = req.body;
 	// Find the reset token document
 	const tokenDocument = await ResetToken.findOne({ token });

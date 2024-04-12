@@ -47,6 +47,10 @@ export function LoginLayout({ formType = "login", children }) {
 									to <span className="text-primary text-animate">VipeTrip</span>
 								</div>
 							</>
+						) : formType === "reset-password" ? (
+							<div className="text-900 mb-2 lg:text-3xl md:text-2xl text-xl text-primary font-medium">
+								Set new Password
+							</div>
 						) : (
 							<>
 								<div className="text-900 mb-2 lg:text-3xl md:text-2xl text-xl text-primary font-medium">

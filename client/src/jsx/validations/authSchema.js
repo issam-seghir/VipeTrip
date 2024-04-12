@@ -52,3 +52,7 @@ export const passwordResetReaquestSchema = baseRegisterSchema.pick({ email: true
 /**
  * @typedef {z.infer<typeof passwordResetReaquestSchema>} passwordResetReaquestBody
  */
+export const passwordResetSchema = baseRegisterSchema.pick({ password: true ,confirmPassword:true});
+/**
+ * @typedef {z.infer<typeof passwordResetSchema>} passwordResetBody
+ */

@@ -11,13 +11,19 @@ import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
 import { PFormTextField } from "./Form/PFormTextField";
 
-export function ForgetPasswordForm() {
+export function ForgetPasswordRequestForm() {
 	const navigate = useNavigate();
 	const isNonMobile = useMediaQuery("(min-width:600px)");
 	const toast = useRef(null);
 
-	const [passwordResetRequest, { error: errorPasswordResetRequest, isLoading: isPasswordResetRequestLoading, isError: isPasswordResetRequestError }] =
-		usePasswordResetRequestMutation();
+	const [
+		passwordResetRequest,
+		{
+			error: errorPasswordResetRequest,
+			isLoading: isPasswordResetRequestLoading,
+			isError: isPasswordResetRequestError,
+		},
+	] = usePasswordResetRequestMutation();
 	const {
 		handleSubmit,
 		watch,

@@ -11,7 +11,7 @@ import App from "@jsx/App.jsx";
 import Home from "@pages/Home";
 import { Login } from "@pages/Login";
 import { Register } from "@pages/Register";
-import { ForgetPassword } from "@pages/ForgetPassword";
+import { ForgetPassword } from "@jsx/pages/ForgetPasswordRequest";
 import Profile from "@pages/Profile";
 import PrivateRoute from "@components/PrivateRoute.jsx";
 import Error from "./pages/Error";

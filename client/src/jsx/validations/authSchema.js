@@ -13,23 +13,28 @@ const passRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!#$%&*?@])[\d!#$%&*?@A-Z
 //? -------- Sub Schema ---------
 const credinalSchema = stringNonEmpty().trim().min(3).max(25);
 const infoSchema = z.string().trim().min(3).max(25).optional();
-
-const baseRegisterSchema = z.object({
-	firstName: credinalSchema,
-	lastName: credinalSchema,
-	email: stringNonEmpty().email().trim().toLowerCase(),
-	password: stringNonEmpty()
-		.min(8, "Password must contain at least 8 character(s)")
-		.max(20, "Password must contain at most 20 character(s)")
-		.regex(
-			passRegex,
-			"Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character (!$%&*?@#)"
-		),
-	confirmPassword: stringNonEmpty(),
-	location: infoSchema,
-	job: infoSchema,
-	picture: z.instanceof(FileList).optional().or(z.literal("")), // fix optional for url / email ...,
-});
+const passSchema = stringNonEmpty()
+	.min(8, "Password must contain at least 8 character(s)")
+	.max(20, "Password must contain at most 20 character(s)")
+	.regex(
+		passRegex,
+		"Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character (!$%&*?@#)"
+	);
+const baseRegisterSchema = z
+	.object({
+		firstName: credinalSchema,
+		lastName: credinalSchema,
+		email: stringNonEmpty().email().trim().toLowerCase(),
+		password: passSchema,
+		confirmPassword: passSchema,
+		location: infoSchema,
+		job: infoSchema,
+		picture: z.instanceof(FileList).optional().or(z.literal("")), // fix optional for url / email ...,
+	})
+	.refine((data) => data.password === data.confirmPassword, {
+		message: "Passwords don't match",
+		path: ["confirmPassword"],
+	});
 
 export const registerSchema = baseRegisterSchema.refine((data) => data.password === data.confirmPassword, {
 	//For advanced features - multiple issues ,  see (superRefine)
@@ -47,12 +52,11 @@ export const loginSchema = baseRegisterSchema.pick({ email: true, password: true
  * @typedef {z.infer<typeof loginSchema>} LoginBody
  */
 
-
-export const passwordResetReaquestSchema = baseRegisterSchema.pick({ email: true});
+export const passwordResetReaquestSchema = baseRegisterSchema.pick({ email: true });
 /**
  * @typedef {z.infer<typeof passwordResetReaquestSchema>} passwordResetReaquestBody
  */
-export const passwordResetSchema = baseRegisterSchema.pick({ password: true ,confirmPassword:true});
+export const passwordResetSchema = baseRegisterSchema.pick({ password: true, confirmPassword: true });
 /**
  * @typedef {z.infer<typeof passwordResetSchema>} passwordResetBody
  */

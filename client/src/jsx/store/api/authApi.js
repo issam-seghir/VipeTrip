@@ -39,8 +39,8 @@ export const authApi = api.injectEndpoints({
 			}),
 		}),
 		passwordReset: builder.mutation({
-			query: (credentials,token) => ({
-				url: `/auth/reset/${token}`,
+			query: (credentials) => ({
+				url: `/auth/reset`,
 				method: "POST",
 				body: credentials,
 			}),
@@ -54,5 +54,5 @@ export const {
 	useLogoutMutation,
 	useCheckEmailExistsQuery,
 	usePasswordResetRequestMutation,
-	usePasswordResetMutation
+	usePasswordResetMutation,
 } = authApi;

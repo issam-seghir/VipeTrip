@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useLocation, useNavigate, Link, useSearchParams } from "react-router-dom";
 import { useDebounce, useMediaQuery } from "@uidotdev/usehooks";
-import { passwordResetReaquestSchema } from "@validations/authSchema";
+import { passwordResetSchema } from "@validations/authSchema";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
 import { PFormTextField } from "./Form/PFormTextField";
@@ -32,7 +32,7 @@ export function ResetPasswordForm() {
 		formState: { errors: errorsForm, isSubmitting },
 	} = useForm({
 		mode: "onChange",
-		resolver: zodResolver(passwordResetReaquestSchema),
+		resolver: zodResolver(passwordResetSchema),
 	});
 
 	const errorMessage = isPasswordResetError ? errorPasswordReset : errorsForm;

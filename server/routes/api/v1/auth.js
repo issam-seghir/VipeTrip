@@ -21,6 +21,14 @@ const {
 } = require("@validations/authSchema");
 
 router.post("/login", validate(loginSchema), handleLogin);
+// router.get("/login/google", passport.authenticate("google"));
+router.get(
+	"/oauth2/redirect/google",
+	passport.authenticate("google", { failureRedirect: "/login", failureMessage: true }),
+	function (req, res) {
+		res.redirect("/");
+	}
+);
 router.get("/check-email", checkEmailExists);
 router.post("/forget", validate(resetPasswordRequestSchema), resetPasswordRequest);
 router.post("/reset", validate(resetPasswordSchema), resetPassword);

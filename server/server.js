@@ -23,6 +23,8 @@ const { pinoLog } = require("@config/pinoConfig");
 const log = require("@/utils/chalkLogger");
 const { generateMockUser } = require("@utils/mockSchema");
 const { normalize } = require("@utils/plugins");
+const passport = require("passport");
+const {passportConfig} = require("@config/PassportjsConfig");
 
 // global mongoose plugins
 mongoose.plugin(normalize);
@@ -50,6 +52,12 @@ app.use(cors(corsOptions));
 // limits number of actions by key and protects from DDoS and brute force attacks at any scale.
 app.use(rateLimiterMiddleware);
 
+// initialize passportJS
+app.use(passport.initialize());
+// all Oauth here : google , facebook ...
+passportConfig(passport);
+
+
 // built-in middleware to handle urlencoded form data
 app.use(express.urlencoded({ limit: "1mb", extended: true }));
 
@@ -69,7 +77,7 @@ app.use(compression());
 //serve static files
 app.use(express.static(join(__dirname, "public")));
 
-// disable "x-powered-by Express" in the req header 
+// disable "x-powered-by Express" in the req header
 app.disable("x-powered-by");
 
 

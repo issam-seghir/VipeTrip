@@ -70,6 +70,8 @@ const envSchema = z.object({
 	EMAIL_PASSWORD: stringNonEmpty(),
 	MAILGUN_API_KEY: stringNonEmpty(),
 	MAILGUN_DOMIAN_NAME: stringNonEmpty(),
+	GOOGLE_CLIENT_ID: stringNonEmpty(),
+	GOOGLE_CLIENT_SECRET: stringNonEmpty(),
 	CLEINT_URL: stringNonEmpty().url(),
 	PORT: z.preprocess((x) => x || undefined, numberSchema.min(1).max(65_536).default(3000)),
 });

@@ -135,6 +135,7 @@ const resetPasswordRequest = asyncWrapper(async (req, res, next) => {
 const resetPassword = asyncWrapper(async (req, res, next) => {
 	/** @type {resetPasswordBody} */
 	const { password, token, userId } = req.body;
+	console.log(req.body);
 	// Find the reset token document
 
 	const tokenDocument = await ResetToken.findOne({ userId });

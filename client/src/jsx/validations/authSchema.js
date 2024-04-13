@@ -20,7 +20,10 @@ const passSchema = stringNonEmpty()
 		passRegex,
 		"Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character (!$%&*?@#)"
 	);
-const baseRegisterSchema = z
+
+
+
+const baseSchema = z
 	.object({
 		firstName: credinalSchema,
 		lastName: credinalSchema,
@@ -31,12 +34,8 @@ const baseRegisterSchema = z
 		job: infoSchema,
 		picture: z.instanceof(FileList).optional().or(z.literal("")), // fix optional for url / email ...,
 	})
-	.refine((data) => data.password === data.confirmPassword, {
-		message: "Passwords don't match",
-		path: ["confirmPassword"],
-	});
 
-export const registerSchema = baseRegisterSchema.refine((data) => data.password === data.confirmPassword, {
+export const registerSchema = baseSchema.refine((data) => data.password === data.confirmPassword, {
 	//For advanced features - multiple issues ,  see (superRefine)
 	message: "Passwords do not match",
 	path: ["confirmPassword"],
@@ -45,18 +44,24 @@ export const registerSchema = baseRegisterSchema.refine((data) => data.password 
  * @typedef {z.infer<typeof registerSchema>} RegisterBody
  */
 
-export const loginSchema = baseRegisterSchema.pick({ email: true, password: true }).extend({
+export const loginSchema = baseSchema.pick({ email: true, password: true }).extend({
 	rememberMe: z.boolean().optional(),
 });
 /**
  * @typedef {z.infer<typeof loginSchema>} LoginBody
  */
 
-export const passwordResetReaquestSchema = baseRegisterSchema.pick({ email: true });
+export const passwordResetReaquestSchema = baseSchema.pick({ email: true });
 /**
  * @typedef {z.infer<typeof passwordResetReaquestSchema>} passwordResetReaquestBody
  */
-export const passwordResetSchema = baseRegisterSchema.pick({ password: true, confirmPassword: true });
+export const passwordResetSchema = baseSchema
+	.pick({ password: true, confirmPassword: true })
+	.refine((data) => data.password === data.confirmPassword, {
+		//For advanced features - multiple issues ,  see (superRefine)
+		message: "Passwords do not match",
+		path: ["confirmPassword"],
+	});;
 /**
  * @typedef {z.infer<typeof passwordResetSchema>} passwordResetBody
  */

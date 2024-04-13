@@ -2,13 +2,13 @@ import { isDev } from "@data/constants";
 import { DevTool } from "@hookform/devtools";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { usePasswordResetMutation } from "@jsx/store/api/authApi";
-import { useEffect, useRef, useState } from "react";
-import { useForm } from "react-hook-form";
-import { useLocation, useNavigate, Link, useSearchParams } from "react-router-dom";
-import { useDebounce, useMediaQuery } from "@uidotdev/usehooks";
+import { useMediaQuery } from "@uidotdev/usehooks";
 import { passwordResetSchema } from "@validations/authSchema";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
+import { useRef } from "react";
+import { useForm } from "react-hook-form";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { PFormTextField } from "./Form/PFormTextField";
 
 export function ResetPasswordForm() {
@@ -59,7 +59,7 @@ export function ResetPasswordForm() {
 	}
 
 	const onSubmit = (data) => {
-		handlePasswordReset({ ...data, userId, resetToken });
+		handlePasswordReset({ ...data, userId, token: resetToken });
 	};
 
 	return (

@@ -99,5 +99,45 @@ router.post(
 		res.status(200).json({ token: resetToken });
 	})
 );
+/**
+ * @typedef {import('@validations/authSchema').resetPasswordBody} resetPasswordBody
+ */
+router.post(
+	"/reset",
+
+	// Step 2: User enters a new password
+	asyncWrapper(async (req, res, next) => {
+		/** @type {resetPasswordBody} */
+		const { password, token, userId } = req.body;
+		// Find the reset token document
+
+		const tokenDocument = await ResetToken.findOne({ userId });
+		if (!tokenDocument)
+			return res.status(404).json({
+				massage:
+					"The password reset token you provided is either invalid or has expired. Please request a new one.",
+			});
+
+		// Verify the token
+		const isValid = await bcrypt.compare(token, tokenDocument.token);
+		if (!isValid)
+			return res.status(400).json({
+				massage:
+					"The password reset token you provided does not match our records. Please check the token and try again.",
+			});
+
+		// Hash the new password and update the user's password
+		const hashedPassword = await bcrypt.hash(password, 10);
+		await User.updateOne({ _id: userId }, { $set: { password: hashedPassword } }, { new: true });
+		const user = await User.findById({ _id: userId });
+
+		// Delete the reset token document
+		await tokenDocument.deleteOne();
+		res.status(200).json({
+			message: "Your password has been changed Successfully",
+			info: { fullName: user.fullName, email: user.email },
+		});
+	})
+);
 
 module.exports = router;

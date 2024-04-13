@@ -38,7 +38,8 @@ const errorMap = zu.makeErrorMap({
 		}
 	},
 	invalid_type: (err) => `${err.defaultError} : ${err.data}`,
-	invalid_enum_value: ({ data, options }) => `${data} : is not a valid enum value. Valid options: ${options?.join(" | ")} `,
+	invalid_enum_value: ({ data, options }) =>
+		`${data} : is not a valid enum value. Valid options: ${options?.join(" | ")} `,
 	too_small: (err) => `value ${err.data}  expected to be  >= ${err.minimum}`,
 	too_big: (err) => `value ${err.data} : expected to be  <= ${err.maximum}`,
 });
@@ -105,7 +106,8 @@ function defaultInstance(schema, options = {}) {
 			let the_shape = schema.shape; // eliminates 'undefined' issue
 			let entries = Object.entries(the_shape);
 			let temp = entries.map(([key, value]) => {
-				let this_default = value instanceof z.ZodEffects ? defaultInstance(value, options) : getDefaultValue(value);
+				let this_default =
+					value instanceof z.ZodEffects ? defaultInstance(value, options) : getDefaultValue(value);
 				return [key, this_default];
 			});
 			return Object.fromEntries(temp);
@@ -132,7 +134,13 @@ function defaultInstance(schema, options = {}) {
 				return dschema.minValue ?? 0;
 			}
 			if (dschema instanceof z.ZodDate) {
-				return defaultDateEmpty ? "" : defaultDateNull ? null : defaultDateUndefined ? undefined : dschema.minDate;
+				return defaultDateEmpty
+					? ""
+					: defaultDateNull
+					? null
+					: defaultDateUndefined
+					? undefined
+					: dschema.minDate;
 			}
 			if (dschema instanceof z.ZodSymbol) return "";
 			if (dschema instanceof z.ZodBoolean) return false;
@@ -174,10 +182,17 @@ function formatPath(path) {
 		.join(".");
 }
 
+const mongoose = require("mongoose");
+// Create a separate schema for MongoDB ObjectId
+const ObjectIdSchema = z.string().refine((val) => mongoose.Types.ObjectId.isValid(val), {
+	message: "Invalid ObjectId",
+});
+
 module.exports = {
 	stringNonEmpty,
 	errorMap,
 	arrayFromString,
 	formatPath,
 	defaultInstance,
+	ObjectIdSchema,
 };

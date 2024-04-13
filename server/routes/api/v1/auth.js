@@ -23,7 +23,7 @@ const {
 router.post("/login", validate(loginSchema), handleLogin);
 router.get("/check-email", checkEmailExists);
 router.post("/forget", validate(resetPasswordRequestSchema), resetPasswordRequest);
-router.post("/reset/:token", validate(resetPasswordSchema), resetPassword);
+router.post("/reset", validate(resetPasswordSchema), resetPassword);
 
 router.post("/register", upload.single("picture"), multerErrorHandler(upload), validate(registerSchema), handleNewUser);
 

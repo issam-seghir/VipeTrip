@@ -2,7 +2,7 @@
 
 const z = require("zod");
 const zu = require("zod_utilz");
-const { stringNonEmpty, arrayFromString, formatPath } = require("@/utils/zodUtils");
+const { stringNonEmpty, arrayFromString, formatPath ,ObjectIdSchema} = require("@/utils/zodUtils");
 
 //? -------- Constant ---------
 
@@ -53,20 +53,20 @@ const loginSchema = {
 const resetPasswordRequestSchema = {
 	body: registerSchema.body.pick({ email: true }),
 };
-
 /**
  * @typedef {z.infer<typeof resetPasswordRequestSchema.body>} resetPasswordRequestBody
  */
 
 const resetPasswordSchema = {
-	body: registerSchema.body.pick({ password: true }),
-	params: z.object({ token: tokenSchema }),
+	body: registerSchema.body.pick({ password: true }).extend({
+		userId: ObjectIdSchema,
+		token: tokenSchema,
+	}),
 };
 
 
 /**
  * @typedef {z.infer<typeof resetPasswordSchema.body>} resetPasswordBody
- * @typedef {z.infer<typeof resetPasswordSchema.params>} resetPasswordParams
  */
 
 

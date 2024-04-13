@@ -80,7 +80,7 @@ const resetPasswordRequest = asyncWrapper(async (req, res, next) => {
 
 	// Hash the reset token and set it in the user's document, along with an expiry time
 	const user = await User.findOne({ email });
-	if (!user) return res.status(404).json({field: "email", message: "No account with that email exists" });
+	if (!user) return res.status(404).json({ field: "email", message: "No account with that email exists" });
 
 	// Delete any existing reset tokens
 	let token = await ResetToken.findOne({ userId: user._id });
@@ -99,7 +99,8 @@ const resetPasswordRequest = asyncWrapper(async (req, res, next) => {
 	await tokenDocument.save();
 
 	// use gmail account
-	const resetPasswordlink = `${ENV.CLEINT_URL}/reset-password/${resetToken}`;
+
+	const resetPasswordlink = `${ENV.CLEINT_URL}/reset-password?token=${resetToken}&id=${user.id}`;
 	const resetEmail = {
 		to: user.email,
 		from: `VipeTrip <${ENV.EMAIL_USERNAME}>`,
@@ -123,53 +124,64 @@ const resetPasswordRequest = asyncWrapper(async (req, res, next) => {
 
 	console.log("Message : %s", JSON.stringify(mailInfo));
 	log.info(`An e-mail has been sent to ${user.email} with further instructions.`);
-	res.status(200).json({message:"Check your email for further instructions"});
+	res.status(200).json({ message: "Check your email for further instructions" });
 });
 
 /**
  * @typedef {import('@validations/authSchema').resetPasswordBody} resetPasswordBody
- * @typedef {import('@validations/authSchema').resetPasswordParams} resetPasswordParams
  */
+
 // Step 2: User enters a new password
 const resetPassword = asyncWrapper(async (req, res, next) => {
-	/** @type {resetPasswordParams} */
-	const { token } = req.params;
 	/** @type {resetPasswordBody} */
-	const { password } = req.body;
+	const { password, token, userId } = req.body;
 	// Find the reset token document
-	const tokenDocument = await ResetToken.findOne({ token });
-	if (!tokenDocument) return res.status(404).json({massage:"Password reset token is invalid or has expired"});
 
-	// Find the user
-	const user = await User.findById(tokenDocument.userId);
-	if (!user) return res.status(404).json({massage:"Password reset token is invalid or has expired"});
+	const tokenDocument = await ResetToken.findOne({ userId });
+	if (!tokenDocument)
+		return res.status(404).json({
+			massage:
+				"The password reset token you provided is either invalid or has expired. Please request a new one.",
+		});
 
 	// Verify the token
 	const isValid = await bcrypt.compare(token, tokenDocument.token);
-	if (!isValid) return res.status(400).json({massage:"Password reset token is invalid or has expired"});
+	if (!isValid)
+		return res.status(400).json({
+			massage:
+				"The password reset token you provided does not match our records. Please check the token and try again.",
+		});
 
 	// Hash the new password and update the user's password
 	const hashedPassword = await bcrypt.hash(password, 10);
-	user.password = hashedPassword;
-	await user.save();
+	await User.updateOne({ _id: userId }, { $set: { password: hashedPassword } }, { new: true });
+	const user = await User.findById({ _id: userId });
 
 	// Delete the reset token document
 	await tokenDocument.deleteOne();
 
 	const resetEmail = {
 		to: user.email,
-		from: ENV.EMAIL_USERNAME,
+		from: `VipeTrip <${ENV.EMAIL_USERNAME}>`,
 		subject: "Password Reset Successfully",
-		text: `
-        Your password has been successfully reset. If you did not request this change, please contact our support immediately.
-    `,
+		html: `<img src="cid:logo.png" alt="logo"/>
+		<h1>Hey ${user.fullName} !</h1>
+		<p>Your password has been successfully reset.</p>
+		<p> If you did not request this change, please contact our support immediately.</p>`,
+		attachments: [
+			{
+				filename: "logo.svg",
+				path: "public/email/logo.svg",
+				cid: "logo.png",
+			},
+		],
 	};
 
 	const mailInfo = await mailer.sendEmail(resetEmail);
 
 	console.log("Message : %s", JSON.stringify(mailInfo));
 	log.info(`An e-mail has been sent to ${user.email} with further instructions.`);
-	res.status(200).json({message:"Your password has been changed"});
+	res.status(200).json({ message: "Your password has been changed Successfully" });
 });
 
 module.exports = { handleLogin, checkEmailExists, resetPasswordRequest, resetPassword };

@@ -59,7 +59,7 @@ export const router = createBrowserRouter(
 					element: <ForgetPasswordRequest />,
 				},
 				{
-					path: "reset-password/:resetToken",
+					path: "reset-password",
 					element: <ResetPassword />,
 				},
 				//? Private routes

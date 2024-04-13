@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { usePasswordResetMutation } from "@jsx/store/api/authApi";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useLocation, useNavigate, Link } from "react-router-dom";
+import { useLocation, useNavigate, Link, useSearchParams } from "react-router-dom";
 import { useDebounce, useMediaQuery } from "@uidotdev/usehooks";
 import { passwordResetReaquestSchema } from "@validations/authSchema";
 import { Button } from "primereact/button";
@@ -13,16 +13,15 @@ import { PFormTextField } from "./Form/PFormTextField";
 
 export function ResetPasswordForm() {
 	const navigate = useNavigate();
+	const [queryParams, setQueryParams] = useSearchParams();
+	const resetToken = queryParams.get("token");
+	const userId = queryParams.get("id");
 	const isNonMobile = useMediaQuery("(min-width:600px)");
 	const toast = useRef(null);
 
 	const [
 		passwordReset,
-		{
-			error: errorPasswordReset,
-			isLoading: isPasswordResetLoading,
-			isError: isPasswordResetError,
-		},
+		{ error: errorPasswordReset, isLoading: isPasswordResetLoading, isError: isPasswordResetError },
 	] = usePasswordResetMutation();
 	const {
 		handleSubmit,
@@ -60,7 +59,7 @@ export function ResetPasswordForm() {
 	}
 
 	const onSubmit = (data) => {
-		handlePasswordReset(data);
+		handlePasswordReset({ ...data, userId, resetToken });
 	};
 
 	return (

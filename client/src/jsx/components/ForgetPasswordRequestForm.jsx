@@ -134,7 +134,7 @@ export function ForgetPasswordRequestForm() {
 						<Button
 							link
 							className="text-xs sm:text-base font-small px-0 md:px-2 underline ml-2  text-left cursor-pointer"
-							onClick={() => navigate("..")}
+							onClick={() => navigate(-1)}
 						>
 							{"Back to Sign in"}
 						</Button>

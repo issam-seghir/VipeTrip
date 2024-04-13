@@ -138,15 +138,15 @@ const resetPassword = asyncWrapper(async (req, res, next) => {
 	const { password } = req.body;
 	// Find the reset token document
 	const tokenDocument = await ResetToken.findOne({ token });
-	if (!tokenDocument) return res.status(404).send("Password reset token is invalid or has expired");
+	if (!tokenDocument) return res.status(404).json({massage:"Password reset token is invalid or has expired"});
 
 	// Find the user
 	const user = await User.findById(tokenDocument.userId);
-	if (!user) return res.status(404).send("Password reset token is invalid or has expired");
+	if (!user) return res.status(404).json({massage:"Password reset token is invalid or has expired"});
 
 	// Verify the token
 	const isValid = await bcrypt.compare(token, tokenDocument.token);
-	if (!isValid) return res.status(400).send("Password reset token is invalid or has expired");
+	if (!isValid) return res.status(400).json({massage:"Password reset token is invalid or has expired"});
 
 	// Hash the new password and update the user's password
 	const hashedPassword = await bcrypt.hash(password, 10);
@@ -169,7 +169,7 @@ const resetPassword = asyncWrapper(async (req, res, next) => {
 
 	console.log("Message : %s", JSON.stringify(mailInfo));
 	log.info(`An e-mail has been sent to ${user.email} with further instructions.`);
-	res.status(200).send("Your password has been changed");
+	res.status(200).json({message:"Your password has been changed"});
 });
 
 module.exports = { handleLogin, checkEmailExists, resetPasswordRequest, resetPassword };

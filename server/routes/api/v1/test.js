@@ -6,6 +6,11 @@ const multerErrorHandler = require("@/middleware/multer/multerErrorHandler");
 const nodemailer = require("nodemailer");
 const { asyncWrapper } = require("@middleware/asyncWrapper");
 const createError = require("http-errors");
+const User = require("@model/User");
+const ResetToken = require("@model/ResetToken");
+const bcrypt = require("bcrypt");
+const { ENV } = require("@/validations/envSchema");
+const { generateResetToken } = require("@utils/index");
 
 // testing multer
 router.post("/upload", upload.array("picture", 2), multerErrorHandler(upload), (req, res) => {
@@ -16,7 +21,7 @@ router.post("/uploadPost", uploadPost.array("picture", 3), multerErrorHandler(up
 });
 
 router.post(
-	"/forget",
+	"/forget-mail",
 	asyncWrapper(async (req, res, next) => {
 		// Generate SMTP service account from ethereal.email
 		nodemailer.createTestAccount((err, account) => {
@@ -58,6 +63,40 @@ router.post(
 				console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
 			});
 		});
+	})
+);
+
+/**
+ * @typedef {import('@validations/authSchema').resetPasswordRequestBody} resetPasswordRequestBody
+ */
+
+router.post(
+	"/forget",
+	asyncWrapper(async (req, res, next) => {
+		/** @type {resetPasswordRequestBody} */
+		const { email } = req.body;
+
+		// Hash the reset token and set it in the user's document, along with an expiry time
+		const user = await User.findOne({ email });
+		if (!user) return res.status(404).json({ field: "email", message: "No account with that email exists" });
+
+		// Delete any existing reset tokens
+		let token = await ResetToken.findOne({ userId: user._id });
+		if (token) await token.deleteOne();
+
+		// Generate a reset token
+		const resetToken = generateResetToken();
+		const hashedToken = await bcrypt.hash(resetToken, 10);
+
+		// Create a new reset token document
+		const tokenDocument = new ResetToken({
+			userId: user._id,
+			token: hashedToken,
+			createdAt: Date.now(),
+		});
+		await tokenDocument.save();
+
+		res.status(200).json({ token: resetToken });
 	})
 );
 

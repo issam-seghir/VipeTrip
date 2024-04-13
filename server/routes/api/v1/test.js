@@ -11,6 +11,8 @@ const ResetToken = require("@model/ResetToken");
 const bcrypt = require("bcrypt");
 const { ENV } = require("@/validations/envSchema");
 const { generateResetToken } = require("@utils/index");
+const { resetPasswordRequestSchema, resetPasswordSchema } = require("@validations/authSchema");
+const validate = require("express-zod-safe");
 
 // testing multer
 router.post("/upload", upload.array("picture", 2), multerErrorHandler(upload), (req, res) => {
@@ -72,6 +74,7 @@ router.post(
 
 router.post(
 	"/forget",
+	validate(resetPasswordRequestSchema),
 	asyncWrapper(async (req, res, next) => {
 		/** @type {resetPasswordRequestBody} */
 		const { email } = req.body;
@@ -104,7 +107,7 @@ router.post(
  */
 router.post(
 	"/reset",
-
+	validate(resetPasswordSchema),
 	// Step 2: User enters a new password
 	asyncWrapper(async (req, res, next) => {
 		/** @type {resetPasswordBody} */

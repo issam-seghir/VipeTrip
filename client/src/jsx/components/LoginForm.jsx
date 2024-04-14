@@ -160,8 +160,11 @@ export function LoginForm() {
 						<span>or you can sign in with </span>
 					</Divider>
 					<div className="flex gap-4 justify-content-center">
-						<a href="">
-							<i className="pi pi-google " style={{ fontSize: "1.5rem" }} />
+						<a href={`${import.meta.env.VITE_SERVER_URL}/api/v1/auth/login/google`}>
+							<i
+								className="pi pi-google hover:text-primary  "
+								style={{ fontSize: "1.5rem", transition: "all .2s linear" }}
+							/>
 						</a>
 						<a href="">
 							<i className="pi pi-facebook " style={{ fontSize: "1.5rem" }} />

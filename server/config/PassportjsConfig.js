@@ -1,4 +1,4 @@
-const GoogleStrategy = require("passport-google-oidc");
+const GoogleStrategy = require("passport-google-oauth").OAuth2Strategy;
 const FacebookStrategy = require("passport-facebook");
 const TwitterStrategy = require("passport-twitter");
 const User = require("@model/User");
@@ -56,29 +56,28 @@ const passportConfig = (passport) => {
 					console.log("accessToken : " + accessToken);
 					console.log("refreshToken : " + refreshToken);
 					console.log(req);
-					const email = profile["_json"]["email"];
+					const email = profile?._json?.email;
 					if (!email) return cb(new Error("Failed to receive email from Google. Please try again :("));
 					console.log("email-1 " + email);
-					console.log("email-2 " + profile.emails[0].value);
-					let user = await User.findOne({ email: profile.emails[0].value });
+					let user = await User.findOne({ email: email });
 					if (!user) {
 						// The account at Google has not logged in to this app before.  Create a
 						// new user record and associate it with the Google account.
 						user = new User({
-							firstName: profile.name.givenName,
-							lastName: profile.name.familyName,
-							email: profile.emails[0].value,
+							firstName: profile._json.name.givenName,
+							lastName: profile._json.name.familyName,
+							email,
 							password: null, // You might want to handle this differently
 						});
 					}
 					// Associate the social media account with the user record.
 					user.socialAccounts.push({
 						provider: provider,
-						profileId: profile.id,
-						displayName: profile.displayName,
-						profileUrl: profile.profileUrl,
-						emails: profile.emails.map((email) => email.value),
-						photos: profile.photos.map((photo) => photo.value),
+						profileId: profile._json.id,
+						displayName: profile._json.displayName,
+						profileUrl: profile._json.profileUrl,
+						emails: profile._json.emails.map((email) => email.value),
+						photos: profile._json.photos.map((photo) => photo.value),
 						accessToken,
 					});
 

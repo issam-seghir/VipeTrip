@@ -73,6 +73,9 @@ const envSchema = z.object({
 	GOOGLE_CLIENT_ID: stringNonEmpty(),
 	GOOGLE_CLIENT_SECRET: stringNonEmpty(),
 	GOOGLE_REDIRECT_URI: stringNonEmpty().url(),
+	FACEBOOK_CLIENT_ID: stringNonEmpty(),
+	FACEBOOK_CLIENT_SECRET: stringNonEmpty(),
+	FACEBOOK_REDIRECT_URI: stringNonEmpty().url(),
 	CLEINT_URL: stringNonEmpty().url(),
 	PORT: z.preprocess((x) => x || undefined, numberSchema.min(1).max(65_536).default(3000)),
 });

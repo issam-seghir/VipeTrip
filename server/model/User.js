@@ -27,6 +27,24 @@ const userSchema = new Schema(
 			type: Boolean,
 			default: true,
 		},
+		socialAccounts: [
+			{
+				provider: {
+					type: String,
+					required: true,
+				},
+				profileId: {
+					type: String,
+					required: true,
+				},
+				displayName: {
+					type: String,
+					required: true,
+				},
+				profileUrl: String,
+				accessToken: String,
+			},
+		],
 		picturePath: {
 			type: String,
 			default: "https://i.imgur.com/zTSAKyM.png",

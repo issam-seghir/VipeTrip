@@ -72,6 +72,7 @@ const envSchema = z.object({
 	MAILGUN_DOMIAN_NAME: stringNonEmpty(),
 	GOOGLE_CLIENT_ID: stringNonEmpty(),
 	GOOGLE_CLIENT_SECRET: stringNonEmpty(),
+	GOOGLE_REDIRECT_URI: stringNonEmpty().url(),
 	CLEINT_URL: stringNonEmpty().url(),
 	PORT: z.preprocess((x) => x || undefined, numberSchema.min(1).max(65_536).default(3000)),
 });

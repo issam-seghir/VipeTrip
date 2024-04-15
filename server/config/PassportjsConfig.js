@@ -3,6 +3,8 @@ const FacebookStrategy = require("passport-facebook");
 const TwitterStrategy = require("passport-twitter");
 const User = require("@model/User");
 const { ENV } = require("@/validations/envSchema");
+const bcrypt = require("bcrypt");
+const { generateHashedToken } = require("@utils/index");
 
 // async function verifyProvider(accessToken, refreshToken, profile, cb, provider) {
 // 	try {
@@ -47,39 +49,48 @@ const passportConfig = (passport) => {
 				clientSecret: ENV.GOOGLE_CLIENT_SECRET,
 				callbackURL: ENV.GOOGLE_REDIRECT_URI,
 				scope: ["profile", "email"],
-				passReqToCallback: true,
+				// passReqToCallback: true, // verifyProvider(req,accessToken, refreshToken, profile, cb)
 			},
-			async function verifyProvider(req, accessToken, refreshToken, profile, cb, provider = "google") {
+			async function verifyProvider(accessToken, refreshToken, profile, cb) {
 				try {
 					// if user sign in with already existing email , the Oauth account will be linked to his account
 					console.log(profile);
-					console.log("accessToken : " + accessToken);
-					console.log("refreshToken : " + refreshToken);
-					console.log(req);
-					const email = profile?._json?.email;
+					const { id, name, displayName, provider, _json: others } = profile;
+					const { picture, email } = others;
+
 					if (!email) return cb(new Error("Failed to receive email from Google. Please try again :("));
-					console.log("email-1 " + email);
+
 					let user = await User.findOne({ email: email });
 					if (!user) {
 						// The account at Google has not logged in to this app before.  Create a
 						// new user record and associate it with the Google account.
+                        const randomPass = generateHashedToken(20);
 						user = new User({
-							firstName: profile._json.name.givenName,
-							lastName: profile._json.name.familyName,
+							firstName: name?.givenName,
+							lastName: name?.familyName,
 							email,
-							password: null, // You might want to handle this differently
+							password: bcrypt.hashSync(randomPass, 10),
 						});
 					}
-					// Associate the social media account with the user record.
-					user.socialAccounts.push({
-						provider: provider,
-						profileId: profile._json.id,
-						displayName: profile._json.displayName,
-						profileUrl: profile._json.profileUrl,
-						emails: profile._json.emails.map((email) => email.value),
-						photos: profile._json.photos.map((photo) => photo.value),
-						accessToken,
-					});
+					const existingAccount = user.socialAccounts.find(
+						(account) => account.provider === provider && account.profileId === id
+					);
+
+					if (existingAccount) {
+						// Update the existing account with the new access and refresh tokens
+						existingAccount.accessToken = accessToken;
+						existingAccount.displayName = displayName;
+						existingAccount.pictureUrl = picture;
+					} else {
+						// Add a new entry to the socialAccounts array
+						user.socialAccounts.push({
+							provider,
+							profileId: id,
+							displayName: displayName,
+							pictureUrl: picture,
+							accessToken,
+						});
+					}
 
 					await user.save();
 

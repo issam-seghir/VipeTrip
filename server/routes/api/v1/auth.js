@@ -29,15 +29,15 @@ const {
 
 router.post("/login", validate(loginSchema), handleLogin);
 
-router.get("/login/google", passport.authenticate("google", { session: false, scope: ["openid", "profile", "email"] }));
+router.get("/login/google", passport.authenticate("google", { session: false }));
 
 // he failureMessage option which will add the message to req.session.messages
 router.get(
 	"/oauth2/redirect/google",
 	passport.authenticate("google", {
 		session: false,
-		failureRedirect: "/google_callback_fail",
-		successRedirect: "/google_callback_success",
+		failureRedirect: "/api/v1/auth/google_callback_fail",
+		successRedirect: "/api/v1/auth/google_callback_success",
 	})
 );
 router.get(

@@ -41,7 +41,7 @@ const userSchema = new Schema(
 					type: String,
 					required: true,
 				},
-				profileUrl: String,
+				pictureUrl: String,
 				accessToken: String,
 			},
 		],

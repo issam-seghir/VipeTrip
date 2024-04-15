@@ -9,7 +9,7 @@ const { asyncWrapper } = require("@middleware/asyncWrapper");
 const createError = require("http-errors");
 const mailer = require("@config/nodemailConfig");
 const log = require("@/utils/chalkLogger");
-const { generateResetToken } = require("@utils/index");
+const { generateHashedToken } = require("@utils/index");
 
 /**
  * @typedef {import('@validations/authSchema').LoginBody} LoginBody
@@ -87,7 +87,7 @@ const resetPasswordRequest = asyncWrapper(async (req, res, next) => {
 	if (token) await token.deleteOne();
 
 	// Generate a reset token
-	const resetToken = generateResetToken();
+	const resetToken = generateHashedToken(20);
 	const hashedToken = await bcrypt.hash(resetToken, 10);
 
 	// Create a new reset token document

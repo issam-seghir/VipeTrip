@@ -38,11 +38,11 @@ function uuid() {
 
 
 /**
- * Generates a reset token.
+ * Generates a hashed token.
  * @returns {string} The generated reset token.
  */
-function generateResetToken() {
-	return crypto.randomBytes(20).toString("hex");
+function generateHashedToken(size) {
+	return crypto.randomBytes(size).toString("hex");
 }
 
 /**
@@ -90,7 +90,7 @@ module.exports = {
 	byteToMb,
 	mbToByte,
 	uuid,
-	generateResetToken,
+	generateHashedToken,
 	signChecker,
 	isRegexSave,
 };

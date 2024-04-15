@@ -10,7 +10,7 @@ const User = require("@model/User");
 const ResetToken = require("@model/ResetToken");
 const bcrypt = require("bcrypt");
 const { ENV } = require("@/validations/envSchema");
-const { generateResetToken } = require("@utils/index");
+const { generateHashedToken } = require("@utils/index");
 const { resetPasswordRequestSchema, resetPasswordSchema } = require("@validations/authSchema");
 const validate = require("express-zod-safe");
 
@@ -88,7 +88,7 @@ router.post(
 		if (token) await token.deleteOne();
 
 		// Generate a reset token
-		const resetToken = generateResetToken();
+		const resetToken = generateHashedToken(20);
 		const hashedToken = await bcrypt.hash(resetToken, 10);
 
 		// Create a new reset token document

@@ -1,7 +1,7 @@
 import { isDev } from "@data/constants";
 import { DevTool } from "@hookform/devtools";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useCheckEmailExistsQuery, useLoginMutation } from "@jsx/store/api/authApi";
+import { useCheckEmailExistsQuery, useLoginMutation,useGoogleLoginQuery } from "@jsx/store/api/authApi";
 import { setCredentials } from "@jsx/store/slices/authSlice";
 import { useIsAppleDevice } from "@jsx/utils/hooks/useIsAppleDevice";
 import { useEffect, useRef, useState } from "react";
@@ -28,6 +28,11 @@ export function LoginForm() {
 	const toast = useRef(null);
 
 	const [login, { error: errorLogin, isLoading: isLoginLoading, isError: isLoginError }] = useLoginMutation();
+		const {
+		data: googleData,
+		isError: isGoogleLoginError,
+	} = useGoogleLoginQuery();
+	console.log(googleData);
 	const {
 		handleSubmit,
 		watch,
@@ -96,7 +101,24 @@ export function LoginForm() {
 	const onSubmit = (data) => {
 		handleLogin(data);
 	};
-
+	// In your UI code, after the user is redirected back to your site
+	function handleGoogleLogin() {
+		try {
+			const res = await googleLogin();
+			if (res) {
+				dispatch(setCredentials({ user: res?.user, token: res?.token }));
+				reset();
+				navigate(from, { replace: true });
+			}
+		} catch (error) {
+			console.error(error);
+			toast.current.show({
+				severity: "error",
+				summary: "Login Failed 💢",
+				detail: error?.data?.message || "email or password not correct",
+			});
+		}
+	}
 	return (
 		<>
 			{/* react hook form dev tool  */}

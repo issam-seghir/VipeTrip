@@ -64,7 +64,7 @@ const passportConfig = (passport) => {
 					if (!user) {
 						// The account at Google has not logged in to this app before.  Create a
 						// new user record and associate it with the Google account.
-                        const randomPass = generateHashedToken(20);
+						const randomPass = generateHashedToken(20);
 						user = new User({
 							firstName: name?.givenName,
 							lastName: name?.familyName,
@@ -160,6 +160,15 @@ const passportConfig = (passport) => {
 	//   }
 
 	// ));
+	passport.serializeUser(function (user, done) {
+		done(null, user.id);
+	});
+
+	passport.deserializeUser(function (id, done) {
+		User.findById(id, function (err, user) {
+			done(err, user);
+		});
+	});
 };
 
 module.exports = { passportConfig };

@@ -11,7 +11,7 @@ export const authApi = api.injectEndpoints({
 		}),
 		googleLogin: builder.query({
 			query: () => ({
-				url: `/auth/login/google`,
+				url: `/auth/login/google_callback_success`,
 				method: "GET",
 			}),
 		}),
@@ -85,5 +85,5 @@ export const {
 	useCheckEmailExistsQuery,
 	usePasswordResetRequestMutation,
 	usePasswordResetMutation,
-	useGoogleLoginQuery
+	useGoogleLoginQuery,
 } = authApi;

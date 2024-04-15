@@ -52,13 +52,6 @@ app.use(cors(corsOptions));
 // limits number of actions by key and protects from DDoS and brute force attacks at any scale.
 app.use(rateLimiterMiddleware);
 
-
-// initialize passportJS
-app.use(passport.initialize());
-// all Oauth here : google , facebook ...
-passportConfig(passport);
-
-
 // built-in middleware to handle urlencoded form data
 app.use(express.urlencoded({ limit: "1mb", extended: true }));
 
@@ -80,6 +73,11 @@ app.use(express.static(join(__dirname, "public")));
 
 // disable "x-powered-by Express" in the req header
 app.disable("x-powered-by");
+
+// initialize passportJS (make sure you have a cookieParser middleware before this)
+app.use(passport.initialize());
+// all Oauth here : google , facebook ...
+passportConfig(passport);
 
 
 app.use("/api/v1", require("@api/v1"));

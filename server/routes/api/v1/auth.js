@@ -29,20 +29,74 @@ const {
 
 router.post("/login", validate(loginSchema), handleLogin);
 
-router.get("/login/google", passport.authenticate("google", { session: false }));
+// router.get("/login/google", passport.authenticate("google"));
 
 // he failureMessage option which will add the message to req.session.messages
+// router.get(
+// 	"/oauth2/redirect/google",
+// 	passport.authenticate("google", {
+// 		failureRedirect: "/api/v1/auth/google_callback_fail",
+// 		successRedirect: "/api/v1/auth/google_callback_success",
+// 		session: false,
+// 	})
+// );
+
+router.get(
+	"/login/google",
+	passport.authenticate("google", {
+		scope: ["profile", "email"],
+	})
+);
+
+
 router.get(
 	"/oauth2/redirect/google",
 	passport.authenticate("google", {
+		failureRedirect: "/",
 		session: false,
-		failureRedirect: "/api/v1/auth/google_callback_fail",
-		successRedirect: "/api/v1/auth/google_callback_success",
+	}),
+	asyncWrapper(async (req, res, next) => {
+		console.log(req.user);
+		const foundUser = await User.findOne({ email: req.user.email });
+		// create JWT Refresh Token
+		const newRefreshToken = jwt.sign(
+			{
+				id: foundUser._id.toString(),
+				email: foundUser.email,
+			},
+			ENV.REFRESH_TOKEN_SECRET,
+			{ expiresIn: ENV.REFRESH_TOKEN_SECRET_EXPIRE_REMEMBER_ME }
+		);
+
+		// Saving refreshToken with current user in database
+		foundUser.refreshToken = newRefreshToken;
+		await foundUser.save();
+
+		// Creates Secure Cookie with refresh token
+		//? Use the httpOnly flag to prevent JavaScript from reading it.
+		//? Use the secure=true flag so it can only be sent over HTTPS.
+		//? Use the SameSite=strict flag whenever possible to prevent CSRF. This can only be used if the Authorization Server has the same site as your front-end.
+		res.cookie("jwt", newRefreshToken, getCookieOptions(true));
+
+		// Create JWT Access Token
+		const accessToken = jwt.sign(
+			{
+				id: foundUser._id.toString(),
+				email: foundUser.email,
+			},
+			ENV.ACCESS_TOKEN_SECRET,
+			{ expiresIn: ENV.ACCESS_TOKEN_SECRET_EXPIRE_REMEMBER_ME }
+		);
+
+		// Send authorization roles and access token to user
+		res.json({ success: `Google Login : ${foundUser.fullName}!`, token: accessToken, user: foundUser });
 	})
 );
+
 router.get(
 	"/google_callback_success",
 	asyncWrapper(async (req, res, next) => {
+		console.log(req.user);
 		const foundUser = await User.findOne({ email: req.user.email });
 		// create JWT Refresh Token
 		const newRefreshToken = jwt.sign(

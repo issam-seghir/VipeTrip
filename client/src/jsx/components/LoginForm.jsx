@@ -1,18 +1,18 @@
 import { isDev } from "@data/constants";
 import { DevTool } from "@hookform/devtools";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useCheckEmailExistsQuery, useLoginMutation,useGoogleLoginQuery } from "@jsx/store/api/authApi";
+import { useCheckEmailExistsQuery, useGoogleLoginQuery, useLoginMutation } from "@jsx/store/api/authApi";
 import { setCredentials } from "@jsx/store/slices/authSlice";
 import { useIsAppleDevice } from "@jsx/utils/hooks/useIsAppleDevice";
-import { useEffect, useRef, useState } from "react";
-import { useForm } from "react-hook-form";
-import { useLocation, useNavigate, Link } from "react-router-dom";
 import { useDebounce, useMediaQuery } from "@uidotdev/usehooks";
 import { loginSchema } from "@validations/authSchema";
 import { Button } from "primereact/button";
 import { Divider } from "primereact/divider";
 import { Toast } from "primereact/toast";
+import { useEffect, useRef, useState } from "react";
+import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { PFormCheckBox } from "./Form/PFormCheckBox";
 import { PFormTextField } from "./Form/PFormTextField";
 
@@ -28,10 +28,7 @@ export function LoginForm() {
 	const toast = useRef(null);
 
 	const [login, { error: errorLogin, isLoading: isLoginLoading, isError: isLoginError }] = useLoginMutation();
-		const {
-		data: googleData,
-		isError: isGoogleLoginError,
-	} = useGoogleLoginQuery();
+	const { data: googleData, isSuccess: isGoogleLoginSuccess } = useGoogleLoginQuery();
 	console.log(googleData);
 	const {
 		handleSubmit,
@@ -102,7 +99,7 @@ export function LoginForm() {
 		handleLogin(data);
 	};
 	// In your UI code, after the user is redirected back to your site
-	function handleGoogleLogin() {
+	async function handleGoogleLogin() {
 		try {
 			const res = await googleLogin();
 			if (res) {

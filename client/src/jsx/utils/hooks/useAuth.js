@@ -1,17 +1,13 @@
-import { useSelector } from "react-redux";
 import { useLogoutMutation } from "@store/api/authApi";
 import { selectCurrentToken } from "@store/slices/authSlice";
-function getCookie(name) {
-	const value = `; ${document.cookie}`;
-	const parts = value.split(`; ${name}=`);
-	if (parts.length === 2) return parts.pop().split(";").shift();
-}
+import { useSelector } from "react-redux";
+import { getCookie } from "@utils/index";
 
 export const useAuth = () => {
 	const localToken = useSelector(selectCurrentToken);
 	const socialToken = getCookie("socialToken");
 	const token = localToken || socialToken;
-	const [logout, { isLoading: isLoggingOut ,error}] = useLogoutMutation();
+	const [logout, { isLoading: isLoggingOut, error }] = useLogoutMutation();
 
 	const handleLogout = async () => {
 		try {

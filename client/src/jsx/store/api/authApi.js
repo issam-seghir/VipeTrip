@@ -9,36 +9,6 @@ export const authApi = api.injectEndpoints({
 				body: credentials,
 			}),
 		}),
-		googleLogin: builder.query({
-			query: () => ({
-				url: `/auth/login/google_callback_success`,
-				method: "GET",
-			}),
-		}),
-		facebookLogin: builder.query({
-			query: () => ({
-				url: `/auth/login/facebook`,
-				method: "GET",
-			}),
-		}),
-		linkedinLogin: builder.query({
-			query: () => ({
-				url: `/auth/login/linkedin`,
-				method: "GET",
-			}),
-		}),
-		twitterLogin: builder.query({
-			query: () => ({
-				url: `/auth/login/twitter`,
-				method: "GET",
-			}),
-		}),
-		githubLogin: builder.query({
-			query: () => ({
-				url: `/auth/login/github`,
-				method: "GET",
-			}),
-		}),
 		logout: builder.mutation({
 			query: () => ({
 				url: "/auth/logout",

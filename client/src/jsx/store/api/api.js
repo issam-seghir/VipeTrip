@@ -1,6 +1,7 @@
 import { SERVER_URL } from "@jsx/data/constants";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { clearCredentials, setCredentials } from "@store/slices/authSlice";
+import { getCookie } from "@utils/index";
 
 const baseQuery = fetchBaseQuery({
 	baseUrl: `${SERVER_URL}/api/v1`,
@@ -8,7 +9,9 @@ const baseQuery = fetchBaseQuery({
 	prepareHeaders: (headers, { getState }) => {
 		// Use Redux's useSelector to get the token from the state
 		// usually we use local storage but in this case we already setup react-persist
-		const token = getState().store.auth.token;
+			const localToken = getState().store.auth.token;
+			const socialToken = getCookie("socialToken");
+			const token = localToken || socialToken;
 		if (token) {
 			headers.set("authorization", `Bearer ${token}`);
 		}

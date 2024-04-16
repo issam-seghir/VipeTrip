@@ -1,7 +1,7 @@
 import { isDev } from "@data/constants";
 import { DevTool } from "@hookform/devtools";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useCheckEmailExistsQuery, useGoogleLoginQuery, useLoginMutation } from "@jsx/store/api/authApi";
+import { useCheckEmailExistsQuery, useLoginMutation } from "@jsx/store/api/authApi";
 import { setCredentials } from "@jsx/store/slices/authSlice";
 import { useIsAppleDevice } from "@jsx/utils/hooks/useIsAppleDevice";
 import { useDebounce, useMediaQuery } from "@uidotdev/usehooks";
@@ -28,8 +28,6 @@ export function LoginForm() {
 	const toast = useRef(null);
 
 	const [login, { error: errorLogin, isLoading: isLoginLoading, isError: isLoginError }] = useLoginMutation();
-	const { data: googleData, isSuccess: isGoogleLoginSuccess } = useGoogleLoginQuery();
-	console.log(googleData);
 	const {
 		handleSubmit,
 		watch,
@@ -44,7 +42,6 @@ export function LoginForm() {
 	});
 
 	const errorMessage = isLoginError ? errorLogin : errorsForm;
-
 	// check if use email exist when typing ...
 	const email = watch("email");
 	const debouncedEmail = useDebounce(errorsForm?.email ? null : email?.trim().toLowerCase(), 500); // Debounce the email input by 500ms
@@ -77,6 +74,8 @@ export function LoginForm() {
 		}
 	}, [chekcEmailExistance, setError, clearErrors]);
 
+
+
 	async function handleLogin(data) {
 		try {
 			const res = await login(data).unwrap();
@@ -99,23 +98,23 @@ export function LoginForm() {
 		handleLogin(data);
 	};
 	// In your UI code, after the user is redirected back to your site
-	async function handleGoogleLogin() {
-		try {
-			const res = await googleLogin();
-			if (res) {
-				dispatch(setCredentials({ user: res?.user, token: res?.token }));
-				reset();
-				navigate(from, { replace: true });
-			}
-		} catch (error) {
-			console.error(error);
-			toast.current.show({
-				severity: "error",
-				summary: "Login Failed 💢",
-				detail: error?.data?.message || "email or password not correct",
-			});
-		}
-	}
+	// async function handleGoogleLogin() {
+	// 	try {
+	// 		const res = await googleLogin();
+	// 		if (res) {
+	// 			dispatch(setCredentials({ user: res?.user, token: res?.token }));
+	// 			reset();
+	// 			navigate(from, { replace: true });
+	// 		}
+	// 	} catch (error) {
+	// 		console.error(error);
+	// 		toast.current.show({
+	// 			severity: "error",
+	// 			summary: "Login Failed 💢",
+	// 			detail: error?.data?.message || "email or password not correct",
+	// 		});
+	// 	}
+	// }
 	return (
 		<>
 			{/* react hook form dev tool  */}
@@ -185,9 +184,11 @@ export function LoginForm() {
 								style={{ fontSize: "1.5rem", transition: "all .2s linear" }}
 							/>
 						</a>
+
 						<a href="">
 							<i className="pi pi-facebook " style={{ fontSize: "1.5rem" }} />
 						</a>
+
 						{isAppleDevice && (
 							<a href="">
 								<i className="pi pi-apple " style={{ fontSize: "1.5rem" }} />

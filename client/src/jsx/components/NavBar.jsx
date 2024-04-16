@@ -25,12 +25,12 @@ export default function NavBar() {
 	const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
 
 	const theme = useTheme();
-	const neutralLight = theme.palette.primary.light;
-	const dark = theme.palette.primary.light;
-	const background = theme.palette.background.default;
-	const primaryLight = theme.palette.primary.light;
-	const alt = theme.palette.background.alt;
-	const isDarkMode = theme.palette.mode === "dark";
+	const neutralLight = "red" || theme?.palette?.primary?.light;
+	const dark = "red" || theme?.palette?.primary?.light;
+	const background = "red" || theme?.palette?.background?.default;
+	const primaryLight = "red" || theme?.palette?.primary?.light;
+	const alt = "red" || theme?.palette?.background?.alt;
+	const isDarkMode = theme?.palette?.mode === "dark";
 	const fullName = `${user?.firstName} ${user?.lastName}`;
 
 	return (

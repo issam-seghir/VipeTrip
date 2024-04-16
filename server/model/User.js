@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { normalize } = require("@utils/plugins");
 
 const Schema = mongoose.Schema;
 
@@ -25,6 +26,7 @@ const userSchema = new Schema(
 		},
 		rememberMe: {
 			type: Boolean,
+			private: true,
 			default: true,
 		},
 		socialAccounts: [
@@ -42,7 +44,10 @@ const userSchema = new Schema(
 					required: true,
 				},
 				pictureUrl: String,
-				accessToken: String,
+				accessToken: {
+					type: String,
+					private: true,
+				},
 			},
 		],
 		picturePath: {
@@ -76,6 +81,10 @@ const userSchema = new Schema(
 		timestamps: true,
 	}
 );
+
+//* Apply plugins
+// normalize : remove _id and __v and private field  from the response
+userSchema.plugin(normalize);
 
 //? --------- instance method ----------------
 

@@ -25,6 +25,29 @@ function mbToByte(mb) {
 	return mb * 1024 * 1024;
 }
 
+function convertToMilliseconds(timeString) {
+	const units = timeString.slice(-1);
+	const value = Number.parseInt(timeString.slice(0, -1));
+
+	switch (units) {
+		case "s": {
+			return value * 1000;
+		}
+		case "m": {
+			return value * 60 * 1000;
+		}
+		case "h": {
+			return value * 60 * 60 * 1000;
+		}
+		case "d": {
+			return value * 24 * 60 * 60 * 1000;
+		}
+		default: {
+			throw new Error(`Unknown time unit: ${units}`);
+		}
+	}
+}
+
 /**
  * Generates a UUID.
  * @returns {string} The generated UUID.
@@ -35,7 +58,6 @@ function mbToByte(mb) {
 function uuid() {
 	return crypto.randomUUID();
 }
-
 
 /**
  * Generates a hashed token.
@@ -89,6 +111,7 @@ function isRegexSave(...regexes) {
 module.exports = {
 	byteToMb,
 	mbToByte,
+	convertToMilliseconds,
 	uuid,
 	generateHashedToken,
 	signChecker,

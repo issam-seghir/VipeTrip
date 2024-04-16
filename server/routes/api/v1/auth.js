@@ -1,5 +1,8 @@
 const express = require("express");
 const passport = require("passport");
+const { isProd } = require("@config/const");
+const {convertToMilliseconds} = require("@utils/index");
+const ms = require("ms")
 
 const router = express.Router();
 const {
@@ -29,17 +32,6 @@ const {
 
 router.post("/login", validate(loginSchema), handleLogin);
 
-// router.get("/login/google", passport.authenticate("google"));
-
-// he failureMessage option which will add the message to req.session.messages
-// router.get(
-// 	"/oauth2/redirect/google",
-// 	passport.authenticate("google", {
-// 		failureRedirect: "/api/v1/auth/google_callback_fail",
-// 		successRedirect: "/api/v1/auth/google_callback_success",
-// 		session: false,
-// 	})
-// );
 
 router.get(
 	"/login/google",
@@ -51,7 +43,7 @@ router.get(
 router.get(
 	"/oauth2/redirect/google",
 	passport.authenticate("google", {
-		failureRedirect: "/",
+		failureRedirect: `${ENV.CLEINT_URL}`,
 		session: false,
 	}),
 	asyncWrapper(async (req, res, next) => {
@@ -88,25 +80,15 @@ router.get(
 			ENV.ACCESS_TOKEN_SECRET,
 			{ expiresIn: ENV.ACCESS_TOKEN_SECRET_EXPIRE_REMEMBER_ME }
 		);
-
-		const htmlWithEmbeddedJWT = `
-    <html>
-      <script>
-        // Save JWT to localStorage
-		const oldPersistStore = JSON.parse(window.localStorage.getItem('persist:store'));
-		console.log(oldPersistStore);
-		  oldPersistStore.auth.token = '${accessToken}';
-          window.localStorage.setItem('persist:store', JSON.stringify(oldPersistStore));
-        // Redirect browser to root of application
-        window.location.href = '/';
-      </script>
-    </html>
-    `;
-
-		res.send(htmlWithEmbeddedJWT);
-		// res.redirect(`${ENV.CLEINT_URL}/home`);
-		// Send authorization roles and access token to user
-		// res.json({ success: `Google Login : ${foundUser.fullName}!`, token: accessToken, user: foundUser });
+		// Set access token as a cookie
+		res.cookie("socialToken", accessToken, {
+			httpOnly: false,
+			secure: isProd,
+			sameSite: isProd ? "strict" : "Lax",
+			maxAge: ms(ENV.ACCESS_TOKEN_SECRET_EXPIRE_REMEMBER_ME),
+		});
+		// Redirect to client's URL
+		res.redirect(`${ENV.CLEINT_URL}/home`);
 	})
 );
 

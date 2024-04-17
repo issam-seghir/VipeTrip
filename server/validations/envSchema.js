@@ -79,9 +79,9 @@ const envSchema = z.object({
 	GITHUB_CLIENT_ID: stringNonEmpty(),
 	GITHUB_CLIENT_SECRET: stringNonEmpty(),
 	GITHUB_REDIRECT_URI: stringNonEmpty().url(),
-	TWITTER_CLIENT_ID: stringNonEmpty(),
-	TWITTER_CLIENT_SECRET: stringNonEmpty(),
-	TWITTER_REDIRECT_URI: stringNonEmpty().url(),
+	LINKEDIN_CLIENT_ID: stringNonEmpty(),
+	LINKEDIN_CLIENT_SECRET: stringNonEmpty(),
+	LINKEDIN_REDIRECT_URI: stringNonEmpty().url(),
 	CLEINT_URL: stringNonEmpty().url(),
 	PORT: z.preprocess((x) => x || undefined, numberSchema.min(1).max(65_536).default(3000)),
 });

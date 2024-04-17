@@ -1,15 +1,12 @@
 const GoogleStrategy = require("passport-google-oauth").OAuth2Strategy;
 const FacebookStrategy = require("passport-facebook");
-const TwitterStrategy = require("passport-twitter");
 const GitHubStrategy = require("passport-github2");
-
+const LinkedInStrategy = require("passport-linkedin-oauth2").Strategy;
 
 const User = require("@model/User");
 const { ENV } = require("@/validations/envSchema");
 const bcrypt = require("bcrypt");
 const { generateHashedToken } = require("@utils/index");
-
-
 
 const passportConfig = (passport) => {
 	passport.use(
@@ -67,7 +64,6 @@ const passportConfig = (passport) => {
 		)
 	);
 	passport.use(
-		// facebook strategy
 		new FacebookStrategy(
 			{
 				clientID: ENV.FACEBOOK_CLIENT_ID,
@@ -143,15 +139,9 @@ const passportConfig = (passport) => {
 				try {
 					// if user sign in with already existing email , the Oauth account will be linked to his account
 					// console.log(profile);
-					const {
-						id,
-						provider,
-						displayName,
-						emails,
-						_json: others,
-					} = profile;
+					const { id, provider, displayName, emails, _json: others } = profile;
 					const { avatar_url, location } = others;
-					const email = emails?.[0]?.value ?? '';
+					const email = emails?.[0]?.value ?? "";
 					if (!email) return cb(new Error("Failed to receive email from Github. Please try again :("));
 
 					let user = await User.findOne({ email: email });
@@ -171,7 +161,7 @@ const passportConfig = (passport) => {
 						}
 
 						user = new User({
-							firstName ,
+							firstName,
 							lastName,
 							email,
 							location,
@@ -198,6 +188,61 @@ const passportConfig = (passport) => {
 			}
 		)
 	);
+
+	passport.use(
+		new LinkedInStrategy(
+			{
+				clientID: ENV.LINKEDIN_CLIENT_ID,
+				clientSecret: ENV.LINKEDIN_CLIENT_SECRET,
+				callbackURL: ENV.LINKEDIN_REDIRECT_URI,
+				scope: ["email", "profile", "openid"],
+				profileFields: [
+					"email-address",
+					"id",
+				],
+			},
+			async (accessToken, refreshToken, profile, cb) => {
+				try {
+					// if user sign in with already existing email , the Oauth account will be linked to his account
+					console.log(profile);
+					const { id, provider, givenName, familyName, displayName, picture, email } = profile;
+					if (!email) return cb(new Error("Failed to receive email from Linkedin. Please try again :("));
+
+					let user = await User.findOne({ email: email });
+					if (!user) {
+						// The account at Github has not logged in to this app before.  Create a
+						// new user record and associate it with the Github account.
+						const randomPass = generateHashedToken(20);
+
+
+						user = new User({
+							firstName: givenName,
+							lastName: familyName,
+							email,
+							picturePath: picture,
+							password: bcrypt.hashSync(randomPass, 10),
+						});
+					}
+					// Add a new entry to the socialAccounts array
+					user.socialAccounts.push({
+						provider,
+						profileId: id,
+						displayName,
+						accessToken,
+					});
+
+					await user.save();
+
+					// The account at Github has previously logged in to the app.  Get the
+					// user record associated with the Github account and log the user in.
+					return cb(null, user);
+				} catch (error) {
+					return cb(error);
+				}
+			}
+		)
+	);
+
 	passport.serializeUser(function (user, done) {
 		done(null, user.id);
 	});

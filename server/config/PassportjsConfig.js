@@ -1,45 +1,15 @@
 const GoogleStrategy = require("passport-google-oauth").OAuth2Strategy;
 const FacebookStrategy = require("passport-facebook");
 const TwitterStrategy = require("passport-twitter");
+const GitHubStrategy = require("passport-github2");
+
+
 const User = require("@model/User");
 const { ENV } = require("@/validations/envSchema");
 const bcrypt = require("bcrypt");
 const { generateHashedToken } = require("@utils/index");
 
-// async function verifyProvider(accessToken, refreshToken, profile, cb, provider) {
-// 	try {
-// 		// if user sign in with already existing email , the Oauth account will be linked to his account
-// 		let user = await User.findOne({ email: profile.emails[0].value });
-// 		console.log(profile);
-// 		if (!user) {
-// 			// The account at Google has not logged in to this app before.  Create a
-// 			// new user record and associate it with the Google account.
-// 			user = new User({
-// 				firstName: profile.name.givenName,
-// 				lastName: profile.name.familyName,
-// 				email: profile.emails[0].value,
-// 				password: null, // You might want to handle this differently
-// 			});
-// 		}
-// 		// Associate the social media account with the user record.
-// 		user.socialAccounts.push({
-// 			provider: provider,
-// 			userId: profile.id,
-// 			displayName: profile.displayName,
-// 			profileUrl: profile.profileUrl,
-// 			emails: profile.emails.map((email) => email.value),
-// 			photos: profile.photos.map((photo) => photo.value),
-// 		});
 
-// 		await user.save();
-
-// 		// The account at Google has previously logged in to the app.  Get the
-// 		// user record associated with the Google account and log the user in.
-// 		return cb(null, user);
-// 	} catch (error) {
-// 		return cb(error);
-// 	}
-// }
 
 const passportConfig = (passport) => {
 	passport.use(
@@ -54,7 +24,7 @@ const passportConfig = (passport) => {
 			async function verifyProvider(accessToken, refreshToken, profile, cb) {
 				try {
 					// if user sign in with already existing email , the Oauth account will be linked to his account
-					console.log(profile);
+					// console.log(profile);
 					const { id, name, displayName, provider, _json: others } = profile;
 					const { picture, email } = others;
 
@@ -116,7 +86,6 @@ const passportConfig = (passport) => {
 						email,
 						first_name,
 						last_name,
-						name,
 						displayName,
 						hometown,
 						location,
@@ -162,49 +131,73 @@ const passportConfig = (passport) => {
 		)
 	);
 
-	// passport.use(
-	// 	new TwitterStrategy(
-	// 		{
-	// 			consumerKey: process.env["TWITTER_CONSUMER_KEY"],
-	// 			consumerSecret: process.env["TWITTER_CONSUMER_SECRET"],
-	// 			callbackURL: "/oauth/callback/twitter",
-	// 		},
-	// 		function verify(token, tokenSecret, profile, cb) {
-	// 			return verifyProvider(token, tokenSecret, profile, cb, "twitter");
-	// 		}
-	// 	)
-	// );
+	passport.use(
+		new GitHubStrategy(
+			{
+				clientID: ENV.GITHUB_CLIENT_ID,
+				clientSecret: ENV.GITHUB_CLIENT_SECRET,
+				callbackURL: ENV.GITHUB_REDIRECT_URI,
+				scope: "user:email",
+			},
+			async (accessToken, refreshToken, profile, cb) => {
+				try {
+					// if user sign in with already existing email , the Oauth account will be linked to his account
+					// console.log(profile);
+					const {
+						id,
+						provider,
+						displayName,
+						emails,
+						_json: others,
+					} = profile;
+					const { avatar_url, location } = others;
+					const email = emails?.[0]?.value ?? '';
+					if (!email) return cb(new Error("Failed to receive email from Github. Please try again :("));
 
-	// passport.use(new GitHubStrategy({
-	//   clientID: config.githubClientId,
-	//   clientSecret: config.githubClientSecret,
-	//   callbackURL: config.githubCallbackURL,
-	//   scope: 'user:email',
-	//   passReqToCallback: true,
-	//   },
-	//   async function(req, accessToken, refreshToken, profile, done) {
-	//     try {
-	//       const email = profile.emails && profile.emails.length ? profile.emails[0].value : null;
-	//       if(!email) return done(new Error('Failed to receive email from Github. Please try again :('));
+					let user = await User.findOne({ email: email });
+					if (!user) {
+						// The account at Github has not logged in to this app before.  Create a
+						// new user record and associate it with the Github account.
+						const randomPass = generateHashedToken(20);
+						const nameParts = displayName.split(" ");
+						let firstName, lastName;
 
-	//       const user = await User.findOne({ 'email': email });
+						if (nameParts.length > 1) {
+							firstName = nameParts[0];
+							lastName = nameParts[1];
+						} else {
+							firstName = displayName;
+							lastName = "";
+						}
 
-	//       if (user) {
-	//         return done(null, user);
-	//       }
-	//       const newUser = await User.create({
-	//         name: profile.displayName,
-	//         profileId: profile.id,
-	//         email,
-	//         accessToken,
-	//       });
-	//       return done(null, newUser);
-	//     } catch (verifyErr) {
-	//       done(verifyErr);
-	//     }
-	//   }
+						user = new User({
+							firstName ,
+							lastName,
+							email,
+							location,
+							picturePath: avatar_url,
+							password: bcrypt.hashSync(randomPass, 10),
+						});
+					}
+					// Add a new entry to the socialAccounts array
+					user.socialAccounts.push({
+						provider,
+						profileId: id,
+						displayName,
+						accessToken,
+					});
 
-	// ));
+					await user.save();
+
+					// The account at Github has previously logged in to the app.  Get the
+					// user record associated with the Github account and log the user in.
+					return cb(null, user);
+				} catch (error) {
+					return cb(error);
+				}
+			}
+		)
+	);
 	passport.serializeUser(function (user, done) {
 		done(null, user.id);
 	});

@@ -151,6 +151,65 @@ router.get(
 );
 
 
+router.get(
+	"/login/github",
+	passport.authenticate("github", {
+		scope: ["user:email"],
+	})
+);
+
+router.get(
+	"/oauth2/redirect/github",
+	passport.authenticate("github", {
+		failureRedirect: `${ENV.CLEINT_URL}`,
+		session: false,
+	}),
+	asyncWrapper(async (req, res, next) => {
+		const foundUser = await User.findOne({ email: req.user.email });
+
+		if (!foundUser) return res.status(404).json({ message: "User not found" });
+		// create JWT Refresh Token
+		const newRefreshToken = jwt.sign(
+			{
+				id: foundUser._id.toString(),
+				email: foundUser.email,
+			},
+			ENV.REFRESH_TOKEN_SECRET,
+			{ expiresIn: ENV.REFRESH_TOKEN_SECRET_EXPIRE_REMEMBER_ME }
+		);
+
+		// Saving refreshToken with current user in database
+		foundUser.refreshToken = newRefreshToken;
+		await foundUser.save();
+
+		// Creates Secure Cookie with refresh token
+		//? Use the httpOnly flag to prevent JavaScript from reading it.
+		//? Use the secure=true flag so it can only be sent over HTTPS.
+		//? Use the SameSite=strict flag whenever possible to prevent CSRF. This can only be used if the Authorization Server has the same site as your front-end.
+		res.cookie("jwt", newRefreshToken, getCookieOptions(true));
+
+		// Create JWT Access Token
+		const accessToken = jwt.sign(
+			{
+				id: foundUser._id.toString(),
+				email: foundUser.email,
+			},
+			ENV.ACCESS_TOKEN_SECRET,
+			{ expiresIn: ENV.ACCESS_TOKEN_SECRET_EXPIRE_REMEMBER_ME }
+		);
+		// Set access token as a cookie
+		res.cookie("socialToken", accessToken, {
+			httpOnly: false,
+			secure: isProd,
+			sameSite: isProd ? "strict" : "Lax",
+			maxAge: ms(ENV.ACCESS_TOKEN_SECRET_EXPIRE_REMEMBER_ME),
+		});
+		// Redirect to client's URL
+		res.redirect(`${ENV.CLEINT_URL}/home`);
+	})
+);
+
+
 
 
 

@@ -202,8 +202,11 @@ export function LoginForm() {
 						<a href="">
 							<i className="pi pi-linkedin " style={{ fontSize: "1.5rem" }} />
 						</a>
-						<a href="">
-							<i className="pi pi-github " style={{ fontSize: "1.5rem" }} />
+						<a href={`${import.meta.env.VITE_SERVER_URL}/api/v1/auth/login/github`}>
+							<i
+								className="pi pi-github hover:text-primary "
+								style={{ fontSize: "1.5rem", transition: "all .2s linear" }}
+							/>
 						</a>
 					</div>
 					<p>

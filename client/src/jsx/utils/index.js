@@ -8,6 +8,8 @@
  * // returns "1.00"
  * byteToMb(1048576);
  */
+import safeRegex from "safe-regex";
+
 function byteToMb(byte) {
 	return (byte / 1024 / 1024).toFixed(2);
 }
@@ -47,9 +49,6 @@ function signChecker(percent) {
 	const numericPercent = Number.parseFloat(percent); // Convert string percentage to a number
 	return numericPercent > 0;
 }
-
-const safeRegex = require("safe-regex");
-
 /**
  * Checks if multiple regular expressions are safe.
  *

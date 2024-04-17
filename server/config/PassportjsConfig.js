@@ -69,6 +69,7 @@ const passportConfig = (passport) => {
 							firstName: name?.givenName,
 							lastName: name?.familyName,
 							email,
+							picturePath: picture,
 							password: bcrypt.hashSync(randomPass, 10),
 						});
 					}
@@ -76,21 +77,13 @@ const passportConfig = (passport) => {
 						(account) => account.provider === provider && account.profileId === id
 					);
 
-					if (existingAccount) {
-						// Update the existing account with the new access and refresh tokens
-						existingAccount.accessToken = accessToken;
-						existingAccount.displayName = displayName;
-						existingAccount.pictureUrl = picture;
-					} else {
-						// Add a new entry to the socialAccounts array
-						user.socialAccounts.push({
-							provider,
-							profileId: id,
-							displayName: displayName,
-							pictureUrl: picture,
-							accessToken,
-						});
-					}
+					// Add a new entry to the socialAccounts array
+					user.socialAccounts.push({
+						provider,
+						profileId: id,
+						displayName: displayName,
+						accessToken,
+					});
 
 					await user.save();
 
@@ -103,19 +96,71 @@ const passportConfig = (passport) => {
 			}
 		)
 	);
-	// passport.use(
-	// 	new FacebookStrategy(
-	// 		{
-	// 			clientID: process.env["FACEBOOK_CLIENT_ID"],
-	// 			clientSecret: process.env["FACEBOOK_CLIENT_SECRET"],
-	// 			callbackURL: "/oauth2/redirect/facebook",
-	// 			state: true,
-	// 		},
-	// 		function verify(accessToken, refreshToken, profile, cb) {
-	// 			return verifyProvider(accessToken, refreshToken, profile, cb, "facebook");
-	// 		}
-	// 	)
-	// );
+	passport.use(
+		// facebook strategy
+		new FacebookStrategy(
+			{
+				clientID: ENV.FACEBOOK_CLIENT_ID,
+				clientSecret: ENV.FACEBOOK_CLIENT_SECRET,
+				callbackURL: ENV.FACEBOOK_REDIRECT_URI,
+				authType: "reauthenticate",
+				scope: ["public_profile", "email", "user_hometown", "user_location"],
+				profileFields: ["id", "email", "name", "displayName", "hometown", "profileUrl", "picture.type(large)"],
+			},
+			async (accessToken, refreshToken, profile, cb) => {
+				try {
+					// if user sign in with already existing email , the Oauth account will be linked to his account
+					console.log(profile);
+					const {
+						id,
+						email,
+						first_name,
+						last_name,
+						name,
+						displayName,
+						hometown,
+						location,
+						profileUrl,
+						picture,
+						_json: others,
+					} = profile;
+					// const { picture, email } = others;
+
+					if (!email) return cb(new Error("Failed to receive email from Facebook. Please try again :("));
+
+					let user = await User.findOne({ email: email });
+					if (!user) {
+						// The account at Facebook has not logged in to this app before.  Create a
+						// new user record and associate it with the Facebook account.
+						const randomPass = generateHashedToken(20);
+						user = new User({
+							firstName: first_name,
+							lastName: last_name,
+							email,
+							location: location,
+							picturePath: picture,
+							password: bcrypt.hashSync(randomPass, 10),
+						});
+					}
+					// Add a new entry to the socialAccounts array
+					user.socialAccounts.push({
+						provider: "facebook",
+						profileId: id,
+						displayName,
+						accessToken,
+					});
+
+					await user.save();
+
+					// The account at Facebook has previously logged in to the app.  Get the
+					// user record associated with the Facebook account and log the user in.
+					return cb(null, user);
+				} catch (error) {
+					return cb(error);
+				}
+			}
+		)
+	);
 
 	// passport.use(
 	// 	new TwitterStrategy(

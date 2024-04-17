@@ -43,7 +43,6 @@ const userSchema = new Schema(
 					type: String,
 					required: true,
 				},
-				pictureUrl: String,
 				accessToken: {
 					type: String,
 					private: true,

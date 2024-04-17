@@ -184,9 +184,11 @@ export function LoginForm() {
 								style={{ fontSize: "1.5rem", transition: "all .2s linear" }}
 							/>
 						</a>
-
-						<a href="">
-							<i className="pi pi-facebook " style={{ fontSize: "1.5rem" }} />
+						<a href={`${import.meta.env.VITE_SERVER_URL}/api/v1/auth/login/facebook`}>
+							<i
+								className="pi pi-facebook hover:text-primary  "
+								style={{ fontSize: "1.5rem", transition: "all .2s linear" }}
+							/>
 						</a>
 
 						{isAppleDevice && (

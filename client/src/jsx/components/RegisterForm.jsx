@@ -221,15 +221,6 @@ export function RegisterForm() {
 						forceSelection={true}
 						errorMessage={errorMessage}
 					/>
-
-					<FormPickImage
-						name="picture"
-						errors={errorMessage}
-						type={"image/*"}
-						multiple={false}
-						register={formRegister}
-					/>
-					{/* <DropZone getInputProps={getInputProps} getRootProps={getRootProps} fileRejections={fileRejections} picture={picture} state={state} /> */}
 				</div>
 				<Button
 					label={isRegisterLoading ? "Loading..." : "Sign Up"}

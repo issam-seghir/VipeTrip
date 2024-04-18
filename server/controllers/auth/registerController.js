@@ -12,8 +12,8 @@ const createError = require("http-errors");
 const handleNewUser = asyncWrapper(async (req, res, next) => {
 	/** @type {RegisterBody} */
 	const { firstName, lastName, email, password, job, location } = req.body;
-	const picturePath = req?.file?.path; // Get picturePath from req.file
-	console.log(req.file);
+	// const picturePath = req?.file?.path; // Get picturePath from req.file
+	// console.log(req.file);
 
 	// check for duplicate usernames in the db
 	const duplicate = await User.findOne({ email });
@@ -25,7 +25,6 @@ const handleNewUser = asyncWrapper(async (req, res, next) => {
 		lastName,
 		email,
 		password,
-		picturePath,
 		job,
 		location,
 	});

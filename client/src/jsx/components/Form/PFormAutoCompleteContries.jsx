@@ -82,20 +82,6 @@ export function PFormAutoCompleteContries({
 		);
 	};
 
-	const selectedCountryTemplate = (item) => {
-		return (
-			<div className="flex align-items-center">
-				<img
-					alt={item.name}
-					src="https://primefaces.org/cdn/primereact/images/flag/flag_placeholder.png"
-					className={`flag flag-${item.code.toLowerCase()} mr-2`}
-					style={{ width: "18px" }}
-				/>
-				<div>{item.name}</div>
-			</div>
-		);
-	};
-
 	useEffect(() => {
 		CountryService.getCountries().then((data) => setCountries(data));
 	}, []);
@@ -111,12 +97,10 @@ export function PFormAutoCompleteContries({
 						<AutoComplete
 							inputId={field.name}
 							inputRef={field.ref}
-							// field={"name"}
 							dropdown
 							value={field.value}
 							inputClassName="input-autocmplete-location"
 							suggestions={filteredCountries}
-							forceSelection={forceSelection}
 							completeMethod={search}
 							className={classNames(
 								{ "p-invalid": fieldState.error },
@@ -128,7 +112,6 @@ export function PFormAutoCompleteContries({
 							onChange={(e) => {
 								field.onChange(e?.value?.name);
 							}}
-							selectedItemTemplate={selectedCountryTemplate}
 							itemTemplate={itemTemplate}
 							panelFooterTemplate={panelFooterTemplate}
 						/>

@@ -31,7 +31,7 @@ const baseSchema = z.object({
 	confirmPassword: stringNonEmpty(),
 	location: infoSchema,
 	job: infoSchema,
-	picture: z.instanceof(FileList).optional().or(z.literal("")), // fix optional for url / email ...,
+	// picture: z.instanceof(FileList).optional().or(z.literal("")), // fix optional for url / email ...,
 });
 
 export const registerSchema = baseSchema.refine((data) => data.password === data.confirmPassword, {

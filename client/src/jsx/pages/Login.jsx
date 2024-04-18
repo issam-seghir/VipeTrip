@@ -3,9 +3,8 @@ import { LoginLayout } from "@jsx/components/LoginLayout";
 
 export function Login() {
   return (
-      <LoginLayout>
-          <LoginForm />
-      </LoginLayout>
-
+		<LoginLayout>
+			<LoginForm />
+		</LoginLayout>
   );
 }

@@ -74,8 +74,6 @@ export function LoginForm() {
 		}
 	}, [chekcEmailExistance, setError, clearErrors]);
 
-
-
 	async function handleLogin(data) {
 		try {
 			const res = await login(data).unwrap();
@@ -184,18 +182,20 @@ export function LoginForm() {
 								style={{ fontSize: "1.5rem", transition: "all .2s linear" }}
 							/>
 						</a>
+						{isAppleDevice && (
+							<a href={`${import.meta.env.VITE_SERVER_URL}/api/v1/auth/login/apple`}>
+								<i
+									className="pi pi-apple hover:text-primary "
+									style={{ fontSize: "1.5rem", transition: "all .2s linear" }}
+								/>
+							</a>
+						)}
 						<a href={`${import.meta.env.VITE_SERVER_URL}/api/v1/auth/login/facebook`}>
 							<i
 								className="pi pi-facebook hover:text-primary  "
 								style={{ fontSize: "1.5rem", transition: "all .2s linear" }}
 							/>
 						</a>
-
-						{isAppleDevice && (
-							<a href="">
-								<i className="pi pi-apple " style={{ fontSize: "1.5rem" }} />
-							</a>
-						)}
 						<a href={`${import.meta.env.VITE_SERVER_URL}/api/v1/auth/login/linkedin`}>
 							<i
 								className="pi pi-linkedin hover:text-primary "

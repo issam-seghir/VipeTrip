@@ -7,6 +7,7 @@ import sectionImg3 from "@assets/images/wallpaper.png";
 import Logo from "@svg/logo.svg?react";
 // import logo from "@svg/logo.svg?url";
 import { Galleria } from "primereact/galleria";
+import { Footer } from "@components/Footer";
 
 export function LoginLayout({ formType = "login", children }) {
 	// for Galleria Component
@@ -34,36 +35,41 @@ export function LoginLayout({ formType = "login", children }) {
 
 	return (
 		<div className="flex viewport">
-			<div className="flex-center" style={{ flex: "50%" }}>
-				<div className="surface-card px-4 py-4 w-11 shadow-2 border-round sm:w-9 md:w-8 lg:w-9  xl:w-8 ">
-					<div className="flex-center mb-4">
-						<Logo className={"surface-card logo"} style={{ transition: "all 2s linear" }} />
-					</div>
-					<div className="text-center flex-center flex-column gap-1 mb-6">
-						{formType === "login" ? (
-							<>
-								<div className="text-900 lg:text-3xl md:text-2xl text-xl font-medium">Welcome Back</div>
-								<div className="text-900 lg:text-3xl md:text-2xl text-xl font-medium">
-									to <span className="text-primary text-animate">VipeTrip</span>
-								</div>
-							</>
-						) : formType === "reset-password" ? (
-							<div className="text-900 mb-2 lg:text-3xl md:text-2xl text-xl text-primary font-medium">
-								Set new Password
-							</div>
-						) : (
-							<>
+			<div className="flex flex-column" style={{ flex: "50%" }}>
+				<div className="flex-center" style={{ flex: "50%" }}>
+					<div className="surface-card px-4 py-4 w-11 shadow-2 border-round sm:w-9 md:w-8 lg:w-9  xl:w-8 ">
+						<div className="flex-center mb-4">
+							<Logo className={"surface-card logo"} style={{ transition: "all 2s linear" }} />
+						</div>
+						<div className="text-center flex-center flex-column gap-1 mb-6">
+							{formType === "login" ? (
+								<>
+									<div className="text-900 lg:text-3xl md:text-2xl text-xl font-medium">
+										Welcome Back
+									</div>
+									<div className="text-900 lg:text-3xl md:text-2xl text-xl font-medium">
+										to <span className="text-primary text-animate">VipeTrip</span>
+									</div>
+								</>
+							) : formType === "reset-password" ? (
 								<div className="text-900 mb-2 lg:text-3xl md:text-2xl text-xl text-primary font-medium">
-									Forgot Your Password ?
+									Set new Password
 								</div>
-								<div className="text-500 lg:text-xl md:text-md text-sm font-medium">
-									Enter your email below to receive a password reset link.
-								</div>
-							</>
-						)}
+							) : (
+								<>
+									<div className="text-900 mb-2 lg:text-3xl md:text-2xl text-xl text-primary font-medium">
+										Forgot Your Password ?
+									</div>
+									<div className="text-500 lg:text-xl md:text-md text-sm font-medium">
+										Enter your email below to receive a password reset link.
+									</div>
+								</>
+							)}
+						</div>
+						{children}
 					</div>
-					{children}
 				</div>
+				<Footer />
 			</div>
 
 			<Galleria

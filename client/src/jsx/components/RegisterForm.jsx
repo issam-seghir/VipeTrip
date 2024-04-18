@@ -1,24 +1,23 @@
-import { useRegisterMutation, useCheckEmailExistsQuery } from "@jsx/store/api/authApi";
-import { useMediaQuery, useDebounce } from "@uidotdev/usehooks";
-import { useEffect,useRef, useState } from "react";
+import { useCheckEmailExistsQuery, useRegisterMutation } from "@jsx/store/api/authApi";
+import { useDebounce, useMediaQuery } from "@uidotdev/usehooks";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import useFormPersist from "react-hook-form-persist";
-import { Link, useLocation,useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
-import FormPickImage from "@components/FormPickImage";
 import { isDev } from "@data/constants";
 import { DevTool } from "@hookform/devtools";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { logFormData } from "@jsx/utils/logFormData";
 // import { useFormHandleErrors } from "@utils/hooks/useFormHandleErrors";
 import { PFormTextField } from "@components/Form/PFormTextField";
+import { PFormAutoCompleteContries } from "@jsx/components/Form/PFormAutoCompleteContries";
+import { useIsAppleDevice } from "@jsx/utils/hooks/useIsAppleDevice";
 import { registerSchema } from "@validations/authSchema";
 import { Button } from "primereact/button";
 import { Divider } from "primereact/divider";
 import { Toast } from "primereact/toast";
 import { useDispatch } from "react-redux";
-import { useIsAppleDevice } from "@jsx/utils/hooks/useIsAppleDevice";
-import { PFormAutoCompleteContries } from "@jsx/components/Form/PFormAutoCompleteContries";
 
 import { SocialAuth } from "./SocialAuth";
 
@@ -31,13 +30,14 @@ export function RegisterForm() {
 	const dispatch = useDispatch();
 	const toast = useRef(null);
 
-	const [register, { error: registerError, isLoading: isRegisterLoading ,isError:isRegisterError }] = useRegisterMutation();
+	const [register, { error: registerError, isLoading: isRegisterLoading, isError: isRegisterError }] =
+		useRegisterMutation();
 	const {
 		handleSubmit,
 		reset,
 		setValue,
-    setError,
-    clearErrors,
+		setError,
+		clearErrors,
 		watch,
 		control,
 		getValues,
@@ -221,31 +221,31 @@ export function RegisterForm() {
 						forceSelection={true}
 						errorMessage={errorMessage}
 					/>
-				</div>
-				<Button
-					label={isRegisterLoading ? "Loading..." : "Sign Up"}
-					className="btn-sign-in w-17rem lg:w-7"
-					iconPos="right"
-					size={isNonMobile ? "large" : "small"}
-					loading={isSubmitting || isRegisterLoading}
-				>
-					<svg viewBox="0 0 180 60" className="sign-in border">
-						<polyline points="179,1 179,59 1,59 1,1 179,1" className="bg-line" />
-						<polyline points="179,1 179,59 1,59 1,1 179,1" className="hl-line" />
-					</svg>
-				</Button>
-				<Divider align="center">
-					<span>or you can sign up with </span>
-				</Divider>
-				<div className="flex gap-4 justify-content-center">
-					<SocialAuth />
+					<div className="flex gap-2 align-items-center justify-content-between mb-4"></div>
+
 					<Button
-						link
-						className="text-xs sm:text-base font-small px-0 md:px-2 underline ml-2  text-left cursor-pointer"
-						onClick={() => navigate("/")}
+						label={isRegisterLoading ? "Loading..." : "Sign Up"}
+						className="btn-sign-in w-17rem lg:w-7"
+						iconPos="right"
+						size={isNonMobile ? "large" : "small"}
+						loading={isSubmitting || isRegisterLoading}
 					>
-						{"Already have an account? Login here."}
+						<svg viewBox="0 0 180 60" className="sign-in border">
+							<polyline points="179,1 179,59 1,59 1,1 179,1" className="bg-line" />
+							<polyline points="179,1 179,59 1,59 1,1 179,1" className="hl-line" />
+						</svg>
 					</Button>
+					<Divider align="center">
+						<span>or you can sign up with </span>
+					</Divider>
+						<SocialAuth />
+						<Button
+							link
+							className="text-xs sm:text-base font-small px-0 md:px-2 underline ml-2  text-left cursor-pointer"
+							onClick={() => navigate("/")}
+						>
+							{"Already have an account? Login here."}
+						</Button>
 				</div>
 			</form>
 		</>

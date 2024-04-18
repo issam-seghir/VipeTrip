@@ -62,6 +62,16 @@ svg.sign-in {
 	padding-inline-start: 2rem !important;
 }
 
+.p-autocomplete-input {
+	@media (width >= 320px) {
+		font-size: 0.73rem !important;
+	}
+
+	@media (width >= 460px) and (width <= 769px) {
+		font-size: 0.85rem !important;
+	}
+}
+
 // flags in autocomplete component
 span.flag {
 	display: inline-block;

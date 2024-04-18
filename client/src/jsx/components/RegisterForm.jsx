@@ -218,6 +218,7 @@ export function RegisterForm() {
 						iconStart={"pi-map-marker"}
 						label="Location"
 						size={"lg"}
+						forceSelection={true}
 						errorMessage={errorMessage}
 					/>
 

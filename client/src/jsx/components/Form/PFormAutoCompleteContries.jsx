@@ -14,6 +14,7 @@ export function PFormAutoCompleteContries({
 	size,
 	iconStart,
 	errorMessage,
+  forceSelection = false,
 	disabled = false,
 }) {
 	const [countries, setCountries] = useState([]);
@@ -108,14 +109,15 @@ export function PFormAutoCompleteContries({
 			render={({ field, fieldState }) => (
 				<div className="flex flex-column align-items-center ">
 					<span className={classNames({ "p-float-label": label }, { "p-input-icon-left": iconStart })}>
-						{iconStart && <i className={classNames("pi", iconStart)} />}
 						<AutoComplete
 							inputId={field.name}
 							inputRef={field.ref}
 							// field={"name"}
 							dropdown
 							value={field.value}
+							inputClassName="input-autocmplete-location"
 							suggestions={filteredCountries}
+							forceSelection={forceSelection}
 							completeMethod={search}
 							className={classNames(
 								{ "p-invalid": fieldState.error },
@@ -132,6 +134,7 @@ export function PFormAutoCompleteContries({
 							panelFooterTemplate={panelFooterTemplate}
 						/>
 						<label htmlFor={field.name}>{label}</label>
+						{iconStart && <i className={classNames("pi", iconStart)} />}
 					</span>
 					{/* error label */}
 					<label

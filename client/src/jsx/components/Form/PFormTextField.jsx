@@ -80,7 +80,9 @@ export function PFormTextField({
 							<i className={classNames("pi", iconEnd)} />
 						)}
 
-						<label htmlFor={field.name}>{label}</label>
+						<label htmlFor={field.name}>
+							{label}
+						</label>
 					</span>
 					{/* error label */}
 					<label

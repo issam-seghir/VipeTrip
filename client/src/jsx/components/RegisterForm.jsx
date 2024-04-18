@@ -18,7 +18,7 @@ import { Divider } from "primereact/divider";
 import { Toast } from "primereact/toast";
 import { useDispatch } from "react-redux";
 import { useIsAppleDevice } from "@jsx/utils/hooks/useIsAppleDevice";
-import { AutoCompleteContries } from "@jsx/components/Form/PFormAutoCompleteContries";
+import { PFormAutoCompleteContries } from "@jsx/components/Form/PFormAutoCompleteContries";
 
 import { SocialAuth } from "./SocialAuth";
 
@@ -198,7 +198,6 @@ export function RegisterForm() {
 						type="password"
 						size={"lg"}
 						iconStart={"pi-lock"}
-						toogleMask={true}
 						clearIconSpace={true}
 						errorMessage={errorMessage}
 					/>
@@ -211,7 +210,7 @@ export function RegisterForm() {
 						iconStart={"pi-briefcase"}
 						errorMessage={errorMessage}
 					/>
-					<AutoCompleteContries
+					<PFormAutoCompleteContries
 						control={control}
 						getValues={getValues}
 						defaultValue={""}

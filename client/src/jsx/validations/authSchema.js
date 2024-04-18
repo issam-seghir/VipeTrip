@@ -23,17 +23,16 @@ const passSchema = stringNonEmpty()
 
 
 
-const baseSchema = z
-	.object({
-		firstName: credinalSchema,
-		lastName: credinalSchema,
-		email: stringNonEmpty().email().trim().toLowerCase(),
-		password: passSchema,
-		confirmPassword: passSchema,
-		location: infoSchema,
-		job: infoSchema,
-		picture: z.instanceof(FileList).optional().or(z.literal("")), // fix optional for url / email ...,
-	})
+const baseSchema = z.object({
+	firstName: credinalSchema,
+	lastName: credinalSchema,
+	email: stringNonEmpty().email().trim().toLowerCase(),
+	password: passSchema,
+	confirmPassword: stringNonEmpty(),
+	location: infoSchema,
+	job: infoSchema,
+	picture: z.instanceof(FileList).optional().or(z.literal("")), // fix optional for url / email ...,
+});
 
 export const registerSchema = baseSchema.refine((data) => data.password === data.confirmPassword, {
 	//For advanced features - multiple issues ,  see (superRefine)

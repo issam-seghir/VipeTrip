@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
+import { CountryService } from "@store/api/countriesApi";
+import { useMediaQuery } from "@uidotdev/usehooks";
 import { AutoComplete } from "primereact/autocomplete";
 import { classNames } from "primereact/utils";
-import { CountryService } from "@store/api/countriesApi";
+import { useEffect, useState } from "react";
 import { Controller } from "react-hook-form";
-import { useMediaQuery } from "@uidotdev/usehooks";
 
 export function PFormAutoCompleteContries({
 	control,
@@ -14,7 +14,7 @@ export function PFormAutoCompleteContries({
 	size,
 	iconStart,
 	errorMessage,
-  forceSelection = false,
+	forceSelection = false,
 	disabled = false,
 }) {
 	const [countries, setCountries] = useState([]);
@@ -57,13 +57,12 @@ export function PFormAutoCompleteContries({
 		setTimeout(() => {
 			let _filteredCountries;
 
-			if (!event.query.trim().length) {
-				_filteredCountries = [...countries];
-			} else {
-				_filteredCountries = countries.filter((country) => {
-					return country.name.toLowerCase().startsWith(event.query.toLowerCase());
-				});
-			}
+			_filteredCountries =
+				event.query.trim().length === 0
+					? [...countries]
+					: countries.filter((country) => {
+							return country.name.toLowerCase().startsWith(event.query.toLowerCase());
+					  });
 
 			setFilteredCountries(_filteredCountries);
 		}, 250);
@@ -127,7 +126,7 @@ export function PFormAutoCompleteContries({
 							)}
 							disabled={disabled}
 							onChange={(e) => {
-								field.onChange(e.value);
+								field.onChange(e?.value?.name);
 							}}
 							selectedItemTemplate={selectedCountryTemplate}
 							itemTemplate={itemTemplate}

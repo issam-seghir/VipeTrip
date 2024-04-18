@@ -17,6 +17,7 @@ export function PFormTextField({
 	toogleMask = false,
 	errorMessage,
 	disabled = false,
+	clearIconSpace = false,
 }) {
 	const sizeClass = `p-inputtext-${size}`;
 	const [showPassword, setShowPassword] = useState(false);
@@ -67,6 +68,7 @@ export function PFormTextField({
 							onChange={(e) => {
 								field.onChange(e.target.value);
 							}}
+							style={{ paddingInlineEnd: clearIconSpace ? "0.9375rem" : "revert-layer" }}
 						/>
 						{toogleMask && type === "password" ? (
 							// eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions

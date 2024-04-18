@@ -14,7 +14,6 @@ export function PFormAutoCompleteContries({
 	size,
 	iconStart,
 	errorMessage,
-	forceSelection = false,
 	disabled = false,
 }) {
 	const [countries, setCountries] = useState([]);
@@ -98,7 +97,7 @@ export function PFormAutoCompleteContries({
 							inputId={field.name}
 							inputRef={field.ref}
 							dropdown
-							value={field.value}
+							value={field?.value}
 							inputClassName="input-autocmplete-location"
 							suggestions={filteredCountries}
 							completeMethod={search}
@@ -110,6 +109,9 @@ export function PFormAutoCompleteContries({
 							)}
 							disabled={disabled}
 							onChange={(e) => {
+								field.onChange(e?.value);
+							}}
+							onSelect={(e) => {
 								field.onChange(e?.value?.name);
 							}}
 							itemTemplate={itemTemplate}

@@ -22,7 +22,7 @@ export function Footer() {
 				Repo
 			</a>
 			<a href="#" className="md:text-sm text-xs flex justify-content-start align-itmes-stretch mx-2 mb-3">
-				© 2024 VipeTrip By Issam Seghir
+				© 2024 VipeTrip By Issam Seghir 🚀
 			</a>
 		</footer>
 	);

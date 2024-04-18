@@ -218,10 +218,11 @@ export function RegisterForm() {
 						iconStart={"pi-map-marker"}
 						label="Location"
 						size={"lg"}
-						forceSelection={true}
 						errorMessage={errorMessage}
 					/>
-					<div className="flex gap-2 align-items-center justify-content-between mb-4"></div>
+					<div className="mb-2 mx-3 text-center" style={{ textWrap: "balance" }}>
+						By signing up, you agree to our Terms , Privacy Policy .
+					</div>
 
 					<Button
 						label={isRegisterLoading ? "Loading..." : "Sign Up"}
@@ -238,14 +239,14 @@ export function RegisterForm() {
 					<Divider align="center">
 						<span>or you can sign up with </span>
 					</Divider>
-						<SocialAuth />
-						<Button
-							link
-							className="text-xs sm:text-base font-small px-0 md:px-2 underline ml-2  text-left cursor-pointer"
-							onClick={() => navigate("/")}
-						>
-							{"Already have an account? Login here."}
-						</Button>
+					<SocialAuth />
+					<Button
+						link
+						className="text-xs sm:text-base font-small px-0 md:px-2 underline ml-2  text-left cursor-pointer"
+						onClick={() => navigate("/")}
+					>
+						{"Already have an account? Login here."}
+					</Button>
 				</div>
 			</form>
 		</>

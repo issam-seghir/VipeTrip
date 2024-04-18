@@ -8,6 +8,14 @@
 		"job": "Implementation Specialist"
 	},
 	{
+		"firstName": "lorando",
+		"lastName": "decabrio",
+		"email": "lorando@gmail.com",
+		"password": "LoranDo@99",
+		"location": "Algeria",
+		"job": "Software enginner"
+	},
+	{
 		"firstName": "Jacey",
 		"lastName": "Miller",
 		"email": "Jacey_Miller@hotmail.com",

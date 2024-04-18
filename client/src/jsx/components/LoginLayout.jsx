@@ -36,7 +36,7 @@ export function LoginLayout({ formType = "login", children }) {
 	return (
 		<div className="flex viewport">
 			<div className="flex flex-column" style={{ flex: "50%" }}>
-				<div className="flex-center" style={{ flex: "50%" }}>
+				<div className="flex-center p-5" style={{ flex: "50%" }}>
 					<div className="surface-card px-4 py-4 w-11 shadow-2 border-round sm:w-9 md:w-8 lg:w-9  xl:w-8 ">
 						<div className="flex-center mb-4">
 							<Logo className={"surface-card logo"} style={{ transition: "all 2s linear" }} />

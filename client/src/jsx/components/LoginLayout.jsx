@@ -55,7 +55,7 @@ export function LoginLayout({ formType = "login", children }) {
 								<div className="text-900 mb-2 lg:text-3xl md:text-2xl text-xl text-primary font-medium">
 									Set new Password
 								</div>
-							) : (
+							) : formType === "forget-password-request" ? (
 								<>
 									<div className="text-900 mb-2 lg:text-3xl md:text-2xl text-xl text-primary font-medium">
 										Forgot Your Password ?
@@ -63,6 +63,18 @@ export function LoginLayout({ formType = "login", children }) {
 									<div className="text-500 lg:text-xl md:text-md text-sm font-medium">
 										Enter your email below to receive a password reset link.
 									</div>
+								</>
+							) : (
+								<>
+									<div className="text-center flex-center flex-column gap-1">
+										<div className="text-900 mb-2 lg:text-3xl md:text-2xl text-xl font-medium">
+											Your New Social Trip
+										</div>
+										<div className="text-900 lg:text-3xl md:text-2xl text-xl font-medium">
+											Starts With <span className="text-primary text-animate">VipeTrip</span>
+										</div>
+									</div>
+
 								</>
 							)}
 						</div>

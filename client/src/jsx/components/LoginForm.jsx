@@ -3,7 +3,6 @@ import { DevTool } from "@hookform/devtools";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useCheckEmailExistsQuery, useLoginMutation } from "@jsx/store/api/authApi";
 import { setCredentials } from "@jsx/store/slices/authSlice";
-import { useIsAppleDevice } from "@jsx/utils/hooks/useIsAppleDevice";
 import { useDebounce, useMediaQuery } from "@uidotdev/usehooks";
 import { loginSchema } from "@validations/authSchema";
 import { Button } from "primereact/button";
@@ -15,6 +14,7 @@ import { useDispatch } from "react-redux";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { PFormCheckBox } from "./Form/PFormCheckBox";
 import { PFormTextField } from "./Form/PFormTextField";
+import { SocialAuth } from "./SocialAuth";
 
 export function LoginForm() {
 	const navigate = useNavigate();
@@ -22,7 +22,6 @@ export function LoginForm() {
 	let from = location.state?.from?.pathname || "/home";
 
 	const isNonMobile = useMediaQuery("(min-width:600px)");
-	const isAppleDevice = useIsAppleDevice();
 
 	const dispatch = useDispatch();
 	const toast = useRef(null);
@@ -95,24 +94,7 @@ export function LoginForm() {
 	const onSubmit = (data) => {
 		handleLogin(data);
 	};
-	// In your UI code, after the user is redirected back to your site
-	// async function handleGoogleLogin() {
-	// 	try {
-	// 		const res = await googleLogin();
-	// 		if (res) {
-	// 			dispatch(setCredentials({ user: res?.user, token: res?.token }));
-	// 			reset();
-	// 			navigate(from, { replace: true });
-	// 		}
-	// 	} catch (error) {
-	// 		console.error(error);
-	// 		toast.current.show({
-	// 			severity: "error",
-	// 			summary: "Login Failed 💢",
-	// 			detail: error?.data?.message || "email or password not correct",
-	// 		});
-	// 	}
-	// }
+
 	return (
 		<>
 			{/* react hook form dev tool  */}
@@ -175,40 +157,7 @@ export function LoginForm() {
 					<Divider align="center">
 						<span>or you can sign in with </span>
 					</Divider>
-					<div className="flex gap-4 justify-content-center">
-						<a href={`${import.meta.env.VITE_SERVER_URL}/api/v1/auth/login/google`}>
-							<i
-								className="pi pi-google hover:text-primary  "
-								style={{ fontSize: "1.5rem", transition: "all .2s linear" }}
-							/>
-						</a>
-						{isAppleDevice && (
-							<a href={`${import.meta.env.VITE_SERVER_URL}/api/v1/auth/login/apple`}>
-								<i
-									className="pi pi-apple hover:text-primary "
-									style={{ fontSize: "1.5rem", transition: "all .2s linear" }}
-								/>
-							</a>
-						)}
-						<a href={`${import.meta.env.VITE_SERVER_URL}/api/v1/auth/login/facebook`}>
-							<i
-								className="pi pi-facebook hover:text-primary  "
-								style={{ fontSize: "1.5rem", transition: "all .2s linear" }}
-							/>
-						</a>
-						<a href={`${import.meta.env.VITE_SERVER_URL}/api/v1/auth/login/linkedin`}>
-							<i
-								className="pi pi-linkedin hover:text-primary "
-								style={{ fontSize: "1.5rem", transition: "all .2s linear" }}
-							/>
-						</a>
-						<a href={`${import.meta.env.VITE_SERVER_URL}/api/v1/auth/login/github`}>
-							<i
-								className="pi pi-github hover:text-primary "
-								style={{ fontSize: "1.5rem", transition: "all .2s linear" }}
-							/>
-						</a>
-					</div>
+					<SocialAuth />
 					<p>
 						<Button
 							link

@@ -22,27 +22,28 @@ import { AutoCompleteContries } from "@jsx/components/Form/PFormAutoCompleteCont
 
 export function RegisterForm() {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
 
   const isAppleDevice = useIsAppleDevice();
   const isNonMobile = useMediaQuery("(min-width:600px)");
+
+  const dispatch = useDispatch();
   const toast = useRef(null);
 
   const [register, { error: registerError, isLoading: isRegisterLoading }] =
     useRegisterMutation();
   const {
-    handleSubmit,
-    reset,
-    setValue,
-    watch,
-    control,
-    getValues,
-    register: formRegister,
-    trigger,
-    formState: { errors, isSubmitting },
+		handleSubmit,
+		reset,
+		setValue,
+		watch,
+		control,
+		getValues,
+		register: formRegister,
+		trigger,
+		formState: { errors, isSubmitting },
   } = useForm({
-    mode: "onBlur",
-    resolver: zodResolver(registerSchema),
+		mode: "onChange",
+		resolver: zodResolver(registerSchema),
   });
 
   useFormPersist("registerForm", {

@@ -31,13 +31,14 @@ const passportConfig = (passport) => {
 					if (!user) {
 						// The account at Google has not logged in to this app before.  Create a
 						// new user record and associate it with the Google account.
-						const randomPass = generateHashedToken(20);
+						// const randomPass = generateHashedToken(20);
+						// password: bcrypt.hashSync(randomPass, 10),
 						user = new User({
 							firstName: name?.givenName,
 							lastName: name?.familyName,
 							email,
 							picturePath: picture,
-							password: bcrypt.hashSync(randomPass, 10),
+							password: null,
 						});
 					}
 					const existingAccount = user.socialAccounts.find(
@@ -97,14 +98,15 @@ const passportConfig = (passport) => {
 					if (!user) {
 						// The account at Facebook has not logged in to this app before.  Create a
 						// new user record and associate it with the Facebook account.
-						const randomPass = generateHashedToken(20);
+						// const randomPass = generateHashedToken(20);
+						// password: bcrypt.hashSync(randomPass, 10),
 						user = new User({
 							firstName: first_name,
 							lastName: last_name,
 							email,
 							location: location,
 							picturePath: picture,
-							password: bcrypt.hashSync(randomPass, 10),
+							password: null,
 						});
 					}
 					// Add a new entry to the socialAccounts array
@@ -148,7 +150,8 @@ const passportConfig = (passport) => {
 					if (!user) {
 						// The account at Github has not logged in to this app before.  Create a
 						// new user record and associate it with the Github account.
-						const randomPass = generateHashedToken(20);
+						// const randomPass = generateHashedToken(20);
+						// password: bcrypt.hashSync(randomPass, 10),
 						const nameParts = displayName.split(" ");
 						let firstName, lastName;
 
@@ -166,7 +169,7 @@ const passportConfig = (passport) => {
 							email,
 							location,
 							picturePath: avatar_url,
-							password: bcrypt.hashSync(randomPass, 10),
+							password: null,
 						});
 					}
 					// Add a new entry to the socialAccounts array
@@ -212,15 +215,15 @@ const passportConfig = (passport) => {
 					if (!user) {
 						// The account at Github has not logged in to this app before.  Create a
 						// new user record and associate it with the Github account.
-						const randomPass = generateHashedToken(20);
-
+						// const randomPass = generateHashedToken(20);
+						// password: bcrypt.hashSync(randomPass, 10),
 
 						user = new User({
 							firstName: givenName,
 							lastName: familyName,
 							email,
 							picturePath: picture,
-							password: bcrypt.hashSync(randomPass, 10),
+							password: null,
 						});
 					}
 					// Add a new entry to the socialAccounts array

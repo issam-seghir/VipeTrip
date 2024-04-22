@@ -95,31 +95,14 @@ export function RegisterForm() {
 	async function handleRegister(data) {
 		try {
 			console.log(data);
-			// the file picture will be added in FormData
-			const formData = new FormData();
-			// Append all form data to formData
-			for (const key in data) {
-				if (key !== "picture") {
-					// Skip picture field
-					formData.append(key, data[key]);
-				}
-			}
-
-			// Append file to formData
-			const file = data?.picture[0];
-			if (file) {
-				formData.append("picture", file);
-			}
-
-			logFormData(formData);
-			const res = await register(formData).unwrap();
+			const res = await register(data).unwrap();
 
 			if (res) {
 				console.log(res);
 				toast.current.show({
 					severity: "success",
 					summary: "Successful Sign up 🚀",
-					detail: `Welcome ${res.user.name} 👋`,
+					detail: `Welcome ${res?.user?.name || "Unknown"} 👋`,
 				});
 				reset();
 				navigate("/home");
@@ -135,8 +118,6 @@ export function RegisterForm() {
 	}
 
 	const onSubmit = (data) => {
-		// console.log(getValues());
-		// console.log(data);
 		handleRegister(data);
 	};
 

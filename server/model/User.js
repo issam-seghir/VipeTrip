@@ -1,9 +1,11 @@
 const mongoose = require("mongoose");
 const { normalize } = require("@utils/plugins");
+const mongooseAlgolia = require("@avila-tek/mongoose-algolia").algoliaIntegration;
+const { ENV } = require("@/validations/envSchema");
 
 const Schema = mongoose.Schema;
 
-const userSchema = new Schema(
+let userSchema = new Schema(
 	{
 		firstName: {
 			type: String,
@@ -82,6 +84,39 @@ const userSchema = new Schema(
 // normalize : remove _id and __v and private field  from the response
 userSchema.plugin(normalize);
 
+// Algolia Search Plugin
+userSchema.plugin(mongooseAlgolia, {
+	appId: ENV.ALGOLIA_APP_ID,
+	apiKey: ENV.ALGOLIA_ADMIN_API_KEY,
+	indexName: "users", //The name of the index in Algolia, you can also pass in a function
+	selector: "-password -socialAccounts.accessToken", //You can decide which field that are getting synced to Algolia (same as selector in mongoose)
+	// populate: {
+	// 	path: "comments",
+	// 	select: "author",
+	// },
+	defaults: {
+		firstName: "unknown",
+		lastName: "unknown",
+		job: "unknown",
+		location: "unknown",
+	},
+	// mappings: {
+	// 	name: function (value) {
+	// 		//Value is the 'name' object
+	// 		return `${value.firstName} ${value.lastName}`; //ES6 is awesome :)
+	// 	},
+	// },
+	// virtuals: {
+	// 	whatever: function (doc) {
+	// 		return `Custom data ${doc.title}`;
+	// 	},
+	// },
+	// filter: function (doc) {
+	// 	return !doc.softdelete;
+	// },
+	debug: true, // Default: false -> If true operations are logged out in your console
+});
+
 //? --------- instance method ----------------
 
 // instance methode to increment viewedProfile
@@ -107,5 +142,20 @@ userSchema.virtual("fullName").get(function () {
 });
 
 //? --------- validations methods ----------------
+
+let User = mongoose.model("User", userSchema);
+
+User.SetAlgoliaSettings({
+	searchableAttributes: [
+		"name",
+		"displayName",
+		"job",
+		"location",
+		"profileId",
+		"totalPosts",
+		"impressions",
+		"viewedProfile",
+	], //Sets the settings for this schema, see [Algolia's Index settings parameters](https://www.algolia.com/doc/api-client/javascript/settings#set-settings) for more info.
+});
 
 module.exports = mongoose.model("User", userSchema);

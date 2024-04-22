@@ -277,7 +277,8 @@ router.get("/check-email", checkEmailExists);
 router.post("/forget", validate(resetPasswordRequestSchema), resetPasswordRequest);
 router.post("/reset", validate(resetPasswordSchema), resetPassword);
 
-router.post("/register", upload.single("picture"), multerErrorHandler(upload), validate(registerSchema), handleNewUser);
+router.post("/register", validate(registerSchema), handleNewUser);
+// router.post("/register", upload.single("picture"), multerErrorHandler(upload), validate(registerSchema), handleNewUser);
 
 router.get("/refresh", handleRefreshToken);
 router.post("/logout", handleLogout);

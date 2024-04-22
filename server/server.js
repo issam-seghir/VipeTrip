@@ -26,6 +26,7 @@ const { normalize } = require("@utils/plugins");
 const passport = require("passport");
 const {passportConfig} = require("@config/PassportjsConfig");
 
+
 // global mongoose plugins
 mongoose.plugin(normalize);
 

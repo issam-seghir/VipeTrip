@@ -82,6 +82,8 @@ const envSchema = z.object({
 	LINKEDIN_CLIENT_ID: stringNonEmpty(),
 	LINKEDIN_CLIENT_SECRET: stringNonEmpty(),
 	LINKEDIN_REDIRECT_URI: stringNonEmpty().url(),
+	ALGOLIA_APP_ID: stringNonEmpty(),
+	ALGOLIA_ADMIN_API_KEY: stringNonEmpty(),
 	CLEINT_URL: stringNonEmpty().url(),
 	PORT: z.preprocess((x) => x || undefined, numberSchema.min(1).max(65_536).default(3000)),
 });

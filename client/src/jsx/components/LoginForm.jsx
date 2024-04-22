@@ -15,6 +15,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { PFormCheckBox } from "./Form/PFormCheckBox";
 import { PFormTextField } from "./Form/PFormTextField";
 import { SocialAuth } from "./SocialAuth";
+import { LoadingSpinner } from "./LoadingSpinner";
 
 export function LoginForm() {
 	const navigate = useNavigate();
@@ -153,6 +154,7 @@ export function LoginForm() {
 							<polyline points="179,1 179,59 1,59 1,1 179,1" className="bg-line" />
 							<polyline points="179,1 179,59 1,59 1,1 179,1" className="hl-line" />
 						</svg>
+						{/* {!isLoginLoading ? <LoadingSpinner /> : ""} */}
 					</Button>
 					<Divider align="center">
 						<span>or you can sign in with </span>

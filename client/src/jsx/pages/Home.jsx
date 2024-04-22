@@ -11,13 +11,6 @@ import { useRef } from "react";
 const HomePage = () => {
 	const isNonMobileScreens = useMediaQuery("(min-width:1000px)");
 	const { id, picturePath, fullName } = useSelector((state) => state.store.auth.user);
-	const toast = useRef(null);
-
-// toast.current.show({
-// 	severity: "success",
-// 	summary: "Successful Log in 🚀",
-// 	detail: `Welcome ${fullName} 👋`,
-// });
 	return (
 		<Box>
 			<Navbar />

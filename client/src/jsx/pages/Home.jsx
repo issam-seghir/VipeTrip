@@ -7,6 +7,7 @@ import { Box, useMediaQuery } from "@mui/material";
 import { useSelector } from "react-redux";
 import { Toast } from "primereact/toast";
 import { useRef } from "react";
+import { AlgoliaSearchBar } from "@components/AlgoliaSearchBar";
 
 const HomePage = () => {
 	const isNonMobileScreens = useMediaQuery("(min-width:1000px)");
@@ -14,7 +15,15 @@ const HomePage = () => {
 	return (
 		<Box>
 			<Navbar />
-			<Box width="100%" padding="2rem 6%" display={isNonMobileScreens ? "flex" : "block"} gap="0.5rem" justifyContent="space-between">
+			<AlgoliaSearchBar />
+
+			<Box
+				width="100%"
+				padding="2rem 6%"
+				display={isNonMobileScreens ? "flex" : "block"}
+				gap="0.5rem"
+				justifyContent="space-between"
+			>
 				<Box flexBasis={isNonMobileScreens ? "26%" : undefined}>
 					{/* <UserWidget userId={_id} picturePath={picturePath} /> */}
 				</Box>

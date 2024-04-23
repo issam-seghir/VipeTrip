@@ -145,17 +145,17 @@ userSchema.virtual("fullName").get(function () {
 
 let User = mongoose.model("User", userSchema);
 
-User.SetAlgoliaSettings({
-	searchableAttributes: [
-		"name",
-		"displayName",
-		"job",
-		"location",
-		"profileId",
-		"totalPosts",
-		"impressions",
-		"viewedProfile",
-	], //Sets the settings for this schema, see [Algolia's Index settings parameters](https://www.algolia.com/doc/api-client/javascript/settings#set-settings) for more info.
-});
+// User.SetAlgoliaSettings({
+// 	searchableAttributes: [
+// 		"name",
+// 		"displayName",
+// 		"job",
+// 		"location",
+// 		"profileId",
+// 		"totalPosts",
+// 		"impressions",
+// 		"viewedProfile",
+// 	], //Sets the settings for this schema, see [Algolia's Index settings parameters](https://www.algolia.com/doc/api-client/javascript/settings#set-settings) for more info.
+// });
 
-module.exports = mongoose.model("User", userSchema);
+module.exports = User;

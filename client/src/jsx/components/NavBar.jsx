@@ -64,18 +64,17 @@ export default function CustomDemo() {
 	);
 
 	const centerContent =
-		<AlgoliaSearchBar/>
-		// <div className="flex flex-wrap align-items-center gap-3">
-		// 	<button className="p-link inline-flex justify-content-center align-items-center text-white h-3rem w-3rem border-circle hover:bg-white-alpha-10 transition-all transition-duration-200">
-		// 		<i className="pi pi-home text-2xl"></i>
-		// 	</button>
-		// 	<button className="p-link inline-flex justify-content-center align-items-center text-white h-3rem w-3rem border-circle hover:bg-white-alpha-10 transition-all transition-duration-200">
-		// 		<i className="pi pi-user text-2xl"></i>
-		// 	</button>
-		// 	<button className="p-link inline-flex justify-content-center align-items-center text-white h-3rem w-3rem border-circle hover:bg-white-alpha-10 transition-all transition-duration-200">
-		// 		<i className="pi pi-search text-2xl"></i>
-		// 	</button>
-		// </div>
+		<div className="flex flex-wrap align-items-center gap-3">
+			<button className="p-link inline-flex justify-content-center align-items-center text-white h-3rem w-3rem border-circle hover:bg-white-alpha-10 transition-all transition-duration-200">
+				<i className="pi pi-home text-2xl"></i>
+			</button>
+			<button className="p-link inline-flex justify-content-center align-items-center text-white h-3rem w-3rem border-circle hover:bg-white-alpha-10 transition-all transition-duration-200">
+				<i className="pi pi-user text-2xl"></i>
+			</button>
+			<button className="p-link inline-flex justify-content-center align-items-center text-white h-3rem w-3rem border-circle hover:bg-white-alpha-10 transition-all transition-duration-200">
+				<i className="pi pi-search text-2xl"></i>
+			</button>
+		</div>
 
 	const endContent = (
 		<React.Fragment>

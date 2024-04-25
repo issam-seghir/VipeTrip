@@ -63,6 +63,7 @@
 		"vite-plugin-svgr": "^4.2.0"
 	},
 	"dependencies": {
+		"@algolia/autocomplete-js": "^1.17.0",
 		"@hookform/resolvers": "^3.3.3",
 		"@mui/icons-material": "^5.15.2",
 		"@reduxjs/toolkit": "^2.0.1",

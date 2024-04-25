@@ -2,8 +2,6 @@ import { FormLabel, Slider } from "@mui/material";
 import React, { useEffect } from "react";
 import { Controller } from "react-hook-form";
 
-
-
 //? --------------- Usage ---------------
 
 /*
@@ -19,8 +17,7 @@ import { Controller } from "react-hook-form";
 		/>
 */
 
-
-export const FormInputSlider = ({ name, control, setValue,defaultValue, label,sx }) => {
+export const FormInputSlider = ({ name, control, setValue, defaultValue, label, sx }) => {
 	const [sliderValue, setSliderValue] = React.useState(30);
 
 	useEffect(() => {
@@ -34,7 +31,23 @@ export const FormInputSlider = ({ name, control, setValue,defaultValue, label,sx
 	return (
 		<>
 			<FormLabel component="legend">{label}</FormLabel>
-			<Controller name={name} defaultValue={defaultValue} control={control} render={({ field, fieldState, formState }) => <Slider {...field} value={sliderValue} onChange={handleChange} valueLabelDisplay="auto" min={0} max={100} step={1} sx={sx} />} />
+			<Controller
+				name={name}
+				defaultValue={defaultValue}
+				control={control}
+				render={({ field, fieldState, formState }) => (
+					<Slider
+						{...field}
+						value={sliderValue}
+						onChange={handleChange}
+						valueLabelDisplay="auto"
+						min={0}
+						max={100}
+						step={1}
+						sx={sx}
+					/>
+				)}
+			/>
 		</>
 	);
 };

@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const { normalize } = require("@utils/plugins");
-const mongooseAlgolia = require("@avila-tek/mongoose-algolia").algoliaIntegration;
+const mongooseAlgolia = require("@issam-seghir/mongoose-algolia").algoliaIntegration;
 const { ENV } = require("@/validations/envSchema");
 
 const Schema = mongoose.Schema;
@@ -89,32 +89,13 @@ userSchema.plugin(mongooseAlgolia, {
 	appId: ENV.ALGOLIA_APP_ID,
 	apiKey: ENV.ALGOLIA_ADMIN_API_KEY,
 	indexName: "users", //The name of the index in Algolia, you can also pass in a function
-	selector: "-password -socialAccounts.accessToken", //You can decide which field that are getting synced to Algolia (same as selector in mongoose)
-	// populate: {
-	// 	path: "comments",
-	// 	select: "author",
-	// },
-	defaults: {
-		firstName: "unknown",
-		lastName: "unknown",
-		job: "unknown",
-		location: "unknown",
-	},
-	// mappings: {
-	// 	name: function (value) {
-	// 		//Value is the 'name' object
-	// 		return `${value.firstName} ${value.lastName}`; //ES6 is awesome :)
-	// 	},
-	// },
-	// virtuals: {
-	// 	whatever: function (doc) {
-	// 		return `Custom data ${doc.title}`;
-	// 	},
+	selector: "-password -email -rememberMe -socialAccounts.accessToken -refreshToken", //  You can decide which field that are getting synced to Algolia (same as selector in mongoose)
+	// If you want to prevent some documents from being synced to algolia
 	// },
 	// filter: function (doc) {
 	// 	return !doc.softdelete;
 	// },
-	debug: true, // Default: false -> If true operations are logged out in your console
+	debug: true, //  logged out in your console
 });
 
 //? --------- instance method ----------------
@@ -141,20 +122,19 @@ userSchema.virtual("fullName").get(function () {
 	return this.firstName + " " + this.lastName;
 });
 
-//? --------- validations methods ----------------
-
 let User = mongoose.model("User", userSchema);
+
+User.syncToAlgolia()
+	.then(() => {
+		console.log("All users have been synced to Algolia");
+	})
+	.catch((error) => {
+		console.error("Error syncing users to Algolia", error);
+	});
 
 // User.SetAlgoliaSettings({
 // 	searchableAttributes: [
-// 		"name",
-// 		"displayName",
-// 		"job",
-// 		"location",
-// 		"profileId",
-// 		"totalPosts",
-// 		"impressions",
-// 		"viewedProfile",
+//	...
 // 	], //Sets the settings for this schema, see [Algolia's Index settings parameters](https://www.algolia.com/doc/api-client/javascript/settings#set-settings) for more info.
 // });
 

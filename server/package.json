@@ -46,6 +46,7 @@
 	"dependencies": {
 		"@anatine/zod-mock": "^3.13.3",
 		"@avila-tek/mongoose-algolia": "^1.6.0",
+		"@issam-seghir/mongoose-algolia": "^1.6.0",
 		"@rimiti/express-async": "^1.2.0",
 		"@sendgrid/mail": "^8.1.1",
 		"algoliasearch": "^4.23.3",

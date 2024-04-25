@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 const autopopulate = require("mongoose-autopopulate");
+const mongooseAlgolia = require("@issam-seghir/mongoose-algolia").algoliaIntegration;
+const { ENV } = require("@/validations/envSchema");
 
 const Schema = mongoose.Schema;
 
@@ -60,10 +62,34 @@ const postSchema = new Schema(
 	{ timestamps: true }
 );
 
-
-
-
-
+// Algolia Search Plugin
 postSchema.plugin(autopopulate);
 
-module.exports = mongoose.model("Post", postSchema);
+postSchema.plugin(mongooseAlgolia, {
+	appId: ENV.ALGOLIA_APP_ID,
+	apiKey: ENV.ALGOLIA_ADMIN_API_KEY,
+	indexName: "posts", //The name of the index in Algolia, you can also pass in a function
+	selector: "-password -email -rememberMe -socialAccounts.accessToken -refreshToken", //  You can decide which field that are getting synced to Algolia (same as selector in mongoose)
+	populate: {
+		path: "userId",
+		select: "author",
+	},
+	// If you want to prevent some documents from being synced to algolia
+	// },
+	// filter: function (doc) {
+	// 	return !doc.softdelete;
+	// },
+	debug: true, //  logged out in your console
+});
+
+let Post = mongoose.model("Post", postSchema);
+
+Post.syncToAlgolia()
+	.then(() => {
+		console.log("All posts have been synced to Algolia");
+	})
+	.catch((error) => {
+		console.error("Error syncing posts to Algolia", error);
+	});
+
+module.exports = Post;

@@ -1,58 +1,91 @@
+import { RelevantSort } from "@jsx/components/RelevantSort";
 import algoliasearch from "algoliasearch/lite";
+import { Button } from "primereact/button";
+import { Checkbox } from "primereact/checkbox";
+import { TabPanel, TabView } from "primereact/tabview";
+import { classNames } from "primereact/utils";
+import { useState } from "react";
 import {
+	ClearRefinements,
 	Configure,
+	CurrentRefinements,
 	Highlight,
 	Hits,
+	HitsPerPage,
+	InfiniteHits,
 	InstantSearch,
 	Pagination,
+	PoweredBy,
 	RefinementList,
 	SearchBox,
-	Snippet,
 	SortBy,
-	PoweredBy,
-	HitsPerPage,
-	ClearRefinements,
-	CurrentRefinements,
+	Stats
 } from "react-instantsearch";
 import { Panel } from "./Panel";
 import { RefrechAlgolia } from "./RefrechAlgolia";
-import { QueryRuleContext } from "./QueryRuleContext";
 
 const searchClient = algoliasearch(import.meta.env.VITE_ALGOLIA_APP_ID, import.meta.env.VITE_ALOGOLIA_SEARCH_API);
 const index = searchClient.initIndex(import.meta.env.VITE_ALGOLIA_INDEX_NAME);
 
 function Hit({ hit }) {
 	return (
-		<div className="border-100 border-round-lg">
-			<Snippet hit={hit} attribute="firstName" />
-			<img
-				src={hit.picturePath}
-				alt={hit.name}
-				height={"40px"}
-				width={"40px"}
-				className="border-100 border-round-lg"
-			/>
-			<Highlight attribute="firstName" hit={hit} className="bg-blue-500" />
-			<div>{hit.lastName}</div>
-			<div>job :{hit.job}</div>
-			<hr className="" />
-			<div>from : {hit.location}</div>
-			<div>totalPosts : {hit.totalPosts}</div>
-			<div>viewedProfile : {hit.viewedProfile}</div>
-			<div>impressions : {hit.impressions}</div>
-			{/* Add more fields as necessary */}
+		<div className="col-12" key={hit._id}>
+			<div
+				className={classNames("flex flex-column xl:flex-row xl:align-items-start p-4 gap-4", {
+					"border-top-1 surface-border": hit.__position !== 0,
+				})}
+			>
+				<img
+					className="w-9 sm:w-16rem xl:w-10rem shadow-2 block xl:block mx-auto border-round"
+					src={hit.picturePath}
+					alt={hit.name}
+				/>
+				<div className="flex flex-column sm:flex-row justify-content-between align-items-center xl:align-items-start flex-1 gap-4">
+					<div className="flex flex-column align-items-center sm:align-items-start gap-3">
+						<Highlight attribute="firstName" hit={hit} className="text-md bg-blue-400 font-bold text-900" />
+						{/* <Snippet hit={hit} attribute="description" /> */}
+						<div>{hit.lastName}</div>
+						<div>job :{hit.job}</div>
+						<div className="flex flex-column align-items-center gap-3">
+							<span className="flex align-items-center gap-2">
+								<i className="pi pi-tag"></i>
+								<span className="font-semibold">{hit.location}</span>
+							</span>
+							<div>totalPosts : {hit.totalPosts}</div>
+							<div>viewedProfile : {hit.viewedProfile}</div>
+							<div>impressions : {hit.impressions}</div>
+						</div>
+					</div>
+
+					<Button
+						className="p-button-rounded"
+						// disabled={product.inventoryStatus === "OUTOFSTOCK"}
+					>
+						Add Friend
+					</Button>
+				</div>
+			</div>
 		</div>
 	);
 }
+const TextComponent = ({ isRelevantSorted }) => (
+	<p>
+		{isRelevantSorted
+			? "We removed some search results to show you the most relevant ones"
+			: "Currently showing all results"}
+	</p>
+);
+
+const ButtonTextComponent = ({ isRelevantSorted }) => (
+	<span>{isRelevantSorted ? "See all results" : "See relevant results"}</span>
+);
 
 export function AlgoliaSearchBar() {
+	const [checked, setChecked] = useState(false);
+	 const [activeIndex, setActiveIndex] = useState(0);
+	 const usersTab = activeIndex === 0;
 	return (
-		<InstantSearch
-			searchClient={searchClient}
-			indexName={import.meta.env.VITE_ALGOLIA_INDEX_NAME}
-			routing={true}
-			insights={true}
-		>
+		<InstantSearch searchClient={searchClient} indexName={usersTab? "users" : "posts"} routing={true} insights={true}>
 			<Configure hitsPerPage={5} />
 			{/* filter section  */}
 			<Panel header="location">
@@ -77,11 +110,24 @@ export function AlgoliaSearchBar() {
 				/>
 				<div className="Search-header">
 					<PoweredBy />
+					<div className="flex align-items-center">
+						<Checkbox
+							inputId="infinteScrolling"
+							name="infinteScrolling"
+							onChange={(e) => setChecked(e.checked)}
+							checked={checked}
+						/>
+
+						<label htmlFor="infinteScrolling" className="ml-2">
+							Infinte Scrolling
+						</label>
+					</div>
 					<HitsPerPage
 						items={[
 							{ label: "10 hits per page", value: 10, default: true },
 							{ label: "20 hits per page", value: 20 },
 						]}
+						hidden={checked}
 					/>
 					{/* create two replicate  "dev_vipetrip_totalPosts_asc" & "dev_vipetrip_totalPosts_desc" in "dev_vipetrip" index*/}
 					{/* in "ranking and sorting" config for each one of the replacte add "sortingBy attribute" as "totalPosts" with "asc" or "desc" */}
@@ -96,12 +142,12 @@ export function AlgoliaSearchBar() {
 					<SortBy
 						defaultRefinement="dev_vipetrip"
 						items={[
-							{ value: "dev_vipetrip", label: "Sort by Impressions" },
-							{ value: "dev_vipetrip_impressions_desc", label: "Most Impressions" },
-							{ value: "dev_vipetrip_impressions_asc", label: "Less Impressions" },
+							{ value: "dev_vipetrip", label: "Relevent Impressions" },
+							{ value: "dev_vipetrip_impressions_desc", label: "Relevent Sort : Most Impressions" },
+							{ value: "dev_vipetrip_impressions_asc", label: "Relevent Sort : Less Impressions" },
 						]}
 					/>
-
+					<RelevantSort textComponent={TextComponent} buttonTextComponent={ButtonTextComponent} />
 					<RefrechAlgolia />
 				</div>
 				<div className="CurrentRefinements">
@@ -122,26 +168,27 @@ export function AlgoliaSearchBar() {
 					/>
 				</div>
 
-				<QueryRuleContext
-					trackedFilters={{
-						location: () => ["Algeria"],
-					}}
-				/>
-
-				{/* <QueryRuleCustomData>
-					{({ items }) => (
-						<>
-							{items.map((item) => (
-								<a href={item.link} key={item.banner}>
-									<img src={item.banner} alt={item.title} />
-								</a>
-							))}
-						</>
-					)}
-				</QueryRuleCustomData> */}
+				<TabView activeIndex={activeIndex} onTabChange={(e) => setActiveIndex(e.index)}>
+					<TabPanel header="Users">
+						<Stats
+							translations={{
+								stats(nbHits, timeSpentMs) {
+									return `${nbHits} results found in ${timeSpentMs}ms`;
+								},
+							}}
+						/>
+						{checked ? (
+							<InfiniteHits showPrevious hitComponent={Hit} />
+						) : (
+							<>
+								<Hits hitComponent={Hit} />
+								<Pagination />
+							</>
+						)}
+					</TabPanel>
+					<TabPanel header="Posts"></TabPanel>
+				</TabView>
 			</div>
-			<Hits hitComponent={Hit} />
-			<Pagination />
 		</InstantSearch>
 	);
 }

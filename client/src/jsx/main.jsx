@@ -6,7 +6,9 @@ import { Provider as ReduxStoreProvider } from "react-redux";
 import PrivateRoute from "@components/PrivateRoute.jsx";
 import App from "@jsx/App.jsx";
 import { ForgetPasswordRequest } from "@pages/ForgetPasswordRequest";
-import Home from "@pages/Home";
+import {Home} from "@pages/Home";
+import { HomeLayout } from "@pages/HomeLayout";
+import {Explore} from "@pages/Explore";
 // import { Login } from "@pages/Login";
 import Profile from "@pages/Profile";
 import { Register } from "@pages/Register";
@@ -33,6 +35,26 @@ const Login = lazy(() => import("@pages/Login").then((module) => ({ default: mod
 // const Drawer = React.lazy(() => import("@pages/Drawer"));
 // const Customers = React.lazy(() => import("@pages/Customers"));
 // const Analytics = React.lazy(() => import("@pages/Analytics"));
+
+
+// Nested routes for HomeLayout
+const homeRoutes = [
+	{
+		path: "home",
+		element: <Home />,
+	},
+	{
+		path: "explore",
+		element: <Explore />,
+	},
+	{
+		path: "profile/:userId",
+		element: <Profile />,
+	},
+];
+
+
+
 export const router = createBrowserRouter(
 	[
 		{
@@ -67,14 +89,11 @@ export const router = createBrowserRouter(
 					element: <PrivateRoute />,
 					children: [
 						{
-							path: "home",
-							element: <Home />,
-						},
-						{
-							path: "profile/:userId",
-							element: <Profile />,
+							element: <HomeLayout />,
+							children: homeRoutes,
 						},
 					],
+
 				},
 			],
 		},

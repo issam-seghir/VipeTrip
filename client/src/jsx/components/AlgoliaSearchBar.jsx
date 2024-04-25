@@ -132,6 +132,7 @@ export function AlgoliaSearchBar() {
 	const usersTab = activeIndex === 0;
 	return (
 		<InstantSearch searchClient={searchClient} indexName={"users"} routing={true} insights={true}>
+			<Configure hitsPerPage={10}/>
 			{/* filter section  */}
 			<Panel header="location">
 				<RefinementList

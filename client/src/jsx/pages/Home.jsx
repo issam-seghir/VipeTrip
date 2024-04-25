@@ -9,12 +9,11 @@ import { Toast } from "primereact/toast";
 import { useRef } from "react";
 import { AlgoliaSearchBar } from "@components/AlgoliaSearchBar";
 
-const HomePage = () => {
+export const Home = () => {
 	const isNonMobileScreens = useMediaQuery("(min-width:1000px)");
 	const { id, picturePath, fullName } = useSelector((state) => state.store.auth.user);
 	return (
 		<Box>
-			<Navbar />
 			<AlgoliaSearchBar />
 
 			<Box
@@ -41,5 +40,3 @@ const HomePage = () => {
 		</Box>
 	);
 };
-
-export default HomePage;

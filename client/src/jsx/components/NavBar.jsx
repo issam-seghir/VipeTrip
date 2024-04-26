@@ -12,7 +12,8 @@ import { AlgoliaAutocomplete } from "./AlgoliaAutoComplete";
 import { useNavigate } from "react-router-dom";
 
 // const searchClient = algoliasearch(import.meta.env.VITE_ALGOLIA_APP_ID, import.meta.env.VITE_ALOGOLIA_SEARCH_API);
-const appId = "latency";
+const appId = "latency";import { Button } from "primereact/button";
+
 const apiKey = "6be0576ff61c053d5f9a3225e2a90f76";
 const searchClient = algoliasearch(appId, apiKey);
 
@@ -185,6 +186,7 @@ export default function CustomDemo() {
 
 	const endContent = (
 		<React.Fragment>
+			<Button raised={true} outlined rounded icon={"pi pi-moon"} />
 			<div className="card flex justify-content-center">
 				<Toast ref={toast}></Toast>
 				<Menu model={items} popup ref={menuLeft} id="popup_menu_left" />

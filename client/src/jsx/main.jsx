@@ -9,6 +9,7 @@ import { ForgetPasswordRequest } from "@pages/ForgetPasswordRequest";
 import {Home} from "@pages/Home";
 import { HomeLayout } from "@pages/HomeLayout";
 import {Explore} from "@pages/Explore";
+import {Notifications} from "@pages/Notifications";
 // import { Login } from "@pages/Login";
 import Profile from "@pages/Profile";
 import { Register } from "@pages/Register";
@@ -46,6 +47,10 @@ const homeRoutes = [
 	{
 		path: "explore",
 		element: <Explore />,
+	},
+	{
+		path: "notifications",
+		element: <Notifications />,
 	},
 	{
 		path: "profile/:userId",

@@ -160,6 +160,8 @@ body {
   }
   // Search box
   @at-root .aa-Form {
+    border-radius: .5rem;
+    padding-inline: .25rem;
     align-items: center;
     background-color: rgba(
       var(--aa-input-background-color-rgb),
@@ -167,7 +169,7 @@ body {
     );
     border: 1px solid
       rgba(var(--aa-input-border-color-rgb), var(--aa-input-border-color-alpha));
-    border-radius: 3px;
+    // border-radius: 3px;
     display: flex;
     line-height: 1em;
     margin: 0;
@@ -293,7 +295,7 @@ body {
         }
         svg {
           stroke-width: var(--aa-icon-stroke-width);
-          width: var(--aa-icon-size);
+          width: calc(var(--aa-icon-size) + 10px);
         }
       }
     }

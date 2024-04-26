@@ -2,11 +2,13 @@ import { autocomplete } from "@algolia/autocomplete-js";
 import React, { createElement, Fragment, useEffect, useRef } from "react";
 import { createRoot } from "react-dom/client";
 
+
 export function AlgoliaAutocomplete(props) {
 	const containerRef = useRef(null);
 	const panelRootRef = useRef(null);
 	const rootRef = useRef(null);
-
+    const className = props.className;
+console.log(className);
 	useEffect(() => {
 		if (!containerRef.current) {
 			return undefined;
@@ -33,5 +35,5 @@ export function AlgoliaAutocomplete(props) {
 		};
 	}, [props]);
 
-	return <div ref={containerRef} />;
+	return <div ref={containerRef} className={className} />;
 }

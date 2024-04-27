@@ -12,370 +12,92 @@ import Stories from "react-insta-stories";
 const users = [
 	{
 		name: "User 1",
+		id: 1,
 		profileImage: "https://picsum.photos/100/100",
-		stories: [
-			{
-				url: sectionImg1,
-				duration: 5000,
-				header: {
-					heading: "Mohit Karekar",
-					subheading: "Posted 30m ago",
-					profileImage: "https://picsum.photos/100/100",
-				},
-			},
-			{
-				url: sectionImg2,
-				duration: 5000,
-				header: {
-					heading: "Mohit Karekar",
-					subheading: "Posted 30m ago",
-					profileImage: "https://picsum.photos/100/100",
-				},
-			},
-			{
-				url: sectionImg3,
-				duration: 5000,
-				header: {
-					heading: "Mohit Karekar",
-					subheading: "Posted 30m ago",
-					profileImage: "https://picsum.photos/100/100",
-				},
-			},
-			{
-				url: sectionImg4,
-				duration: 5000,
-				header: {
-					heading: "Mohit Karekar",
-					subheading: "Posted 30m ago",
-					profileImage: "https://picsum.photos/100/100",
-				},
-			},
-			{
-				url: sectionImg5,
-				duration: 5000,
-				header: {
-					heading: "Mohit Karekar",
-					subheading: "Posted 30m ago",
-					profileImage: "https://picsum.photos/100/100",
-				},
-			},
-			// ... other stories
-		],
 	},
 	{
-		name: "User 1",
+		name: "User 2",
+		id: 2,
 		profileImage: "https://picsum.photos/100/100",
-		stories: [
-			{
-				url: sectionImg1,
-				duration: 5000,
-				header: {
-					heading: "Mohit Karekar",
-					subheading: "Posted 30m ago",
-					profileImage: "https://picsum.photos/100/100",
-				},
-			},
-			{
-				url: sectionImg2,
-				duration: 5000,
-				header: {
-					heading: "Mohit Karekar",
-					subheading: "Posted 30m ago",
-					profileImage: "https://picsum.photos/100/100",
-				},
-			},
-			{
-				url: sectionImg3,
-				duration: 5000,
-				header: {
-					heading: "Mohit Karekar",
-					subheading: "Posted 30m ago",
-					profileImage: "https://picsum.photos/100/100",
-				},
-			},
-			{
-				url: sectionImg4,
-				duration: 5000,
-				header: {
-					heading: "Mohit Karekar",
-					subheading: "Posted 30m ago",
-					profileImage: "https://picsum.photos/100/100",
-				},
-			},
-			{
-				url: sectionImg5,
-				duration: 5000,
-				header: {
-					heading: "Mohit Karekar",
-					subheading: "Posted 30m ago",
-					profileImage: "https://picsum.photos/100/100",
-				},
-			},
-			// ... other stories
-		],
 	},
 	{
-		name: "User 1",
+		name: "User 3",
+		id: 3,
 		profileImage: "https://picsum.photos/100/100",
-		stories: [
-			{
-				url: sectionImg1,
-				duration: 5000,
-				header: {
-					heading: "Mohit Karekar",
-					subheading: "Posted 30m ago",
-					profileImage: "https://picsum.photos/100/100",
-				},
-			},
-			{
-				url: sectionImg2,
-				duration: 5000,
-				header: {
-					heading: "Mohit Karekar",
-					subheading: "Posted 30m ago",
-					profileImage: "https://picsum.photos/100/100",
-				},
-			},
-			{
-				url: sectionImg3,
-				duration: 5000,
-				header: {
-					heading: "Mohit Karekar",
-					subheading: "Posted 30m ago",
-					profileImage: "https://picsum.photos/100/100",
-				},
-			},
-			{
-				url: sectionImg4,
-				duration: 5000,
-				header: {
-					heading: "Mohit Karekar",
-					subheading: "Posted 30m ago",
-					profileImage: "https://picsum.photos/100/100",
-				},
-			},
-			{
-				url: sectionImg5,
-				duration: 5000,
-				header: {
-					heading: "Mohit Karekar",
-					subheading: "Posted 30m ago",
-					profileImage: "https://picsum.photos/100/100",
-				},
-			},
-			// ... other stories
-		],
 	},
 	{
-		name: "User 1",
+		name: "User 4",
+		id: 4,
 		profileImage: "https://picsum.photos/100/100",
-		stories: [
-			{
-				url: sectionImg1,
-				duration: 5000,
-				header: {
-					heading: "Mohit Karekar",
-					subheading: "Posted 30m ago",
-					profileImage: "https://picsum.photos/100/100",
-				},
-			},
-			{
-				url: sectionImg2,
-				duration: 5000,
-				header: {
-					heading: "Mohit Karekar",
-					subheading: "Posted 30m ago",
-					profileImage: "https://picsum.photos/100/100",
-				},
-			},
-			{
-				url: sectionImg3,
-				duration: 5000,
-				header: {
-					heading: "Mohit Karekar",
-					subheading: "Posted 30m ago",
-					profileImage: "https://picsum.photos/100/100",
-				},
-			},
-			{
-				url: sectionImg4,
-				duration: 5000,
-				header: {
-					heading: "Mohit Karekar",
-					subheading: "Posted 30m ago",
-					profileImage: "https://picsum.photos/100/100",
-				},
-			},
-			{
-				url: sectionImg5,
-				duration: 5000,
-				header: {
-					heading: "Mohit Karekar",
-					subheading: "Posted 30m ago",
-					profileImage: "https://picsum.photos/100/100",
-				},
-			},
-			// ... other stories
-		],
 	},
 	{
-		name: "User 1",
+		name: "User 5",
+		id: 5,
 		profileImage: "https://picsum.photos/100/100",
-		stories: [
-			{
-				url: sectionImg1,
-				duration: 5000,
-				header: {
-					heading: "Mohit Karekar",
-					subheading: "Posted 30m ago",
-					profileImage: "https://picsum.photos/100/100",
-				},
-			},
-			{
-				url: sectionImg2,
-				duration: 5000,
-				header: {
-					heading: "Mohit Karekar",
-					subheading: "Posted 30m ago",
-					profileImage: "https://picsum.photos/100/100",
-				},
-			},
-			{
-				url: sectionImg3,
-				duration: 5000,
-				header: {
-					heading: "Mohit Karekar",
-					subheading: "Posted 30m ago",
-					profileImage: "https://picsum.photos/100/100",
-				},
-			},
-			{
-				url: sectionImg4,
-				duration: 5000,
-				header: {
-					heading: "Mohit Karekar",
-					subheading: "Posted 30m ago",
-					profileImage: "https://picsum.photos/100/100",
-				},
-			},
-			{
-				url: sectionImg5,
-				duration: 5000,
-				header: {
-					heading: "Mohit Karekar",
-					subheading: "Posted 30m ago",
-					profileImage: "https://picsum.photos/100/100",
-				},
-			},
-			// ... other stories
-		],
 	},
 	{
-		name: "User 1",
+		name: "User 6",
+		id: 6,
 		profileImage: "https://picsum.photos/100/100",
-		stories: [
-			{
-				url: sectionImg1,
-				duration: 5000,
-				header: {
-					heading: "Mohit Karekar",
-					subheading: "Posted 30m ago",
-					profileImage: "https://picsum.photos/100/100",
-				},
-			},
-			{
-				url: sectionImg2,
-				duration: 5000,
-				header: {
-					heading: "Mohit Karekar",
-					subheading: "Posted 30m ago",
-					profileImage: "https://picsum.photos/100/100",
-				},
-			},
-			{
-				url: sectionImg3,
-				duration: 5000,
-				header: {
-					heading: "Mohit Karekar",
-					subheading: "Posted 30m ago",
-					profileImage: "https://picsum.photos/100/100",
-				},
-			},
-			{
-				url: sectionImg4,
-				duration: 5000,
-				header: {
-					heading: "Mohit Karekar",
-					subheading: "Posted 30m ago",
-					profileImage: "https://picsum.photos/100/100",
-				},
-			},
-			{
-				url: sectionImg5,
-				duration: 5000,
-				header: {
-					heading: "Mohit Karekar",
-					subheading: "Posted 30m ago",
-					profileImage: "https://picsum.photos/100/100",
-				},
-			},
-			// ... other stories
-		],
 	},
 	{
-		name: "User 1",
+		name: "User 7",
+		id: 7,
 		profileImage: "https://picsum.photos/100/100",
-		stories: [
-			{
-				url: sectionImg1,
-				duration: 5000,
-				header: {
-					heading: "Mohit Karekar",
-					subheading: "Posted 30m ago",
-					profileImage: "https://picsum.photos/100/100",
-				},
-			},
-			{
-				url: sectionImg2,
-				duration: 5000,
-				header: {
-					heading: "Mohit Karekar",
-					subheading: "Posted 30m ago",
-					profileImage: "https://picsum.photos/100/100",
-				},
-			},
-			{
-				url: sectionImg3,
-				duration: 5000,
-				header: {
-					heading: "Mohit Karekar",
-					subheading: "Posted 30m ago",
-					profileImage: "https://picsum.photos/100/100",
-				},
-			},
-			{
-				url: sectionImg4,
-				duration: 5000,
-				header: {
-					heading: "Mohit Karekar",
-					subheading: "Posted 30m ago",
-					profileImage: "https://picsum.photos/100/100",
-				},
-			},
-			{
-				url: sectionImg5,
-				duration: 5000,
-				header: {
-					heading: "Mohit Karekar",
-					subheading: "Posted 30m ago",
-					profileImage: "https://picsum.photos/100/100",
-				},
-			},
-			// ... other stories
-		],
 	},
 	// ... other users
 ];
+
+users.forEach((user) => {
+	user.stories = [
+		{
+			url: sectionImg1,
+			duration: 5000,
+			header: {
+				heading: user.name,
+				subheading: "Posted 30m ago",
+				profileImage: user.profileImage,
+			},
+		},
+		{
+			url: sectionImg2,
+			duration: 5000,
+			header: {
+				heading: user.name,
+				subheading: "Posted 30m ago",
+				profileImage: user.profileImage,
+			},
+		},
+		{
+			url: sectionImg3,
+			duration: 5000,
+			header: {
+				heading: user.name,
+				subheading: "Posted 30m ago",
+				profileImage: user.profileImage,
+			},
+		},
+		{
+			url: sectionImg4,
+			duration: 5000,
+			header: {
+				heading: user.name,
+				subheading: "Posted 30m ago",
+				profileImage: user.profileImage,
+			},
+		},
+		{
+			url: sectionImg5,
+			duration: 5000,
+			header: {
+				heading: user.name,
+				subheading: "Posted 30m ago",
+				profileImage: user.profileImage,
+			},
+		},
+		// ... other stories ...
+	];
+});
 
 const responsiveOptions = [
 	{
@@ -408,19 +130,23 @@ export function Explore() {
 				onClick={() => {
 					setActiveUser(user);
 				}}
-				className="cover-overlay h-12rem  w-9 border-1 surface-border border-round" // Add some padding and center the content
+				className="cover-overlay h-12rem  w-11 border-1 surface-border border-round" // Add some padding and center the content
 			>
 				<img
 					src={user.profileImage}
 					alt={user.name}
 					className="rounded-full" // Make the image round and add a white border
 				/>
-				<div className="w-full text-left text-white text-xs z-5 absolute bottom-0 left-0">
-					{/* {Add a gradient overlay at the bottom for the text} */}
-					{user.name}
-				</div>
+				<div className="w-full p-4 text-left text-white text-xs z-5 absolute bottom-0 left-0">{user.name}</div>
 			</Button>
 		);
+	};
+	const nextUser = () => {
+		const currentIndex = users.indexOf(activeUser);
+		const nextIndex = (currentIndex + 1) % users.length;
+		console.log("nextIndex", nextIndex);
+		console.log("next user", users?.[nextIndex]);
+		setActiveUser(users?.[nextIndex]);
 	};
 	return (
 		<div>
@@ -460,6 +186,7 @@ export function Explore() {
 							<div className="w-full h-full overflow-y-auto">
 								{activeUser && (
 									<Stories
+										key={activeUser.id}
 										stories={activeUser.stories}
 										defaultInterval={1500}
 										keyboardNavigation
@@ -471,6 +198,7 @@ export function Explore() {
 											background: "var(--surface-card)",
 											display: "block",
 										}}
+										onAllStoriesEnd={nextUser}
 									/>
 								)}
 							</div>

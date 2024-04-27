@@ -7,7 +7,6 @@ import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { classNames } from "primereact/utils";
 
 export const HomeLayout = () => {
-    const isActive = (url) => window.location.pathname === url;
 
 	const isNonMobileScreens = useMediaQuery("(min-width:1000px)");
 	const navigate = useNavigate();
@@ -19,8 +18,8 @@ export const HomeLayout = () => {
 				style={({ isActive, isPending, isTransitioning }) => {
 					return {
 						fontWeight: isActive ? "bold" : "revert-layer",
-						// color: isActive ? "red" : "revert-layer",
-						// background: isActive ? "red" : "revert-layer",
+						color: isActive ? "var(--primary-300)" : "revert-layer",
+						background: isActive ? "var(--surface-0)" : "revert-layer",
 						viewTransitionName: isTransitioning ? "slide" : "revert-layer",
 					};
 				}}
@@ -41,7 +40,6 @@ export const HomeLayout = () => {
 			label: "Home",
 			icon: "pi pi-home",
 			url: "/home",
-			className: classNames({ "p-focus": isActive("/home") }),
 			template: itemRenderer,
 		},
 		{
@@ -67,9 +65,9 @@ export const HomeLayout = () => {
 			template: itemRenderer,
 		},
 		{
-			label: "Bookmarkes",
+			label: "Bookmarks",
 			icon: "pi pi-bookmark",
-			url: "bookmarkes",
+			url: "bookmarks",
 			template: itemRenderer,
 		},
 		{
@@ -92,7 +90,7 @@ export const HomeLayout = () => {
 			<Suspense fallback={<div className="text-4xl text-bluegray-700">Loading .....</div>}>
 				<main className="grid-container">
 					<div className="grid-container-left">
-						<Menu model={items} className="w-full surface-card p-2" />
+						<Menu model={items} className="w-full surface-card p-2 autoZIndex" />
 					</div>
 					<div className="grid-container-middle">
 						<Outlet />

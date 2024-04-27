@@ -10,6 +10,9 @@ import {Home} from "@pages/Home";
 import { HomeLayout } from "@pages/HomeLayout";
 import {Explore} from "@pages/Explore";
 import {Notifications} from "@pages/Notifications";
+import {Messages} from "@pages/Messages";
+import { Settings } from "@pages/Settings";
+import {BookMarks} from "@pages/BookMarks";
 // import { Login } from "@pages/Login";
 import Profile from "@pages/Profile";
 import { Register } from "@pages/Register";
@@ -53,8 +56,20 @@ const homeRoutes = [
 		element: <Notifications />,
 	},
 	{
-		path: "profile/:userId",
+		path: "messages",
+		element: <Messages />,
+	},
+	{
+		path: "bookmarks",
+		element: <BookMarks />,
+	},
+	{
+		path: "profile",
 		element: <Profile />,
+	},
+	{
+		path: "settings",
+		element: <Settings />,
 	},
 ];
 
@@ -105,6 +120,7 @@ export const router = createBrowserRouter(
 	],
 	{ basename: import.meta.env.BASE_URL }
 );
+
 
 ReactDOM.createRoot(document.getElementById("root")).render(
 	<StrictMode>

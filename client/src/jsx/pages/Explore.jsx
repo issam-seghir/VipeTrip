@@ -7,6 +7,7 @@ import { selectCurrentUser } from "@store/slices/authSlice";
 import { Avatar } from "primereact/avatar";
 import { Button } from "primereact/button";
 import { Carousel } from "primereact/carousel";
+import { Dialog } from "primereact/dialog";
 import { Sidebar } from "primereact/sidebar";
 import { useState } from "react";
 import Stories from "react-insta-stories";
@@ -127,6 +128,7 @@ const responsiveOptions = [
 export function Explore() {
 	const [activeUser, setActiveUser] = useState(null);
 	const user = useSelector(selectCurrentUser);
+	const [visible, setVisible] = useState(false);
 	console.log("user", user);
 	const userTemplate = (user) => {
 		return (
@@ -224,8 +226,44 @@ export function Explore() {
 				></Sidebar>
 			</div>
 
+			<Dialog
+				header={
+					<div className="flex justify-content-between">
+						<h5>Create Post</h5>
+						<Avatar size="large" image={user?.picturePath} alt={user?.fullName} shape="circle" />
+						<span>{user?.fullName} </span>
+					</div>
+				}
+				visible={visible}
+				style={{ width: "50vw" }}
+				onHide={() => setVisible(false)}
+				draggable={false}
+				dismissableMask={true}
+				closeOnEscape={true}
+				footer={
+					<div className="flex justify-content-between">
+					<Button label="Media" icon="pi pi-image" iconPos="left" className="p-button-text" />
+					<Button label="Emoji" icon="pi pi-face-smile" iconPos="left" className="p-button-text" />
+					<Button label="Poll" icon="pi pi-chart-bar" iconPos="left" className="p-button-text" />
+				</div>
+				}
+			>
+				<p className="m-0">
+					Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore
+					et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+					aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+					cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
+					culpa qui officia deserunt mollit anim id est laborum.
+				</p>
+			</Dialog>
 			{/* create new post widget */}
-			<div className="cursor-pointer flex flex-column justify-content-between gap-2 p-3 w-full border-1 surface-border border-round" onClick={}>
+			<div
+				className="cursor-pointer flex flex-column justify-content-between gap-2 p-3 w-full border-1 surface-border border-round"
+				onClick={() => setVisible(true)}
+				onKeyDown={() => {}}
+				tabIndex={0}
+				role="button"
+			>
 				<div className="flex justify-content-between align-items-center gap-2">
 					<Avatar
 						size="large"

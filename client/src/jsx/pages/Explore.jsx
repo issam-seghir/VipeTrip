@@ -404,22 +404,20 @@ export function Explore() {
 	const userTemplate = (user) => {
 		return (
 			<Button
-        outlined
+				outlined
 				onClick={() => {
 					setActiveUser(user);
 				}}
-				className="flex flex-col items-center justify-center p-0" // Add some padding and center the content
+				className="cover-overlay h-12rem  w-9 border-1 surface-border border-round" // Add some padding and center the content
 			>
-				<div className="relative">
-					<img
-						src={user.profileImage}
-						alt={user.name}
-						className="w-40 h-40 rounded-full" // Make the image round and add a white border
-					/>
-					<div className="overlay w-full text-left text-white text-xs ">
-						{/* {Add a gradient overlay at the bottom for the text} */}
-						{user.name}
-					</div>
+				<img
+					src={user.profileImage}
+					alt={user.name}
+					className="rounded-full" // Make the image round and add a white border
+				/>
+				<div className="w-full text-left text-white text-xs z-5 absolute bottom-0 left-0">
+					{/* {Add a gradient overlay at the bottom for the text} */}
+					{user.name}
 				</div>
 			</Button>
 		);
@@ -430,6 +428,12 @@ export function Explore() {
 				value={users}
 				numVisible={3}
 				numScroll={3}
+				showIndicators={false}
+				pt={{
+					item: "flex justify-content-center",
+				}}
+				containerClassName="flex justify-content-center"
+				contentClassName="flex justify-content-center"
 				responsiveOptions={responsiveOptions}
 				itemTemplate={userTemplate}
 			/>

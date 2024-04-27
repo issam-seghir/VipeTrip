@@ -3,11 +3,14 @@ import sectionImg2 from "@assets/images/Contemplative Urban Dreamer.png";
 import sectionImg5 from "@assets/images/Contemporary Billiards Lounge with Ambient Lighting.png";
 import sectionImg4 from "@assets/images/poster.png";
 import sectionImg3 from "@assets/images/wallpaper.png";
+import { selectCurrentUser } from "@store/slices/authSlice";
+import { Avatar } from "primereact/avatar";
 import { Button } from "primereact/button";
 import { Carousel } from "primereact/carousel";
 import { Sidebar } from "primereact/sidebar";
 import { useState } from "react";
 import Stories from "react-insta-stories";
+import { useSelector } from "react-redux";
 
 const users = [
 	{
@@ -123,6 +126,8 @@ const responsiveOptions = [
 ];
 export function Explore() {
 	const [activeUser, setActiveUser] = useState(null);
+	const user = useSelector(selectCurrentUser);
+	console.log("user", user);
 	const userTemplate = (user) => {
 		return (
 			<Button
@@ -132,11 +137,23 @@ export function Explore() {
 				}}
 				className="cover-overlay h-12rem  w-11 border-1 surface-border border-round" // Add some padding and center the content
 			>
+				{/* overlay image */}
 				<img
-					src={user.profileImage}
+					src={user.stories[0].url}
 					alt={user.name}
 					className="rounded-full" // Make the image round and add a white border
 				/>
+				<div className="z-5 absolute top-0 left-0 border-2 border-circle border-500	 p-1 m-1 flex ">
+					<Avatar
+						classNames=""
+						aria-controls="popup_menu_left"
+						aria-haspopup
+						// onClick={(event) => menuLeft.current.toggle(event)}
+						image={user.profileImage}
+						alt={user.name}
+						shape="circle"
+					/>
+				</div>
 				<div className="w-full p-4 text-left text-white text-xs z-5 absolute bottom-0 left-0">{user.name}</div>
 			</Button>
 		);
@@ -151,6 +168,7 @@ export function Explore() {
 	return (
 		<div>
 			<Carousel
+				className="mb-4"
 				value={users}
 				numVisible={3}
 				numScroll={3}
@@ -164,7 +182,6 @@ export function Explore() {
 				itemTemplate={userTemplate}
 			/>
 
-			{/* <button onClick={() => setActiveUser(null)}>Close</button> */}
 			<div className="card flex justify-content-center">
 				<Sidebar
 					visible={activeUser}
@@ -205,6 +222,28 @@ export function Explore() {
 						</div>
 					)}
 				></Sidebar>
+			</div>
+
+			{/* create new post widget */}
+			<div className="cursor-pointer flex flex-column justify-content-between gap-2 p-3 w-full border-1 surface-border border-round" onClick={}>
+				<div className="flex justify-content-between align-items-center gap-2">
+					<Avatar
+						size="large"
+						aria-controls="popup_menu_left"
+						// onClick={(event) => menuLeft.current.toggle(event)}
+						image={user?.picturePath}
+						alt={user?.fullName}
+						shape="circle"
+					/>
+					<div className="pl-6 p-2 w-full border-1 surface-border border-round-3xl">
+						What&apos;s on your mind?
+					</div>
+				</div>
+				<div className="flex justify-content-between">
+					<Button label="Media" icon="pi pi-image" iconPos="left" className="p-button-text" />
+					<Button label="Emoji" icon="pi pi-face-smile" iconPos="left" className="p-button-text" />
+					<Button label="Poll" icon="pi pi-chart-bar" iconPos="left" className="p-button-text" />
+				</div>
 			</div>
 		</div>
 	);

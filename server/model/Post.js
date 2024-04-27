@@ -7,7 +7,7 @@ const Schema = mongoose.Schema;
 
 const postSchema = new Schema(
 	{
-		userId: {
+		author: {
 			type: Schema.Types.ObjectId,
 			ref: "User",
 			required: true,
@@ -18,6 +18,11 @@ const postSchema = new Schema(
 			ref: "Post",
 			required: true,
 			autopopulate: true,
+		},
+		privacy: {
+			type: String,
+			enum: ["onlyMe", "friends", "public"],
+			default: "public",
 		},
 		description: {
 			type: String,

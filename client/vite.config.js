@@ -31,6 +31,8 @@ export default defineConfig({
 
 	server: {
 		port: 3000,
+		//  Vite will fail instead of using the next available port,
+		strictPort: true,
 		// open the server with google chrome browser
 		// open: (process.env.BROWSER = "E:\\Apps\\scoop\\apps\\googlechrome-dev\\current\\chrome.exe"),
 	},

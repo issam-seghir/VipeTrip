@@ -18,10 +18,13 @@ import { Suspense, lazy, useRef, useState } from "react";
 import Stories from "react-insta-stories";
 import { useSelector } from "react-redux";
 import { FileUpload } from "primereact/fileupload";
-
+import { FileUploadDialog } from "@components/FileUploadDialog";
+import { Tooltip } from "primereact/tooltip";
+import { Tag } from "primereact/tag";
 
 const EmojiPicker = lazy(() => import("emoji-picker-react"));
 const customEmojis = [
+
 	{
 		names: ["Alice", "alice in wonderland"],
 		imgUrl: "https://cdn.jsdelivr.net/gh/ealush/emoji-picker-react@custom_emojis_assets/alice.png",
@@ -175,14 +178,8 @@ export function Explore() {
 	const [multipleSuggestions, setMultipleSuggestions] = useState([]);
 	const tagSuggestions = ["primereact", "primefaces", "primeng", "primevue"];
 	const op = useRef(null);
-	const [showFileUpload, setShowFileUpload] = useState(false);
-	const [selectedFiles, setSelectedFiles] = useState([]);
+	const [showFileUploadDialog, setShowFileUploadDialog] = useState(false);
 
-	const handleFileUpload = ({ files }) => {
-		// Store the selected files in the state
-		setSelectedFiles(files);
-	};
-	
 	const handleEmojiClick = (emojiObject) => {
 		console.log("emojiObject", emojiObject);
 			setMentionValue((prevValue) => `${prevValue} ${emojiObject.emoji}`);
@@ -382,26 +379,13 @@ export function Explore() {
 				closeOnEscape={true}
 				footer={
 					<div>
-						{showFileUpload && (
-							<FileUpload
-								name="demo[]"
-								customUpload
-								uploadLabel="Confirm"
-								uploadOptions={{icon: "pi pi-upload"}}
-								uploadHandler={handleFileUpload}
-								multiple
-								accept="image/*"
-								maxFileSize={1000000}
-								emptyTemplate={<p className="m-0">Drag and drop files to here to upload.</p>}
-							/>
-						)}
 						<div className="flex mb-4 gap-2">
 							<Button
 								label="Media"
 								icon="pi pi-image"
 								iconPos="left"
 								className="p-button-text"
-								onClick={() => setShowFileUpload(!showFileUpload)}
+								onClick={() => setShowFileUploadDialog(!showFileUploadDialog)}
 							/>
 							<Button
 								label="Emoji"
@@ -451,6 +435,7 @@ export function Explore() {
 					inputClassName="w-full h-25rem max-h-29rem overflow-auto"
 				/>
 			</Dialog>
+			<FileUploadDialog showFileUploadDialog={showFileUploadDialog} setShowFileUploadDialog={setShowFileUploadDialog} />
 			{/* create new post widget */}
 			<div
 				className="cursor-pointer flex flex-column justify-content-between gap-2 p-3 w-full border-1 surface-border border-round"

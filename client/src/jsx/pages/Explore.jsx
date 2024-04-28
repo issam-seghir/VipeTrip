@@ -12,10 +12,13 @@ import { Dialog } from "primereact/dialog";
 import { Divider } from "primereact/divider";
 import { Dropdown } from "primereact/dropdown";
 import { Mention } from "primereact/mention";
+import { OverlayPanel } from "primereact/overlaypanel";
 import { Sidebar } from "primereact/sidebar";
-import { useState } from "react";
+import { Suspense, lazy, useRef, useState } from "react";
 import Stories from "react-insta-stories";
 import { useSelector } from "react-redux";
+
+const EmojiPicker = lazy(() => import("emoji-picker-react"));
 
 const users = [
 	{
@@ -138,7 +141,11 @@ export function Explore() {
 	const [mentionValue, setMentionValue] = useState("");
 	const [multipleSuggestions, setMultipleSuggestions] = useState([]);
 	const tagSuggestions = ["primereact", "primefaces", "primeng", "primevue"];
-
+	const op = useRef(null);
+	const handleEmojiClick = (emojiObject) => {
+		console.log("emojiObject", emojiObject);
+		setMentionValue((prevValue) => `${prevValue} ${emojiObject?.emoji}`);
+	};
 	console.log("user", user);
 	const userTemplate = (user) => {
 		return (
@@ -341,7 +348,18 @@ export function Explore() {
 								icon={<Icon icon="uil:smile" className="pi p-button-icon-left" />}
 								iconPos="left"
 								className="p-button-text"
+								onClick={(e) => op.current.toggle(e)}
 							/>
+							<OverlayPanel
+								ref={op}
+								pt={{
+									content: "p-0",
+								}}
+							>
+								<Suspense fallback={<div className="text-4xl text-bluegray-700">Loading .....</div>}>
+									<EmojiPicker onEmojiClick={handleEmojiClick} />
+								</Suspense>
+							</OverlayPanel>
 							<Button label="Poll" icon="pi pi-chart-bar" iconPos="left" className="p-button-text" />
 						</div>
 						<Divider />

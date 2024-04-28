@@ -75,6 +75,7 @@
 		"@zxcvbn-ts/language-en": "^3.0.2",
 		"algoliasearch": "^4.23.3",
 		"date-fns": "^3.0.5",
+		"emoji-picker-react": "^4.9.2",
 		"instantsearch.js": "^4.67.0",
 		"passport-linkedin-oauth2": "^2.0.0",
 		"primeflex": "^3.3.1",

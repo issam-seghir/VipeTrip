@@ -17,9 +17,42 @@ import { Sidebar } from "primereact/sidebar";
 import { Suspense, lazy, useRef, useState } from "react";
 import Stories from "react-insta-stories";
 import { useSelector } from "react-redux";
+import { FileUpload } from "primereact/fileupload";
+
 
 const EmojiPicker = lazy(() => import("emoji-picker-react"));
-
+const customEmojis = [
+	{
+		names: ["Alice", "alice in wonderland"],
+		imgUrl: "https://cdn.jsdelivr.net/gh/ealush/emoji-picker-react@custom_emojis_assets/alice.png",
+		id: "alice",
+	},
+	{
+		names: ["Dog"],
+		imgUrl: "https://cdn.jsdelivr.net/gh/ealush/emoji-picker-react@custom_emojis_assets/dog.png",
+		id: "dog",
+	},
+	{
+		names: ["Hat"],
+		imgUrl: "https://cdn.jsdelivr.net/gh/ealush/emoji-picker-react@custom_emojis_assets/hat.png",
+		id: "hat",
+	},
+	{
+		names: ["Vest"],
+		imgUrl: "https://cdn.jsdelivr.net/gh/ealush/emoji-picker-react@custom_emojis_assets/vest.png",
+		id: "vest",
+	},
+	{
+		names: ["Shock", "Surprised", "WOW", "OMG", "Oh My God", "Oh My Gosh", "Oh Gosh", "Oh God", "Oh No", "Oh Wow"],
+		imgUrl: "https://cdn3.emoji.gg/emojis/7980-my-eyes.png",
+		id: "shock",
+	},
+	{
+		names: ["Ok", "Okay", "Yes", "Good", "Great", "Fine", "Acceptable", "Agree", "Agreed", "Yup", "Yea", "Yeah"],
+		imgUrl: "https://cdn3.emoji.gg/emojis/77093-haruhi-like.png",
+		id: "ok",
+	},
+];
 const users = [
 	{
 		name: "User 1",
@@ -142,9 +175,17 @@ export function Explore() {
 	const [multipleSuggestions, setMultipleSuggestions] = useState([]);
 	const tagSuggestions = ["primereact", "primefaces", "primeng", "primevue"];
 	const op = useRef(null);
+	const [showFileUpload, setShowFileUpload] = useState(false);
+	const [selectedFiles, setSelectedFiles] = useState([]);
+
+	const handleFileUpload = ({ files }) => {
+		// Store the selected files in the state
+		setSelectedFiles(files);
+	};
+	
 	const handleEmojiClick = (emojiObject) => {
 		console.log("emojiObject", emojiObject);
-		setMentionValue((prevValue) => `${prevValue} ${emojiObject?.emoji}`);
+			setMentionValue((prevValue) => `${prevValue} ${emojiObject.emoji}`);
 	};
 	console.log("user", user);
 	const userTemplate = (user) => {
@@ -341,8 +382,27 @@ export function Explore() {
 				closeOnEscape={true}
 				footer={
 					<div>
+						{showFileUpload && (
+							<FileUpload
+								name="demo[]"
+								customUpload
+								uploadLabel="Confirm"
+								uploadOptions={{icon: "pi pi-upload"}}
+								uploadHandler={handleFileUpload}
+								multiple
+								accept="image/*"
+								maxFileSize={1000000}
+								emptyTemplate={<p className="m-0">Drag and drop files to here to upload.</p>}
+							/>
+						)}
 						<div className="flex mb-4 gap-2">
-							<Button label="Media" icon="pi pi-image" iconPos="left" className="p-button-text" />
+							<Button
+								label="Media"
+								icon="pi pi-image"
+								iconPos="left"
+								className="p-button-text"
+								onClick={() => setShowFileUpload(!showFileUpload)}
+							/>
 							<Button
 								label="Emoji"
 								icon={<Icon icon="uil:smile" className="pi p-button-icon-left" />}
@@ -357,7 +417,13 @@ export function Explore() {
 								}}
 							>
 								<Suspense fallback={<div className="text-4xl text-bluegray-700">Loading .....</div>}>
-									<EmojiPicker onEmojiClick={handleEmojiClick} />
+									<EmojiPicker
+										theme="auto"
+										emojiStyle={"native"}
+										lazyLoadEmojis={true}
+										customEmojis={customEmojis}
+										onEmojiClick={handleEmojiClick}
+									/>
 								</Suspense>
 							</OverlayPanel>
 							<Button label="Poll" icon="pi pi-chart-bar" iconPos="left" className="p-button-text" />

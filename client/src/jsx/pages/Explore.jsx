@@ -3,17 +3,19 @@ import sectionImg2 from "@assets/images/Contemplative Urban Dreamer.png";
 import sectionImg5 from "@assets/images/Contemporary Billiards Lounge with Ambient Lighting.png";
 import sectionImg4 from "@assets/images/poster.png";
 import sectionImg3 from "@assets/images/wallpaper.png";
+import { Icon } from "@iconify/react";
 import { selectCurrentUser } from "@store/slices/authSlice";
 import { Avatar } from "primereact/avatar";
 import { Button } from "primereact/button";
 import { Carousel } from "primereact/carousel";
 import { Dialog } from "primereact/dialog";
+import { Divider } from "primereact/divider";
 import { Dropdown } from "primereact/dropdown";
+import { Mention } from "primereact/mention";
 import { Sidebar } from "primereact/sidebar";
 import { useState } from "react";
 import Stories from "react-insta-stories";
 import { useSelector } from "react-redux";
-import { Mention } from "primereact/mention";
 
 const users = [
 	{
@@ -134,8 +136,8 @@ export function Explore() {
 	const [selectedCity, setSelectedCity] = useState("public");
 	const privacies = ["onlyMe", "friends", "public"];
 	const [mentionValue, setMentionValue] = useState("");
-  const [multipleSuggestions, setMultipleSuggestions] = useState([]);
-  const tagSuggestions = ["primereact", "primefaces", "primeng", "primevue"];
+	const [multipleSuggestions, setMultipleSuggestions] = useState([]);
+	const tagSuggestions = ["primereact", "primefaces", "primeng", "primevue"];
 
 	console.log("user", user);
 	const userTemplate = (user) => {
@@ -176,39 +178,41 @@ export function Explore() {
 		setActiveUser(users?.[nextIndex]);
 	};
 
-	 const onMultipleSearch = (event) => {
-			const trigger = event.trigger;
+	const onMultipleSearch = (event) => {
+		const trigger = event.trigger;
 
-			if (trigger === "@") {
-				//in a real application, make a request to a remote url with the query and return suggestions, for demo we filter at client side
-				setTimeout(() => {
-					const query = event.query;
-					let suggestions;
+		if (trigger === "@") {
+			//in a real application, make a request to a remote url with the query and return suggestions, for demo we filter at client side
+			setTimeout(() => {
+				const query = event.query;
+				let suggestions;
 
-					suggestions =
-						query.trim().length > 0
-							? users.filter((user) => {
-									return user.name.toLowerCase().startsWith(query.toLowerCase());
-							  })
-							: [...users];
-							  console.log("suggestions", suggestions);
-					setMultipleSuggestions(suggestions);
-				}, 250);
-			} else if (trigger === "#") {
-				setTimeout(() => {
-					const query = event.query;
-					let suggestions;
+				suggestions =
+					query.trim().length > 0
+						? users.filter((user) => {
+								return user.name.toLowerCase().startsWith(query.toLowerCase());
+						  })
+						: [...users];
+				console.log("suggestions", suggestions);
+				setMultipleSuggestions(suggestions);
+			}, 250);
+		} else if (trigger === "#") {
+			setTimeout(() => {
+				const query = event.query;
+				let suggestions;
 
-					suggestions = query.trim().length > 0 ? tagSuggestions.filter((tag) => {
-							return tag.toLowerCase().startsWith(query.toLowerCase());
-						}) : [...tagSuggestions];
+				suggestions =
+					query.trim().length > 0
+						? tagSuggestions.filter((tag) => {
+								return tag.toLowerCase().startsWith(query.toLowerCase());
+						  })
+						: [...tagSuggestions];
 
-					setMultipleSuggestions(suggestions);
-				}, 250);
-			}
-		};
- const itemTemplate = (suggestion) => {
-
+				setMultipleSuggestions(suggestions);
+			}, 250);
+		}
+	};
+	const itemTemplate = (suggestion) => {
 		return (
 			<div className="flex align-items-center">
 				<img alt={suggestion.name} src={suggestion.profileImage} />
@@ -220,9 +224,9 @@ export function Explore() {
 				</span>
 			</div>
 		);
- };
+	};
 
- const multipleItemTemplate = (suggestion, options) => {
+	const multipleItemTemplate = (suggestion, options) => {
 		const trigger = options.trigger;
 		if (trigger === "@" && suggestion?.name) {
 			return itemTemplate(suggestion);
@@ -231,7 +235,7 @@ export function Explore() {
 		}
 
 		return null;
- };
+	};
 
 	return (
 		<div>
@@ -329,10 +333,19 @@ export function Explore() {
 				dismissableMask={true}
 				closeOnEscape={true}
 				footer={
-					<div className="flex gap-2">
-						<Button label="Media" icon="pi pi-image" iconPos="left" className="p-button-text" />
-						<Button label="Emoji" icon="pi pi-face-smile" iconPos="left" className="p-button-text" />
-						<Button label="Poll" icon="pi pi-chart-bar" iconPos="left" className="p-button-text" />
+					<div>
+						<div className="flex mb-4 gap-2">
+							<Button label="Media" icon="pi pi-image" iconPos="left" className="p-button-text" />
+							<Button
+								label="Emoji"
+								icon={<Icon icon="uil:smile" className="pi p-button-icon-left" />}
+								iconPos="left"
+								className="p-button-text"
+							/>
+							<Button label="Poll" icon="pi pi-chart-bar" iconPos="left" className="p-button-text" />
+						</div>
+						<Divider />
+						<Button label="Post" className="w-full" />
 					</div>
 				}
 			>
@@ -340,15 +353,18 @@ export function Explore() {
 					value={mentionValue}
 					onChange={(e) => {
 						console.log("e.target.value", e.target.value);
-						setMentionValue(e.target.value)}}
+						setMentionValue(e.target.value);
+					}}
 					trigger={["@", "#"]}
 					suggestions={multipleSuggestions}
 					onSearch={onMultipleSearch}
 					field={["name"]}
 					placeholder="Enter @ to mention people, # to mention tag"
 					itemTemplate={multipleItemTemplate}
-					rows={5}
-					cols={40}
+					autoResize={true}
+					maxLength={3000}
+					className="flex"
+					inputClassName="w-full h-25rem max-h-29rem overflow-auto"
 				/>
 			</Dialog>
 			{/* create new post widget */}
@@ -374,7 +390,12 @@ export function Explore() {
 				</div>
 				<div className="flex gap-2">
 					<Button label="Media" icon="pi pi-image" iconPos="left" className="p-button-text" />
-					<Button label="Emoji" icon="pi pi-face-smile" iconPos="left" className="p-button-text" />
+					<Button
+						label="Emoji"
+						icon={<Icon icon="uil:smile" className="pi p-button-icon-left" />}
+						iconPos="left"
+						className="p-button-text"
+					/>
 					<Button label="Poll" icon="pi pi-chart-bar" iconPos="left" className="p-button-text" />
 				</div>
 			</div>

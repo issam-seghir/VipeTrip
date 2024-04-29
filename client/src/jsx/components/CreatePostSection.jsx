@@ -5,6 +5,7 @@ import sectionImg4 from "@assets/images/poster.png";
 import sectionImg3 from "@assets/images/wallpaper.png";
 import { FileUploadDialog } from "@components/FileUploadDialog";
 import { Icon } from "@iconify/react";
+import { PhotosPreview } from "@jsx/components/PhotosPreview";
 import { selectCurrentUser } from "@store/slices/authSlice";
 import { Avatar } from "primereact/avatar";
 import { Button } from "primereact/button";
@@ -15,14 +16,11 @@ import { Mention } from "primereact/mention";
 import { OverlayPanel } from "primereact/overlaypanel";
 import { Suspense, lazy, useRef, useState } from "react";
 import { useSelector } from "react-redux";
-import { isDev } from "@data/constants";
-import { DevTool } from "@hookform/devtools";
-import { zodResolver } from "@hookform/resolvers/zod";
-import {  useLoginMutation } from "@jsx/store/api/authApi";
-import { loginSchema } from "@validations/authSchema";
+import { CreatePostDialogFooter } from "@jsx/components/CreatePostDialogFooter";
 
 
 const EmojiPicker = lazy(() => import("emoji-picker-react"));
+
 const customEmojis = [
 	{
 		names: ["Alice", "alice in wonderland"],
@@ -146,23 +144,47 @@ users.forEach((user) => {
 	];
 });
 
+const privacies = ["onlyMe", "friends", "public"];
+const tagSuggestions = ["primereact", "primefaces", "primeng", "primevue"];
+
 export function CreatePostSection() {
 	const user = useSelector(selectCurrentUser);
-	const [visible, setVisible] = useState(false);
-	const [selectedCity, setSelectedCity] = useState("public");
-	const privacies = ["onlyMe", "friends", "public"];
+
+	const [selectedPrivacy, setSelectedPrivacy] = useState("public");
+	const [showCreatePostDialog, setShowCreatePostDialog] = useState(false);
+
+	// for mentions in description
 	const [mentionValue, setMentionValue] = useState("");
 	const [multipleSuggestions, setMultipleSuggestions] = useState([]);
-	const tagSuggestions = ["primereact", "primefaces", "primeng", "primevue"];
-	const op = useRef(null);
+
+	// for fileUploads
 	const [showFileUploadDialog, setShowFileUploadDialog] = useState(false);
-	const [savedFiles, setSavedFiles] = useState([]);
+	const [savedPhotos, setSavedPhotos] = useState([]);
 	const [totalNumber, setTotalNumber] = useState(0);
 
-	const handleEmojiClick = (emojiObject) => {
-		console.log("emojiObject", emojiObject);
-		setMentionValue((prevValue) => `${prevValue} ${emojiObject.emoji}`);
+	// Creat Post Actions Handlers
+	const emojiPicker = useRef(null);
+
+	const handleEmojiOpen = (e) => {
+		emojiPicker.current.toggle(e);
 	};
+
+	const handleEmojiClick = (emojiObject) => {
+		setMentionValue((prevValue) => `${prevValue} ${emojiObject?.emoji}`);
+	};
+	const handleMediaOpen = () => {
+		setShowFileUploadDialog(!showFileUploadDialog);
+	};
+	const onPhotoRemove = (photo) => {
+		const updatedPhotos = savedPhotos.filter((savedPhoto) => savedPhoto.name !== photo.name);
+		setSavedPhotos(updatedPhotos);
+		setTotalNumber((prevNumber) => prevNumber - 1);
+	};
+
+	const handlePollOpen = () => {
+		// handle poll click
+	};
+
 	const onMultipleSearch = (event) => {
 		const trigger = event.trigger;
 
@@ -222,17 +244,12 @@ export function CreatePostSection() {
 		return null;
 	};
 
-	const onPhotoRemove = (file, index) => {
-		const updatedFiles = savedFiles.filter((f) => f.name !== file.name);
-		setSavedFiles(updatedFiles);
-		setTotalNumber((prevNumber) => prevNumber - 1);
-	};
 	return (
 		<>
 			{/* Create New post Widget */}
 			<div
 				className="cursor-pointer flex flex-column justify-content-between gap-2 p-3 w-full border-1 surface-border border-round"
-				onClick={() => setVisible(true)}
+				onClick={() => setShowCreatePostDialog(true)}
 				onKeyDown={() => {}}
 				tabIndex={0}
 				role="button"
@@ -240,7 +257,6 @@ export function CreatePostSection() {
 				<div className="flex justify-content-between align-items-center gap-2">
 					<Avatar
 						size="large"
-						aria-controls="popup_menu_left"
 						// onClick={(event) => menuLeft.current.toggle(event)}
 						image={user?.picturePath}
 						alt={user?.fullName}
@@ -264,120 +280,76 @@ export function CreatePostSection() {
 
 			{/* Create New Post Form Dialog */}
 			<Dialog
-				header={
-					<div className="flex">
-						<div className="flex align-items-center justify-content-center gap-2">
-							{/* <h5>Create Post</h5> */}
-							<Avatar
-								size="large"
-								className="h-4rem w-4rem"
-								image={user?.picturePath}
-								alt={user?.fullName}
-								shape="circle"
-							/>
-							<div className="flex flex-column gap-1">
-								<h5>{user?.fullName} </h5>
-								<Dropdown
-									pt={{
-										item: "p-1 pl-4",
-										itemLabel: "p-1",
-										input: "p-1",
-									}}
-									value={selectedCity}
-									onChange={(e) => setSelectedCity(e.value)}
-									options={privacies}
-									className="h-2rem pl-2"
-									highlightOnSelect={false}
-								/>
-							</div>
-						</div>
-					</div>
-				}
-				visible={visible}
+				header={<h2 className="text-center">Create Post</h2>}
+				visible={showCreatePostDialog}
 				style={{ width: "50vw" }}
-				onHide={() => setVisible(false)}
+				onHide={() => setShowCreatePostDialog(false)}
 				draggable={false}
 				dismissableMask={true}
 				closeOnEscape={true}
 				footer={
-					<div>
-						{savedFiles.length > 0 && (
-							<div className="flex gap-2 mb-2">
-								{savedFiles.map((file, index) => (
-									<div key={index} className="relative cover w-8rem h-8rem">
-										<img src={file.objectURL} alt={file.name} className=" border-round-md" />
-										<Button
-											type="button"
-											size="small"
-											icon="pi pi-times"
-											className="absolute top-0 left-0 p-1 m-1 z-5 border-circle p-button-danger"
-											onClick={() => onPhotoRemove(file, index)}
-										/>
-									</div>
-								))}
-							</div>
-						)}
-						<div className="flex mb-4 gap-2">
-							<Button
-								label="Media"
-								icon="pi pi-image"
-								iconPos="left"
-								className="p-button-text"
-								onClick={() => setShowFileUploadDialog(!showFileUploadDialog)}
-							/>
-							<Button
-								label="Emoji"
-								icon={<Icon icon="uil:smile" className="pi p-button-icon-left" />}
-								iconPos="left"
-								className="p-button-text"
-								onClick={(e) => op.current.toggle(e)}
-							/>
-							<OverlayPanel
-								ref={op}
-								pt={{
-									content: "p-0",
-								}}
-							>
-								<Suspense fallback={<div className="text-4xl text-bluegray-700">Loading .....</div>}>
-									<EmojiPicker
-										theme="auto"
-										emojiStyle={"native"}
-										lazyLoadEmojis={true}
-										customEmojis={customEmojis}
-										onEmojiClick={handleEmojiClick}
-									/>
-								</Suspense>
-							</OverlayPanel>
-							<Button label="Poll" icon="pi pi-chart-bar" iconPos="left" className="p-button-text" />
-						</div>
-						<Divider />
-						<Button label="Post" className="w-full" />
-					</div>
+					<CreatePostDialogFooter
+						savedPhotos={savedPhotos}
+						onPhotoRemove={onPhotoRemove}
+						handleMediaOpen={handleMediaOpen}
+						handleEmojiOpen={handleEmojiOpen}
+						emojiPicker={emojiPicker}
+						handleEmojiClick={handleEmojiClick}
+					/>
 				}
 			>
-				<Mention
-					value={mentionValue}
-					onChange={(e) => {
-						console.log("e.target.value", e.target.value);
-						setMentionValue(e.target.value);
-					}}
-					trigger={["@", "#"]}
-					suggestions={multipleSuggestions}
-					onSearch={onMultipleSearch}
-					field={["name"]}
-					placeholder="Enter @ to mention people, # to mention tag"
-					itemTemplate={multipleItemTemplate}
-					autoResize={true}
-					maxLength={3000}
-					className="flex"
-					inputClassName="w-full h-25rem max-h-29rem overflow-auto"
-				/>
+				<div className="flex flex-column gap-4">
+					{/* user cerdinals  */}
+					<div className="flex align-items-center justify-content-start gap-3">
+						<Avatar
+							size="large"
+							className="h-4rem w-4rem"
+							image={user?.picturePath}
+							alt={user?.fullName}
+							shape="circle"
+						/>
+						<div className="flex flex-column gap-1">
+							<h5 className="text-xl">{user?.fullName} </h5>
+							<Dropdown
+								pt={{
+									item: "p-1 pl-4",
+									itemLabel: "p-1",
+									input: "p-1",
+								}}
+								value={selectedPrivacy}
+								onChange={(e) => setSelectedPrivacy(e.value)}
+								options={privacies}
+								className="h-2rem pl-2"
+								highlightOnSelect={false}
+							/>
+						</div>
+					</div>
+					{/* content input area  */}
+					<Mention
+						value={mentionValue}
+						onChange={(e) => {
+							setMentionValue(e.target.value);
+						}}
+						trigger={["@", "#"]}
+						suggestions={multipleSuggestions}
+						onSearch={onMultipleSearch}
+						field={["name"]}
+						placeholder="Enter @ to mention people, # to mention tag"
+						itemTemplate={multipleItemTemplate}
+						autoResize={true}
+						maxLength={3000}
+						className="flex mb-2"
+						inputClassName="w-full h-25rem max-h-29rem overflow-auto"
+					/>
+					{/* Photos Preview */}
+					{savedPhotos.length > 0 && <PhotosPreview photos={savedPhotos} onPhotoRemove={onPhotoRemove} />}
+				</div>
 			</Dialog>
 			<FileUploadDialog
 				showFileUploadDialog={showFileUploadDialog}
 				setShowFileUploadDialog={setShowFileUploadDialog}
-				setSavedFiles={setSavedFiles}
-				savedFiles={savedFiles}
+				setSavedFiles={setSavedPhotos}
+				savedFiles={savedPhotos}
 				totalNumber={totalNumber}
 				setTotalNumber={setTotalNumber}
 			/>

@@ -5,51 +5,61 @@ import { FileUpload } from "primereact/fileupload";
 import { Tag } from "primereact/tag";
 import { Tooltip } from "primereact/tooltip";
 
-import { classNames } from "primereact/utils";
+import { Toast } from "primereact/toast";
 import { useRef, useState } from "react";
-import { Messages } from "primereact/messages";
 
 const MAX_FILES = 5; // Set your limit
-export function FileUploadDialog({ showFileUploadDialog, setShowFileUploadDialog }) {
-	const [totalNumber, setTotalNumber] = useState(0);
+export function FileUploadDialog({
+	showFileUploadDialog,
+	setShowFileUploadDialog,
+	savedFiles,
+	setSavedFiles,
+	totalNumber,
+	setTotalNumber,
+}) {
 	const fileUploadRef = useRef(null);
-	const [selectedFiles, setSelectedFiles] = useState([]);
-	const [maxFilesError, setMaxFilesError] = useState(false);
-	console.log("selected Files");
-	console.log(selectedFiles);
-	const msgs = useRef(null);
-	const addMessages = () => {
-		msgs.current.show([
-			{
-				severity: "error",
-				summary: "Error",
-				detail: `Maximum number of files exceeded. Limit is ${MAX_FILES}.`,
-				closable: true,
-			},
-		]);
-	};
-    maxFilesError && addMessages();
+
+	const toast = useRef(null);
+	console.log("savedFiles");
+	console.log(savedFiles);
 
 	const onTemplateSelect = (e) => {
-		console.log("onTemplateSelect");
-		if (e.files.length > MAX_FILES) {
+		const selectedFiles = e.files;
+		console.log("selected Files");
+		console.log(selectedFiles);
+		if (totalNumber + selectedFiles.length > MAX_FILES) {
 			// Show an error message
-			setMaxFilesError(true);
-		} else {
-			setTotalNumber(e.files.length);
-			setSelectedFiles(e.files);
+			toast.current.show({
+				severity: "error",
+				sticky: true,
+				summary: "Validation Error",
+				detail: `Maximum number of files exceeded. Limit is ${MAX_FILES}.`,
+			});
+			// Remove the excess files
+			const excessFiles = new Set(selectedFiles.slice(0, totalNumber + selectedFiles.length - MAX_FILES));
+			const updatedFiles = selectedFiles.filter((file) => !excessFiles.has(file));
+			setSavedFiles((prevFiles) => [...prevFiles, ...updatedFiles]);
+			setTotalNumber((prevNumber) => prevNumber + updatedFiles.length);
+		} else if (totalNumber < MAX_FILES) {
+			setSavedFiles((prevFiles) => [...prevFiles, ...selectedFiles]);
+			setTotalNumber((prevNumber) => prevNumber + selectedFiles.length);
 		}
 	};
 
 	const onTemplateRemove = (file, callback) => {
 		setTotalNumber((totalNumber) => totalNumber - 1);
-		setSelectedFiles((files) => files.filter((f) => f.name !== file.name));
+		setSavedFiles((files) => {
+			const updatedFiles = files.filter((f) => f.name !== file.name);
+			fileUploadRef.current.setFiles(updatedFiles); // Update the FileUpload component's internal files state
+			return updatedFiles;
+		});
+		// );
 		callback();
 	};
 
 	const onTemplateClear = () => {
 		setTotalNumber(0);
-		setSelectedFiles([]);
+		setSavedFiles([]);
 	};
 
 	const headerTemplate = (options) => {
@@ -64,40 +74,42 @@ export function FileUploadDialog({ showFileUploadDialog, setShowFileUploadDialog
 				{uploadButton}
 				{cancelButton}
 				<div className="flex align-items-center gap-3 ml-auto">
-					<span className={classNames({ "red-500": maxFilesError })}>
+					<span>
 						{totalNumber} / {MAX_FILES}
 					</span>
-				</div>
-				<div className="flex align-items-center gap-3 ml-auto">
-					<Messages ref={msgs} />
 				</div>
 			</div>
 		);
 	};
 
 	const itemTemplate = (file, props) => {
-        const realFile = selectedFiles.find((f) => f.name === file.name);
-        console.log("realFile");
-        console.log(realFile);
+		const realFile = savedFiles.find((f) => f.name === file.name);
 		return (
-            {realFile} &&
-			(<div className="flex align-items-center flex-wrap">
-				<div className="flex align-items-center" style={{ width: "40%" }}>
-					<img alt={realFile.name} role="presentation" src={realFile.objectURL} width={100} />
-					<span className="flex flex-column text-left ml-3">
-						{realFile.name}
-						<small>{new Date().toLocaleDateString()}</small>
-					</span>
-				</div>
-				<Tag value={props.formatSize} severity="warning" className="px-3 py-2" />
+			realFile && (
+				<div className="flex align-items-center flex-wrap">
+					<div className="flex align-items-center" style={{ width: "40%" }}>
+						<img
+							className="border-round-md"
+							alt={realFile.name}
+							role="presentation"
+							src={realFile.objectURL}
+							width={100}
+						/>
+						<span className="flex flex-column text-left ml-3">
+							{realFile.name}
+							<small>{new Date().toLocaleDateString()}</small>
+						</span>
+					</div>
+					<Tag value={props.formatSize} severity="warning" className="px-3 py-2" />
 
-				<Button
-					type="button"
-					icon="pi pi-times"
-					className="p-button-outlined p-button-rounded p-button-danger ml-auto"
-					onClick={() => onTemplateRemove(realFile, props.onRemove)}
-				/>
-			</div>)
+					<Button
+						type="button"
+						icon="pi pi-times"
+						className="p-button-outlined p-button-rounded p-button-danger ml-auto"
+						onClick={() => onTemplateRemove(realFile, props.onRemove)}
+					/>
+				</div>
+			)
 		);
 	};
 
@@ -147,12 +159,13 @@ export function FileUploadDialog({ showFileUploadDialog, setShowFileUploadDialog
 			onHide={() => setShowFileUploadDialog(false)}
 			draggable={false}
 		>
+			<Toast ref={toast} position="top-center" />
+
 			<Tooltip target=".custom-choose-btn" content="Choose" position="bottom" />
 			<Tooltip target=".custom-upload-btn" content="Confirm" position="bottom" />
 			<Tooltip target=".custom-cancel-btn" content="Clear" position="bottom" />
 
 			<FileUpload
-
 				ref={fileUploadRef}
 				name="demo[]"
 				customUpload

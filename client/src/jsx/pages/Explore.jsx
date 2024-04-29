@@ -179,12 +179,15 @@ export function Explore() {
 	const tagSuggestions = ["primereact", "primefaces", "primeng", "primevue"];
 	const op = useRef(null);
 	const [showFileUploadDialog, setShowFileUploadDialog] = useState(false);
+	const [savedFiles, setSavedFiles] = useState([]);
+	const [totalNumber, setTotalNumber] = useState(0);
+
 
 	const handleEmojiClick = (emojiObject) => {
 		console.log("emojiObject", emojiObject);
 			setMentionValue((prevValue) => `${prevValue} ${emojiObject.emoji}`);
 	};
-	console.log("user", user);
+	// console.log("user", user);
 	const userTemplate = (user) => {
 		return (
 			<Button
@@ -282,6 +285,11 @@ export function Explore() {
 		return null;
 	};
 
+	const onPhotoRemove = (file, index) => {
+		const updatedFiles = savedFiles.filter((f) => f.name !== file.name);
+		setSavedFiles(updatedFiles);
+		setTotalNumber((prevNumber) => prevNumber - 1);
+	}
 	return (
 		<div>
 			<Carousel
@@ -379,6 +387,22 @@ export function Explore() {
 				closeOnEscape={true}
 				footer={
 					<div>
+						{savedFiles.length > 0 && (
+							<div className="flex gap-2 mb-2">
+								{savedFiles.map((file, index) => (
+									<div key={index} className="relative cover w-8rem h-8rem">
+										<img src={file.objectURL} alt={file.name} className=" border-round-md" />
+										<Button
+											type="button"
+											size="small"
+											icon="pi pi-times"
+											className="absolute top-0 left-0 p-1 m-1 z-5 border-circle p-button-danger"
+											onClick={() => onPhotoRemove(file, index)}
+										/>
+									</div>
+								))}
+							</div>
+						)}
 						<div className="flex mb-4 gap-2">
 							<Button
 								label="Media"
@@ -435,7 +459,14 @@ export function Explore() {
 					inputClassName="w-full h-25rem max-h-29rem overflow-auto"
 				/>
 			</Dialog>
-			<FileUploadDialog showFileUploadDialog={showFileUploadDialog} setShowFileUploadDialog={setShowFileUploadDialog} />
+			<FileUploadDialog
+				showFileUploadDialog={showFileUploadDialog}
+				setShowFileUploadDialog={setShowFileUploadDialog}
+				setSavedFiles={setSavedFiles}
+				savedFiles={savedFiles}
+				totalNumber={totalNumber}
+				setTotalNumber={setTotalNumber}
+			/>
 			{/* create new post widget */}
 			<div
 				className="cursor-pointer flex flex-column justify-content-between gap-2 p-3 w-full border-1 surface-border border-round"

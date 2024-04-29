@@ -3,9 +3,6 @@
 import { stringNonEmpty } from "@utils/zodUtils";
 import { z } from "zod";
 
-//? -------- Constant ---------
-const MAX_FILE_SIZE = 500_000;
-const ACCEPTED_IMAGE_TYPES = new Set(["image/jpeg", "image/jpg", "image/png", "image/webp"]);
 
 //? -------- REGEX ---------
 const passRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!#$%&*?@])[\d!#$%&*?@A-Za-z]{8,}$/;
@@ -31,7 +28,6 @@ const baseSchema = z.object({
 	confirmPassword: stringNonEmpty(),
 	location: infoSchema,
 	job: infoSchema,
-	// picture: z.instanceof(FileList).optional().or(z.literal("")), // fix optional for url / email ...,
 });
 
 export const registerSchema = baseSchema.refine((data) => data.password === data.confirmPassword, {

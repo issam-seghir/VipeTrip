@@ -1,3 +1,9 @@
+import sectionImg1 from "@assets/images/Autumn Biking Companions.png";
+import sectionImg2 from "@assets/images/Contemplative Urban Dreamer.png";
+import sectionImg5 from "@assets/images/Contemporary Billiards Lounge with Ambient Lighting.png";
+import sectionImg4 from "@assets/images/poster.png";
+import sectionImg3 from "@assets/images/wallpaper.png";
+import { FileUploadDialog } from "@components/FileUploadDialog";
 import { Icon } from "@iconify/react";
 import { selectCurrentUser } from "@store/slices/authSlice";
 import { Avatar } from "primereact/avatar";
@@ -9,12 +15,11 @@ import { Mention } from "primereact/mention";
 import { OverlayPanel } from "primereact/overlaypanel";
 import { Suspense, lazy, useRef, useState } from "react";
 import { useSelector } from "react-redux";
-import { FileUploadDialog } from "@components/FileUploadDialog";
-import sectionImg1 from "@assets/images/Autumn Biking Companions.png";
-import sectionImg2 from "@assets/images/Contemplative Urban Dreamer.png";
-import sectionImg5 from "@assets/images/Contemporary Billiards Lounge with Ambient Lighting.png";
-import sectionImg4 from "@assets/images/poster.png";
-import sectionImg3 from "@assets/images/wallpaper.png";
+import { isDev } from "@data/constants";
+import { DevTool } from "@hookform/devtools";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {  useLoginMutation } from "@jsx/store/api/authApi";
+import { loginSchema } from "@validations/authSchema";
 
 
 const EmojiPicker = lazy(() => import("emoji-picker-react"));
@@ -141,8 +146,6 @@ users.forEach((user) => {
 	];
 });
 
-
-
 export function CreatePostSection() {
 	const user = useSelector(selectCurrentUser);
 	const [visible, setVisible] = useState(false);
@@ -259,7 +262,7 @@ export function CreatePostSection() {
 				</div>
 			</div>
 
-			{/* Create Post Form Dialog */}
+			{/* Create New Post Form Dialog */}
 			<Dialog
 				header={
 					<div className="flex">

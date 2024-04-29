@@ -16,7 +16,6 @@ const postSchema = new Schema(
 		sharedFrom: {
 			type: Schema.Types.ObjectId,
 			ref: "Post",
-			required: true,
 			autopopulate: true,
 		},
 		privacy: {
@@ -28,7 +27,7 @@ const postSchema = new Schema(
 			type: String,
 			required: true,
 		},
-		attachments: [
+		images: [
 			{
 				type: String,
 			},

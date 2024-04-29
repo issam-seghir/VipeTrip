@@ -12,7 +12,6 @@ import { z } from "zod";
  *
  */
 
-
 /**
  * Creates a Zod schema for a non-empty string.
  * @param {z.ZodErrorMap} errorMap - An optional object that maps error types to error messages.
@@ -182,4 +181,6 @@ function formatPath(path) {
 		.join(".");
 }
 
-export { arrayFromString, defaultInstance, formatPath, stringNonEmpty };
+const ObjectIdSchema = z.string().regex(/^[\da-f]{24}$/);
+
+export { arrayFromString, defaultInstance, formatPath, ObjectIdSchema, stringNonEmpty };

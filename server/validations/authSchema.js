@@ -6,8 +6,6 @@ const { stringNonEmpty, arrayFromString, formatPath ,ObjectIdSchema} = require("
 
 //? -------- Constant ---------
 
-const MAX_FILE_SIZE = 500_000;
-const ACCEPTED_IMAGE_TYPES = new Set(["image/jpeg", "image/jpg", "image/png", "image/webp"]);
 
 //? -------- REGEX ---------
 const passRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!#$%&*?@])[\d!#$%&*?@A-Za-z]{8,}$/;

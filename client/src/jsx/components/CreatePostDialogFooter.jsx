@@ -2,14 +2,28 @@ import { Icon } from "@iconify/react";
 import { EmojiPickerOverlay } from "@jsx/components/EmojiPickerOverlay";
 import { Button } from "primereact/button";
 import { Divider } from "primereact/divider";
-
+import { FileUploadDialog } from "@components/FileUploadDialog";
+import { useRef, useState } from "react";
 
 export function CreatePostDialogFooter({
-	handleMediaOpen,
-	handleEmojiOpen,
-	emojiPicker,
 	handleEmojiClick,
+	savedPhotos,
+	setSavedPhotos,
+	totalNumber,
+	setTotalNumber,
 }) {
+	const [showFileUploadDialog, setShowFileUploadDialog] = useState(false);
+	const handleMediaOpen = () => {
+		setShowFileUploadDialog(!showFileUploadDialog);
+	};
+
+	// Creat Post Actions Handlers
+	const emojiPicker = useRef(null);
+
+	const handleEmojiOpen = (e) => {
+		emojiPicker.current.toggle(e);
+	};
+
 	return (
 		<div>
 			{/* Creat Post Actions */}
@@ -20,6 +34,14 @@ export function CreatePostDialogFooter({
 					iconPos="left"
 					className="p-button-text"
 					onClick={handleMediaOpen}
+				/>
+				<FileUploadDialog
+					showFileUploadDialog={showFileUploadDialog}
+					setShowFileUploadDialog={setShowFileUploadDialog}
+					setSavedFiles={setSavedPhotos}
+					savedFiles={savedPhotos}
+					totalNumber={totalNumber}
+					setTotalNumber={setTotalNumber}
 				/>
 				<Button
 					label="Emoji"

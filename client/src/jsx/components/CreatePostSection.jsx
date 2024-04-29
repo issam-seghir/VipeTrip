@@ -19,40 +19,6 @@ import { useSelector } from "react-redux";
 import { CreatePostDialogFooter } from "@jsx/components/CreatePostDialogFooter";
 
 
-const EmojiPicker = lazy(() => import("emoji-picker-react"));
-
-const customEmojis = [
-	{
-		names: ["Alice", "alice in wonderland"],
-		imgUrl: "https://cdn.jsdelivr.net/gh/ealush/emoji-picker-react@custom_emojis_assets/alice.png",
-		id: "alice",
-	},
-	{
-		names: ["Dog"],
-		imgUrl: "https://cdn.jsdelivr.net/gh/ealush/emoji-picker-react@custom_emojis_assets/dog.png",
-		id: "dog",
-	},
-	{
-		names: ["Hat"],
-		imgUrl: "https://cdn.jsdelivr.net/gh/ealush/emoji-picker-react@custom_emojis_assets/hat.png",
-		id: "hat",
-	},
-	{
-		names: ["Vest"],
-		imgUrl: "https://cdn.jsdelivr.net/gh/ealush/emoji-picker-react@custom_emojis_assets/vest.png",
-		id: "vest",
-	},
-	{
-		names: ["Shock", "Surprised", "WOW", "OMG", "Oh My God", "Oh My Gosh", "Oh Gosh", "Oh God", "Oh No", "Oh Wow"],
-		imgUrl: "https://cdn3.emoji.gg/emojis/7980-my-eyes.png",
-		id: "shock",
-	},
-	{
-		names: ["Ok", "Okay", "Yes", "Good", "Great", "Fine", "Acceptable", "Agree", "Agreed", "Yup", "Yea", "Yeah"],
-		imgUrl: "https://cdn3.emoji.gg/emojis/77093-haruhi-like.png",
-		id: "ok",
-	},
-];
 
 const users = [
 	{
@@ -158,23 +124,15 @@ export function CreatePostSection() {
 	const [multipleSuggestions, setMultipleSuggestions] = useState([]);
 
 	// for fileUploads
-	const [showFileUploadDialog, setShowFileUploadDialog] = useState(false);
 	const [savedPhotos, setSavedPhotos] = useState([]);
 	const [totalNumber, setTotalNumber] = useState(0);
 
-	// Creat Post Actions Handlers
-	const emojiPicker = useRef(null);
 
-	const handleEmojiOpen = (e) => {
-		emojiPicker.current.toggle(e);
-	};
 
 	const handleEmojiClick = (emojiObject) => {
 		setMentionValue((prevValue) => `${prevValue} ${emojiObject?.emoji}`);
 	};
-	const handleMediaOpen = () => {
-		setShowFileUploadDialog(!showFileUploadDialog);
-	};
+
 	const onPhotoRemove = (photo) => {
 		const updatedPhotos = savedPhotos.filter((savedPhoto) => savedPhoto.name !== photo.name);
 		setSavedPhotos(updatedPhotos);
@@ -291,9 +249,9 @@ export function CreatePostSection() {
 					<CreatePostDialogFooter
 						savedPhotos={savedPhotos}
 						onPhotoRemove={onPhotoRemove}
-						handleMediaOpen={handleMediaOpen}
-						handleEmojiOpen={handleEmojiOpen}
-						emojiPicker={emojiPicker}
+						totalNumber={totalNumber}
+						setTotalNumber={setTotalNumber}
+						setSavedPhotos={setSavedPhotos}
 						handleEmojiClick={handleEmojiClick}
 					/>
 				}
@@ -345,14 +303,6 @@ export function CreatePostSection() {
 					{savedPhotos.length > 0 && <PhotosPreview photos={savedPhotos} onPhotoRemove={onPhotoRemove} />}
 				</div>
 			</Dialog>
-			<FileUploadDialog
-				showFileUploadDialog={showFileUploadDialog}
-				setShowFileUploadDialog={setShowFileUploadDialog}
-				setSavedFiles={setSavedPhotos}
-				savedFiles={savedPhotos}
-				totalNumber={totalNumber}
-				setTotalNumber={setTotalNumber}
-			/>
 		</>
 	);
 }

@@ -1,7 +1,7 @@
 import FlexBetween from "@components/FlexBetween";
 import UserImage from "@components/UserImage";
 import WidgetWrapper from "@components/WidgetWrapper";
-import { useNewPostMutation } from "@jsx/store/api/postApi";
+import { useCreatePostMutation } from "@jsx/store/api/postApi";
 import {
   AttachFileOutlined,
   DeleteOutlined,
@@ -36,7 +36,7 @@ const MyPostWidget = ({ picturePath }) => {
   const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
   const mediumMain = palette.neutral.mediumMain;
   const medium = palette.neutral.medium;
-  	const [newPost, { error: newPostError, isLoading: isnewPostLoading, isError: isnewPostError }] = useNewPostMutation();
+  	const [newPost, { error: newPostError, isLoading: isnewPostLoading, isError: isnewPostError }] = useCreatePostMutation();
 
     async function handlePost(data) {
 		try {

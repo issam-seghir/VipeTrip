@@ -5,7 +5,7 @@ const { stringNonEmpty, ObjectIdSchema } = require("@/utils/zodUtils");
 //? -------- Sub Schema ---------
 const totalSchema = z.number().int().positive().default(0);
 
-const postSchema = {
+const createPostSchema = {
 	body: z.object({
 		author: ObjectIdSchema,
 		privacy: z.enum(["onlyMe", "friends", "public"]).default("public"),
@@ -21,7 +21,7 @@ const postSchema = {
 };
 
 /**
- * @typedef {z.infer<typeof postSchema.body>} postSchemadBody
+ * @typedef {z.infer<typeof createPostSchema.body>}createPostSchemaBody
  */
 
-module.exports = { postSchema };
+module.exports = { createPostSchema };

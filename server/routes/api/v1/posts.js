@@ -5,7 +5,7 @@ const { getFeedPosts, getUserPosts, sharePost, getSinglePost, createPost, delete
 const multerErrorHandler = require("@/middleware/multer/multerErrorHandler");
 const { upload, uploadPost } = require("@/middleware/multer/multerUploader");
 
-router.route("/").post(createPost).get(getFeedPosts);
+router.route("/").post(upload.array("picture", 5), createPost).get(getFeedPosts);
 router.route("/:postId").get(getSinglePost).delete(deletePost).put(updatePost);
 
 router.route("/:postId/share").post(sharePost);

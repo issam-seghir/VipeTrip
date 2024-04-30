@@ -22,7 +22,7 @@ const path = require("node:path");
 const fs = require("node:fs");
 
 const MAX_FILE_SIZE_MB = 3;
-const MAX_FILE_SIZE_POST_MB = 5;
+const MAX_FILE_SIZE_POST_MB = 1;
 const GLOBAL_DIR = "public/global";
 const POSTS_DIR = "public/posts";
 

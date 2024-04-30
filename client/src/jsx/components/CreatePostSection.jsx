@@ -3,22 +3,24 @@ import sectionImg2 from "@assets/images/Contemplative Urban Dreamer.png";
 import sectionImg5 from "@assets/images/Contemporary Billiards Lounge with Ambient Lighting.png";
 import sectionImg4 from "@assets/images/poster.png";
 import sectionImg3 from "@assets/images/wallpaper.png";
-import { FileUploadDialog } from "@components/FileUploadDialog";
+import { isDev } from "@data/constants";
+import { DevTool } from "@hookform/devtools";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Icon } from "@iconify/react";
 import { PhotosPreview } from "@jsx/components/PhotosPreview";
+import { useCreatePostMutation } from "@jsx/store/api/postApi";
 import { selectCurrentUser } from "@store/slices/authSlice";
+import { createPostSchema } from "@validations/postSchema";
 import { Avatar } from "primereact/avatar";
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
-import { Divider } from "primereact/divider";
 import { Dropdown } from "primereact/dropdown";
 import { Mention } from "primereact/mention";
-import { OverlayPanel } from "primereact/overlaypanel";
-import { Suspense, lazy, useRef, useState } from "react";
+import { Toast } from "primereact/toast";
+import { classNames } from "primereact/utils";
+import { useRef, useState ,useEffect} from "react";
+import { Controller, useForm } from "react-hook-form";
 import { useSelector } from "react-redux";
-import { CreatePostDialogFooter } from "@jsx/components/CreatePostDialogFooter";
-
-
 
 const users = [
 	{
@@ -115,22 +117,94 @@ const tagSuggestions = ["primereact", "primefaces", "primeng", "primevue"];
 
 export function CreatePostSection() {
 	const user = useSelector(selectCurrentUser);
+	const toast = useRef(null);
 
-	const [selectedPrivacy, setSelectedPrivacy] = useState("public");
+	const [createPost, createPostResult] = useCreatePostMutation();
+	const {
+		handleSubmit,
+		watch,
+		reset,
+		setError,
+		setValue,
+		getValues,
+		clearErrors,
+		control,
+		formState: { errors: errorsForm, isSubmitting, isValidating, isValid },
+	} = useForm({
+		mode: "onChange",
+		resolver: zodResolver(createPostSchema),
+	});
+	console.log("errorsForm", errorsForm);
+	console.log("isValidating", isValidating);
+	console.log("isValid", isValid);
+
+	const errorMessage = createPostResult?.isError ? createPostResult?.error : errorsForm;
+
+	const getFormErrorMessage = (name) => {
+		if (errorMessage[name]) {
+			// Check if the error message is an array
+			return Array.isArray(errorMessage[name]) ? errorMessage[name].map(
+				(error, index) =>
+					error && (
+						<small key={index} className="p-error">
+							* {error.message}
+						</small>
+					)
+			) : <small className="p-error">* {errorMessage[name].message}</small>;
+		} else if (errorMessage?.data?.field === name) {
+			// server error
+			return <small className="p-error">* {errorMessage?.data?.message}</small>;
+		}
+	};
+
+	async function handleCreatePost(data) {
+		try {
+			const res = await createPost(data).unwrap();
+			if (res) {
+				reset();
+				toast.current.show({
+					severity: "success",
+					summary: "Post Created 🎉",
+					detail: "Your post has been created successfully",
+				});
+			}
+		} catch (error) {
+			console.error(error);
+			toast.current.show({
+				severity: "error",
+				summary: "Login Failed 💢",
+				detail: error?.data?.message || "email or password not correct",
+			});
+		}
+	}
+
+	const onSubmit = (data) => {
+		console.log("tests");
+		handleCreatePost(data);
+	};
+
 	const [showCreatePostDialog, setShowCreatePostDialog] = useState(false);
 
-	// for mentions in description
-	const [mentionValue, setMentionValue] = useState("");
+	// for mentions/tags overlay suggestion
 	const [multipleSuggestions, setMultipleSuggestions] = useState([]);
+ 	const description = watch("description");
+
+	 console.log("values", getValues());
+  useEffect(() => {
+		const mentions = (description?.match(/@\w+/g) || []);
+		const tags = (description?.match(/#\w+/g) || []);
+	console.log("mentions", mentions);
+	console.log("mentions", mentions);
+		setValue("mentions", mentions ,{shouldValidate: true});
+		setValue("tags", tags,{shouldValidate: true});
+  }, [description, setValue]);
 
 	// for fileUploads
 	const [savedPhotos, setSavedPhotos] = useState([]);
 	const [totalNumber, setTotalNumber] = useState(0);
 
-
-
 	const handleEmojiClick = (emojiObject) => {
-		setMentionValue((prevValue) => `${prevValue} ${emojiObject?.emoji}`);
+		// setMentionValue((prevValue) => `${prevValue} ${emojiObject?.emoji}`);
 	};
 
 	const onPhotoRemove = (photo) => {
@@ -236,6 +310,9 @@ export function CreatePostSection() {
 				</div>
 			</div>
 
+			{/* react hook form dev tool  */}
+			{isDev && <DevTool control={control} placement="top-left" />}
+			<Toast ref={toast} />
 			{/* Create New Post Form Dialog */}
 			<Dialog
 				header={<h2 className="text-center">Create Post</h2>}
@@ -245,63 +322,123 @@ export function CreatePostSection() {
 				draggable={false}
 				dismissableMask={true}
 				closeOnEscape={true}
-				footer={
-					<CreatePostDialogFooter
-						savedPhotos={savedPhotos}
-						onPhotoRemove={onPhotoRemove}
-						totalNumber={totalNumber}
-						setTotalNumber={setTotalNumber}
-						setSavedPhotos={setSavedPhotos}
-						handleEmojiClick={handleEmojiClick}
-					/>
-				}
+				// footer={
+				// 	<CreatePostDialogFooter
+				// 		createPostState={createPostState}
+				// 		isSubmitting={isSubmitting}
+				// 		savedPhotos={savedPhotos}
+				// 		onPhotoRemove={onPhotoRemove}
+				// 		totalNumber={totalNumber}
+				// 		setTotalNumber={setTotalNumber}
+				// 		setSavedPhotos={setSavedPhotos}
+				// 		handleEmojiClick={handleEmojiClick}
+				// 	/>
+				// }
 			>
-				<div className="flex flex-column gap-4">
-					{/* user cerdinals  */}
-					<div className="flex align-items-center justify-content-start gap-3">
-						<Avatar
-							size="large"
-							className="h-4rem w-4rem"
-							image={user?.picturePath}
-							alt={user?.fullName}
-							shape="circle"
-						/>
-						<div className="flex flex-column gap-1">
-							<h5 className="text-xl">{user?.fullName} </h5>
-							<Dropdown
-								pt={{
-									item: "p-1 pl-4",
-									itemLabel: "p-1",
-									input: "p-1",
-								}}
-								value={selectedPrivacy}
-								onChange={(e) => setSelectedPrivacy(e.value)}
-								options={privacies}
-								className="h-2rem pl-2"
-								highlightOnSelect={false}
+				<form onSubmit={handleSubmit(onSubmit)}>
+					<div className="flex flex-column gap-4">
+						{/* user cerdinals  */}
+						<div className="flex  justify-content-start gap-3">
+							<Avatar
+								size="large"
+								className="mt-1 h-4rem w-4rem"
+								image={user?.picturePath}
+								alt={user?.fullName}
+								shape="circle"
 							/>
+							<div className="flex flex-column gap-1">
+								<h5 className="text-xl">{user?.fullName} </h5>
+								<Controller
+									defaultValue={"public"}
+									name={"privacy"}
+									control={control}
+									render={({ field, fieldState }) => (
+										<>
+											<Dropdown
+												id={field.name}
+												value={field.value}
+												focusInputRef={field.ref}
+												{...field}
+												className={classNames(
+													{ "p-invalid": fieldState.error },
+													"w-fit h-2rem pl-2"
+												)}
+												options={privacies}
+												onChange={(e) => field.onChange(e.value)}
+												highlightOnSelect={false}
+												pt={{
+													item: "p-1 pl-4",
+													itemLabel: "p-1",
+													input: "p-1",
+												}}
+											/>
+
+											{/* error label */}
+											<label
+												htmlFor={field.name}
+												style={{ textWrap: "balance" }}
+												className={classNames({
+													"p-error": errorMessage || fieldState.error,
+												})}
+											>
+												{getFormErrorMessage(field.name)}
+											</label>
+										</>
+									)}
+								/>
+							</div>
 						</div>
+						{/* content input area  */}
+						<Controller
+							defaultValue={""}
+							name={"description"}
+							control={control}
+							render={({ field, fieldState }) => (
+								<div className="flex flex-column ">
+									<Mention
+										id={field.name}
+										value={field.value}
+										{...field}
+										className={classNames({ "p-invalid": fieldState.error }, "flex mb-2")}
+										inputClassName="w-full h-25rem max-h-29rem overflow-auto"
+										onChange={(e) => field.onChange(e.target.value)}
+										trigger={["@", "#"]}
+										suggestions={multipleSuggestions}
+										onSearch={onMultipleSearch}
+										field={["name"]}
+										placeholder="Enter @ to mention people, # to mention tag"
+										itemTemplate={multipleItemTemplate}
+										autoResize={true}
+									/>
+									{/* error label */}
+									<label
+										htmlFor={field.name}
+										style={{ textWrap: "balance" }}
+										className={classNames({
+											"p-error": errorMessage || fieldState.error,
+										},
+										"inline-flex flex-column")}
+									>
+										{getFormErrorMessage(field.name)}
+										{getFormErrorMessage("mentions")}
+										{getFormErrorMessage("tags")}
+									</label>
+								</div>
+							)}
+						/>
+
+						{/* Photos Preview */}
+						{savedPhotos.length > 0 && <PhotosPreview photos={savedPhotos} onPhotoRemove={onPhotoRemove} />}
+						<Button
+							type="submit"
+							label={createPostResult?.isLoading ? "Creatting..." : "Post"}
+							className="w-full"
+							iconPos="right"
+							loading={isSubmitting || createPostResult?.isLoading}
+							onClick={handleSubmit}
+						/>
 					</div>
-					{/* content input area  */}
-					<Mention
-						value={mentionValue}
-						onChange={(e) => {
-							setMentionValue(e.target.value);
-						}}
-						trigger={["@", "#"]}
-						suggestions={multipleSuggestions}
-						onSearch={onMultipleSearch}
-						field={["name"]}
-						placeholder="Enter @ to mention people, # to mention tag"
-						itemTemplate={multipleItemTemplate}
-						autoResize={true}
-						maxLength={3000}
-						className="flex mb-2"
-						inputClassName="w-full h-25rem max-h-29rem overflow-auto"
-					/>
-					{/* Photos Preview */}
-					{savedPhotos.length > 0 && <PhotosPreview photos={savedPhotos} onPhotoRemove={onPhotoRemove} />}
-				</div>
+				</form>
 			</Dialog>
 		</>
 	);

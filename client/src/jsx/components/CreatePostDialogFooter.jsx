@@ -1,8 +1,8 @@
+import { FileUploadDialog } from "@components/FileUploadDialog";
 import { Icon } from "@iconify/react";
 import { EmojiPickerOverlay } from "@jsx/components/EmojiPickerOverlay";
 import { Button } from "primereact/button";
 import { Divider } from "primereact/divider";
-import { FileUploadDialog } from "@components/FileUploadDialog";
 import { useRef, useState } from "react";
 
 export function CreatePostDialogFooter({
@@ -11,6 +11,8 @@ export function CreatePostDialogFooter({
 	setSavedPhotos,
 	totalNumber,
 	setTotalNumber,
+	createPostState,
+	isSubmitting,
 }) {
 	const [showFileUploadDialog, setShowFileUploadDialog] = useState(false);
 	const handleMediaOpen = () => {
@@ -60,7 +62,13 @@ export function CreatePostDialogFooter({
 				/>
 			</div>
 			<Divider />
-			<Button label="Post" className="w-full" />
+			<Button
+				type="submit"
+				label={createPostState?.isLoading ? "Creatting..." : "Post"}
+				className="w-full"
+				iconPos="right"
+				loading={isSubmitting || createPostState?.isLoading}
+			/>
 		</div>
 	);
 }

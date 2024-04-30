@@ -1,6 +1,6 @@
 const User = require("@model/User");
 const { asyncWrapper } = require("@middleware/asyncWrapper");
-const { mongooseIdSchema } = require("@validations/mongooseIdSchema");
+const { ObjectIdSchema } = require("@utils/zodUtils");
 const createError = require("http-errors");
 
 const getAllUsers = asyncWrapper(async (req, res, next) => {
@@ -11,7 +11,7 @@ const getAllUsers = asyncWrapper(async (req, res, next) => {
 });
 const getUser = asyncWrapper(async (req, res, next) => {
 	try {
-		mongooseIdSchema.parse(req.params.id); //pass the validation
+		ObjectIdSchema.parse(req.params.id); //pass the validation
 	} catch (error) {
 		return next(new createError.BadRequest(error));
 	}

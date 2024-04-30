@@ -16,7 +16,7 @@ export const createPostSchema = z.object({
 	description: stringNonEmpty().max(3000),
 	images: z.instanceof(FileList).optional().or(z.literal("")), // fix optional for url / email ...,
 	edited: z.boolean().default(false),
-	mentions: z.array(z.string()).max(2).default([]),
+	mentions: z.array(z.string()).max(50).default([]),
 	tags: z
 		.array(
 			z

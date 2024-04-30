@@ -11,8 +11,9 @@ export function CreatePostDialogFooter({
 	setSavedPhotos,
 	totalNumber,
 	setTotalNumber,
-	createPostState,
+	createPostResult,
 	isSubmitting,
+	handleSubmit,
 }) {
 	const [showFileUploadDialog, setShowFileUploadDialog] = useState(false);
 	const handleMediaOpen = () => {
@@ -27,7 +28,7 @@ export function CreatePostDialogFooter({
 	};
 
 	return (
-		<div>
+		<div className="p-dialog-footer">
 			{/* Creat Post Actions */}
 			<div className="flex m-2 gap-2">
 				<Button
@@ -64,10 +65,11 @@ export function CreatePostDialogFooter({
 			<Divider />
 			<Button
 				type="submit"
-				label={createPostState?.isLoading ? "Creatting..." : "Post"}
+				label={createPostResult?.isLoading ? "Creatting..." : "Post"}
 				className="w-full"
 				iconPos="right"
-				loading={isSubmitting || createPostState?.isLoading}
+				loading={isSubmitting || createPostResult?.isLoading}
+				onClick={handleSubmit}
 			/>
 		</div>
 	);

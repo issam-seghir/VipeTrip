@@ -21,6 +21,11 @@ import { classNames } from "primereact/utils";
 import { useRef, useState ,useEffect} from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useSelector } from "react-redux";
+import { CreatePostDialogFooter } from "./CreatePostDialogFooter";
+import { FileUploadDialog } from "@components/FileUploadDialog";
+import { EmojiPickerOverlay } from "@jsx/components/EmojiPickerOverlay";
+import { Divider } from "primereact/divider";
+
 
 const users = [
 	{
@@ -135,8 +140,7 @@ export function CreatePostSection() {
 		resolver: zodResolver(createPostSchema),
 	});
 	console.log("errorsForm", errorsForm);
-	console.log("isValidating", isValidating);
-	console.log("isValid", isValid);
+	 console.log("values", getValues());
 
 	const errorMessage = createPostResult?.isError ? createPostResult?.error : errorsForm;
 
@@ -179,8 +183,8 @@ export function CreatePostSection() {
 	}
 
 	const onSubmit = (data) => {
-		console.log("tests");
-		handleCreatePost(data);
+		console.log("---------------- Submitting ---------------");
+		// handleCreatePost(data);
 	};
 
 	const [showCreatePostDialog, setShowCreatePostDialog] = useState(false);
@@ -189,12 +193,9 @@ export function CreatePostSection() {
 	const [multipleSuggestions, setMultipleSuggestions] = useState([]);
  	const description = watch("description");
 
-	 console.log("values", getValues());
   useEffect(() => {
 		const mentions = (description?.match(/@\w+/g) || []);
 		const tags = (description?.match(/#\w+/g) || []);
-	console.log("mentions", mentions);
-	console.log("mentions", mentions);
 		setValue("mentions", mentions ,{shouldValidate: true});
 		setValue("tags", tags,{shouldValidate: true});
   }, [description, setValue]);
@@ -216,6 +217,18 @@ export function CreatePostSection() {
 	const handlePollOpen = () => {
 		// handle poll click
 	};
+
+		const [showFileUploadDialog, setShowFileUploadDialog] = useState(false);
+		const handleMediaOpen = () => {
+			setShowFileUploadDialog(!showFileUploadDialog);
+		};
+
+		// Creat Post Actions Handlers
+		const emojiPicker = useRef(null);
+
+		const handleEmojiOpen = (e) => {
+			emojiPicker.current.toggle(e);
+		};
 
 	const onMultipleSearch = (event) => {
 		const trigger = event.trigger;
@@ -322,18 +335,54 @@ export function CreatePostSection() {
 				draggable={false}
 				dismissableMask={true}
 				closeOnEscape={true}
-				// footer={
-				// 	<CreatePostDialogFooter
-				// 		createPostState={createPostState}
-				// 		isSubmitting={isSubmitting}
-				// 		savedPhotos={savedPhotos}
-				// 		onPhotoRemove={onPhotoRemove}
-				// 		totalNumber={totalNumber}
-				// 		setTotalNumber={setTotalNumber}
-				// 		setSavedPhotos={setSavedPhotos}
-				// 		handleEmojiClick={handleEmojiClick}
-				// 	/>
-				// }
+				footer={
+					// <form onSubmit={handleSubmit(onSubmit)}>
+					<div className="p-dialog-footer">
+						{/* Creat Post Actions */}
+						<div className="flex m-2 gap-2">
+							<Button
+								label="Media"
+								icon="pi pi-image"
+								iconPos="left"
+								className="p-button-text"
+								onClick={handleMediaOpen}
+							/>
+							<FileUploadDialog
+								showFileUploadDialog={showFileUploadDialog}
+								setShowFileUploadDialog={setShowFileUploadDialog}
+								setSavedFiles={setSavedPhotos}
+								savedFiles={savedPhotos}
+								totalNumber={totalNumber}
+								setTotalNumber={setTotalNumber}
+							/>
+							<Button
+								label="Emoji"
+								icon={<Icon icon="uil:smile" className="pi p-button-icon-left" />}
+								iconPos="left"
+								className="p-button-text"
+								onClick={handleEmojiOpen}
+							/>
+							<EmojiPickerOverlay ref={emojiPicker} handleEmojiClick={handleEmojiClick} />
+							<Button
+								label="Poll"
+								icon="pi pi-chart-bar"
+								iconPos="left"
+								className="p-button-text"
+								// onClick={handlePollOpen}
+							/>
+						</div>
+						<Divider />
+						<Button
+							type="submit"
+							label={createPostResult?.isLoading ? "Creatting..." : "Post"}
+							className="w-full"
+							iconPos="right"
+							loading={isSubmitting || createPostResult?.isLoading}
+							onClick={handleSubmit(onSubmit)}
+						/>
+					</div>
+					// </form>
+				}
 			>
 				<form onSubmit={handleSubmit(onSubmit)}>
 					<div className="flex flex-column gap-4">
@@ -414,10 +463,12 @@ export function CreatePostSection() {
 									<label
 										htmlFor={field.name}
 										style={{ textWrap: "balance" }}
-										className={classNames({
-											"p-error": errorMessage || fieldState.error,
-										},
-										"inline-flex flex-column")}
+										className={classNames(
+											{
+												"p-error": errorMessage || fieldState.error,
+											},
+											"inline-flex flex-column"
+										)}
 									>
 										{getFormErrorMessage(field.name)}
 										{getFormErrorMessage("mentions")}
@@ -429,14 +480,6 @@ export function CreatePostSection() {
 
 						{/* Photos Preview */}
 						{savedPhotos.length > 0 && <PhotosPreview photos={savedPhotos} onPhotoRemove={onPhotoRemove} />}
-						<Button
-							type="submit"
-							label={createPostResult?.isLoading ? "Creatting..." : "Post"}
-							className="w-full"
-							iconPos="right"
-							loading={isSubmitting || createPostResult?.isLoading}
-							onClick={handleSubmit}
-						/>
 					</div>
 				</form>
 			</Dialog>

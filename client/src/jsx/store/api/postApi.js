@@ -3,10 +3,10 @@ import { api } from "@jsx/store/api/api";
 export const postApi = api.enhanceEndpoints({ addTagTypes: ["Post"] }).injectEndpoints({
 	endpoints: (builder) => ({
 		createPost: builder.mutation({
-			query: (postData) => ({
-				url: `/posts`,
+			query: (body) => ({
+				url: `posts`,
 				method: "POST",
-				body: postData,
+				body,
 			}),
 		}),
 		getAllPosts: builder.query({

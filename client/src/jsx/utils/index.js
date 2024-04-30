@@ -75,6 +75,27 @@ function isRegexSave(...regexes) {
 	};
 }
 
+/**
+ * * Converts size in bytes to megabytes.
+ *
+ * @param {number} sizeInBytes - The size in bytes.
+ * @param {number} [decimalsNum=2] - The number of decimal places to keep in the result.
+ * @returns {number} The size in megabytes.
+ *
+ * @example
+ * // returns 1.00
+ * sizeInMB(1048576);
+ *
+ * @example
+ * // returns 1.5
+ * sizeInMB(1572864, 1);
+ */
+const sizeInMB = (sizeInBytes, decimalsNum = 2) => {
+	const result = sizeInBytes / (1024 * 1024);
+	const fixedResult = result.toFixed(decimalsNum);
+	return +Number.parseFloat(fixedResult).toString();
+};
+
 
 export default {
 	byteToMb,

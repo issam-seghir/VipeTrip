@@ -165,6 +165,7 @@ export function CreatePostSection() {
 
 	async function handleCreatePost(data) {
 		try {
+			console.log(data);
 			const res = await createPost(data).unwrap();
 			if (res) {
 				reset();
@@ -186,7 +187,7 @@ export function CreatePostSection() {
 
 	const onSubmit = (data) => {
 		console.log("---------------- Submitting ---------------");
-		// handleCreatePost(data);
+		handleCreatePost(data);
 	};
 
 	const [showCreatePostDialog, setShowCreatePostDialog] = useState(false);
@@ -351,6 +352,7 @@ export function CreatePostSection() {
 								onClick={handleMediaOpen}
 							/>
 							<FileUploadDialog
+								control={control}
 								showFileUploadDialog={showFileUploadDialog}
 								setShowFileUploadDialog={setShowFileUploadDialog}
 								setSavedFiles={setSavedPhotos}

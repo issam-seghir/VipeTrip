@@ -6,6 +6,7 @@ const createError = require("http-errors");
 
 const createPost = asyncWrapper(async (req, res) => {
 		const { userId, description, mentions, tags } = req.body;
+		const {images} = req.files;
 		const attachments = req.files.map((file) => file.path); // Get paths of uploaded files
 
 		// Check if the user exists

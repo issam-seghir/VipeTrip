@@ -7,6 +7,7 @@ import { Tooltip } from "primereact/tooltip";
 
 import { Toast } from "primereact/toast";
 import { useRef, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 
 const MAX_FILES = 5; // Set your limit
 export function FileUploadDialog({
@@ -16,6 +17,7 @@ export function FileUploadDialog({
 	setSavedFiles,
 	totalNumber,
 	setTotalNumber,
+	control
 }) {
 	const fileUploadRef = useRef(null);
 
@@ -164,8 +166,34 @@ export function FileUploadDialog({
 			<Tooltip target=".custom-choose-btn" content="Choose" position="bottom" />
 			<Tooltip target=".custom-upload-btn" content="Confirm" position="bottom" />
 			<Tooltip target=".custom-cancel-btn" content="Clear" position="bottom" />
-
-			<FileUpload
+			<Controller
+				defaultValue={[]}
+				name="images"
+				control={control}
+				render={({ field: { onChange, value } }) => (
+					<FileUpload
+						name="demo[]"
+						customUpload
+						multiple
+						accept="image/*"
+						uploadOptions={uploadOptions}
+						chooseOptions={chooseOptions}
+						cancelOptions={cancelOptions}
+						maxFileSize={1_000_000}
+						onSelect={(e) => {
+							  onChange(e.files);
+								onTemplateSelect(e);
+						}}
+						onError={onTemplateClear}
+						onClear={onTemplateClear}
+						headerTemplate={headerTemplate}
+						itemTemplate={itemTemplate}
+						emptyTemplate={emptyTemplate}
+						files={value}
+					/>
+				)}
+			/>
+			{/* <FileUpload
 				ref={fileUploadRef}
 				name="demo[]"
 				customUpload
@@ -181,7 +209,7 @@ export function FileUploadDialog({
 				headerTemplate={headerTemplate}
 				itemTemplate={itemTemplate}
 				emptyTemplate={emptyTemplate}
-			/>
+			/> */}
 		</Dialog>
 	);
 }

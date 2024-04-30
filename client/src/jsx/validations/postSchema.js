@@ -2,8 +2,10 @@ import { stringNonEmpty } from "@utils/zodUtils";
 import { z } from "zod";
 
 //? -------- Constant ---------
-const MAX_FILE_SIZE = 500_000;
+const MAX_FILES = 5; // Set your limit
+const MAX_FILE_SIZE = 1;
 const ACCEPTED_IMAGE_TYPES = new Set(["image/jpeg", "image/jpg", "image/png", "image/webp"]);
+
 
 //? -------- REGEX ---------
 const tagRegex = /^#?[\w-]+$/;
@@ -14,8 +16,16 @@ const totalSchema = z.number().int().positive().default(0);
 export const createPostSchema = z.object({
 	privacy: z.enum(["onlyMe", "friends", "public"]).default("public"),
 	description: stringNonEmpty().max(3000),
-	images: z.instanceof(FileList).optional().or(z.literal("")), // fix optional for url / email ...,
-	edited: z.boolean().default(false),
+	images: z
+		.instanceof(FileList)
+		.optional()
+		.or(z.literal("")) // fix optional for url / email ...,
+		.refine((files) => files.length <= MAX_FILES, `Maximum number of Images exceeded. Limit is ${MAX_FILES}.`)
+		.refine((files) => files.every((file) => sizeInMB(file.size) <= MAX_FILE_SIZE), `Image size should be <= 1mb.`)
+		.refine(
+			(files) => files.every((file) => ACCEPTED_IMAGE_TYPES.includes(file.type)),
+			"Only these types are allowed .jpg, .jpeg, .png and .webp"
+		),
 	mentions: z.array(z.string()).max(50).default([]),
 	tags: z
 		.array(

@@ -3,10 +3,12 @@ import sectionImg2 from "@assets/images/Contemplative Urban Dreamer.png";
 import sectionImg5 from "@assets/images/Contemporary Billiards Lounge with Ambient Lighting.png";
 import sectionImg4 from "@assets/images/poster.png";
 import sectionImg3 from "@assets/images/wallpaper.png";
+import { FileUploadDialog } from "@components/FileUploadDialog";
 import { isDev } from "@data/constants";
 import { DevTool } from "@hookform/devtools";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Icon } from "@iconify/react";
+import { EmojiPickerOverlay } from "@jsx/components/EmojiPickerOverlay";
 import { PhotosPreview } from "@jsx/components/PhotosPreview";
 import { useCreatePostMutation } from "@jsx/store/api/postApi";
 import { selectCurrentUser } from "@store/slices/authSlice";
@@ -14,18 +16,14 @@ import { createPostSchema } from "@validations/postSchema";
 import { Avatar } from "primereact/avatar";
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
+import { Divider } from "primereact/divider";
 import { Dropdown } from "primereact/dropdown";
 import { Mention } from "primereact/mention";
 import { Toast } from "primereact/toast";
 import { classNames } from "primereact/utils";
-import { useRef, useState ,useEffect} from "react";
+import { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useSelector } from "react-redux";
-import { CreatePostDialogFooter } from "./CreatePostDialogFooter";
-import { FileUploadDialog } from "@components/FileUploadDialog";
-import { EmojiPickerOverlay } from "@jsx/components/EmojiPickerOverlay";
-import { Divider } from "primereact/divider";
-
 
 const users = [
 	{
@@ -140,21 +138,25 @@ export function CreatePostSection() {
 		resolver: zodResolver(createPostSchema),
 	});
 	console.log("errorsForm", errorsForm);
-	 console.log("values", getValues());
+	console.log("values", getValues());
 
 	const errorMessage = createPostResult?.isError ? createPostResult?.error : errorsForm;
 
 	const getFormErrorMessage = (name) => {
 		if (errorMessage[name]) {
 			// Check if the error message is an array
-			return Array.isArray(errorMessage[name]) ? errorMessage[name].map(
-				(error, index) =>
-					error && (
-						<small key={index} className="p-error">
-							* {error.message}
-						</small>
-					)
-			) : <small className="p-error">* {errorMessage[name].message}</small>;
+			return Array.isArray(errorMessage[name]) ? (
+				errorMessage[name].map(
+					(error, index) =>
+						error && (
+							<small key={index} className="p-error">
+								* {error.message}
+							</small>
+						)
+				)
+			) : (
+				<small className="p-error">* {errorMessage[name].message}</small>
+			);
 		} else if (errorMessage?.data?.field === name) {
 			// server error
 			return <small className="p-error">* {errorMessage?.data?.message}</small>;
@@ -191,21 +193,22 @@ export function CreatePostSection() {
 
 	// for mentions/tags overlay suggestion
 	const [multipleSuggestions, setMultipleSuggestions] = useState([]);
- 	const description = watch("description");
+	const description = watch("description");
 
-  useEffect(() => {
-		const mentions = (description?.match(/@\w+/g) || []);
-		const tags = (description?.match(/#\w+/g) || []);
-		setValue("mentions", mentions ,{shouldValidate: true});
-		setValue("tags", tags,{shouldValidate: true});
-  }, [description, setValue]);
+	useEffect(() => {
+		const mentions = description?.match(/@\w+/g) || [];
+		const tags = description?.match(/#\w+/g) || [];
+		setValue("mentions", mentions, { shouldValidate: true });
+		setValue("tags", tags, { shouldValidate: true });
+	}, [description, setValue]);
 
 	// for fileUploads
 	const [savedPhotos, setSavedPhotos] = useState([]);
 	const [totalNumber, setTotalNumber] = useState(0);
 
 	const handleEmojiClick = (emojiObject) => {
-		// setMentionValue((prevValue) => `${prevValue} ${emojiObject?.emoji}`);
+		const prevValue = getValues("description");
+		setValue("description", `${prevValue} ${emojiObject?.emoji}`, { shouldValidate: true });
 	};
 
 	const onPhotoRemove = (photo) => {
@@ -218,17 +221,17 @@ export function CreatePostSection() {
 		// handle poll click
 	};
 
-		const [showFileUploadDialog, setShowFileUploadDialog] = useState(false);
-		const handleMediaOpen = () => {
-			setShowFileUploadDialog(!showFileUploadDialog);
-		};
+	const [showFileUploadDialog, setShowFileUploadDialog] = useState(false);
+	const handleMediaOpen = () => {
+		setShowFileUploadDialog(!showFileUploadDialog);
+	};
 
-		// Creat Post Actions Handlers
-		const emojiPicker = useRef(null);
+	// Creat Post Actions Handlers
+	const emojiPicker = useRef(null);
 
-		const handleEmojiOpen = (e) => {
-			emojiPicker.current.toggle(e);
-		};
+	const handleEmojiOpen = (e) => {
+		emojiPicker.current.toggle(e);
+	};
 
 	const onMultipleSearch = (event) => {
 		const trigger = event.trigger;

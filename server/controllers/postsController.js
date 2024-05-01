@@ -22,13 +22,7 @@ const createPost = asyncWrapper(async (req, res) => {
 	const mentionNames = mentions.map((mention) => mention.replace("@", ""));
 	console.log(mentionNames);
 	// Find all mentioned users by their firstName or lastName
-	const mentionedUsers = await User.find({
-		$or: [
-			{ firstName: { $in: mentionNames } },
-			{ lastName: { $in: mentionNames } },
-			{ fullName: { $in: mentionNames } },
-		],
-	});
+	const mentionedUsers = await User.find({ fullName: { $in: mentionNames } });
 	const mentionIds = mentionedUsers.map((user) => user.id);
 
 	const newPost = new Post({

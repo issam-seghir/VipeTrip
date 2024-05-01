@@ -1,8 +1,3 @@
-import sectionImg1 from "@assets/images/Autumn Biking Companions.png";
-import sectionImg2 from "@assets/images/Contemplative Urban Dreamer.png";
-import sectionImg5 from "@assets/images/Contemporary Billiards Lounge with Ambient Lighting.png";
-import sectionImg4 from "@assets/images/poster.png";
-import sectionImg3 from "@assets/images/wallpaper.png";
 import { FileUploadDialog } from "@components/FileUploadDialog";
 import { isDev } from "@data/constants";
 import { DevTool } from "@hookform/devtools";
@@ -12,23 +7,20 @@ import { EmojiPickerOverlay } from "@jsx/components/EmojiPickerOverlay";
 import { PhotosPreview } from "@jsx/components/PhotosPreview";
 import { useCreatePostMutation } from "@jsx/store/api/postApi";
 import { selectCurrentUser } from "@store/slices/authSlice";
+import { useDebounce } from "@uidotdev/usehooks";
 import { createPostSchema } from "@validations/postSchema";
 import { Avatar } from "primereact/avatar";
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
 import { Divider } from "primereact/divider";
-import { Mention } from "primereact/mention";
 import { Toast } from "primereact/toast";
-import { classNames } from "primereact/utils";
 import { useEffect, useRef, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { convertModelToFormData } from "./../utils/index";
 import { PFormDropdown } from "./Form/PFormDropdown";
 import { PFormMentionTagTextArea } from "./Form/PFormMentionTagTextArea";
-import { useDebounce } from "@uidotdev/usehooks";
-import { convertModelToFormData } from "./../utils/index";
-
 
 const privacies = ["onlyMe", "friends", "public"];
 
@@ -79,13 +71,12 @@ export function CreatePostSection() {
 
 	async function handleCreatePost(data) {
 		try {
-			console.log("-------------- issubmitting ---------------");
-			console.log(data);
 			// Convert data to FormData
 			const formData = convertModelToFormData(data);
 			const res = await createPost(formData).unwrap();
 			if (res) {
-				// reset();
+				reset();
+				setShowCreatePostDialog(false);
 				toast.current.show({
 					severity: "success",
 					summary: "Post Created 🎉",
@@ -197,7 +188,7 @@ export function CreatePostSection() {
 				breakpoints={{ "960px": "75vw", "640px": "90vw" }}
 				onHide={() => setShowCreatePostDialog(false)}
 				draggable={false}
-				dismissableMask={true}
+				dismissableMask={!isSubmitting && !createPostResult?.isLoading}
 				closeOnEscape={true}
 				footer={
 					<>
@@ -270,6 +261,7 @@ export function CreatePostSection() {
 										itemLabel: "p-1",
 										input: "p-1",
 									}}
+									disabled={isSubmitting || createPostResult?.isLoading}
 									highlightOnSelect={false}
 									errorMessage={errorMessage}
 								/>
@@ -285,6 +277,7 @@ export function CreatePostSection() {
 							placeholder="Enter @ to mention people, # to mention tag"
 							autoResize={true}
 							autoFocus={true}
+							disabled={isSubmitting || createPostResult?.isLoading}
 							errorMessage={errorMessage}
 						/>
 

@@ -25,13 +25,7 @@ export function FileUploadDialog({
 	const toast = useRef(null);
 
 	const onTemplateRemove = (file, callback) => {
-		// setSavedFiles((files) => {
-		// 	const updatedFiles = files.filter((f) => f.name !== file.name);
-		// 	fileUploadRef.current.setFiles(updatedFiles); // Update the FileUpload component's internal files state
-		// 	return updatedFiles;
-		// });
 		onPhotoRemove(file);
-		// );
 		callback();
 	};
 
@@ -92,7 +86,7 @@ export function FileUploadDialog({
 						type="button"
 						icon="pi pi-times"
 						className="p-button-outlined p-button-rounded p-button-danger ml-auto"
-						onClick={() => onTemplateRemove(images, props.onRemove)}
+						onClick={() => onTemplateRemove(image, props.onRemove)}
 					/>
 				</div>
 			)

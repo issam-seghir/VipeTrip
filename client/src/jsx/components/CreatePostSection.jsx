@@ -214,7 +214,9 @@ export function CreatePostSection() {
 	};
 
 	const onPhotoRemove = (photo) => {
+		console.log("photo", photo);
 		    const updatedPhotos = images.filter((image) => image.name !== photo.name);
+			console.log("updatedPhotos", updatedPhotos);
 			setValue("images", updatedPhotos, { shouldValidate: true });
 	};
 

@@ -201,6 +201,8 @@ export const PFormMentionTagTextArea = ({
 						itemTemplate={multipleItemTemplate}
 						autoResize={autoResize}
 						autoFocus={autoFocus}
+						pt={pt}
+						disabled={disabled}
 					/>
 					{/* error label */}
 					<label

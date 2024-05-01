@@ -1,11 +1,19 @@
-import { Controller } from "react-hook-form";
 import { Dropdown } from "primereact/dropdown";
 import { classNames } from "primereact/utils";
+import { Controller } from "react-hook-form";
 
-
-export const PFormDropdown = ({ control, defaultValue, name, options, pt, className, errorMessage,highlightOnSelect, disabled }) => {
-
-    const getErrorMessage = (name) => {
+export const PFormDropdown = ({
+	control,
+	defaultValue,
+	name,
+	options,
+	pt,
+	className,
+	errorMessage,
+	highlightOnSelect,
+	disabled,
+}) => {
+	const getErrorMessage = (name) => {
 		if (errorMessage[name]) {
 			// Check if the error message is an array
 			return Array.isArray(errorMessage[name]) ? (
@@ -41,6 +49,7 @@ export const PFormDropdown = ({ control, defaultValue, name, options, pt, classN
 						options={options}
 						onChange={(e) => field.onChange(e.value)}
 						highlightOnSelect={highlightOnSelect}
+						disabled={disabled}
 						pt={pt}
 					/>
 

@@ -76,7 +76,6 @@ postSchema.plugin(mongooseAlgolia, {
 	selector: "-password -email -rememberMe -socialAccounts.accessToken -refreshToken", //  You can decide which field that are getting synced to Algolia (same as selector in mongoose)
 	populate: {
 		path: "author",
-		select: "author",
 	},
 	// If you want to prevent some documents from being synced to algolia
 	// },
@@ -85,6 +84,25 @@ postSchema.plugin(mongooseAlgolia, {
 	// },
 	debug: true, //  logged out in your console
 });
+
+//? --------- Middlewares ----------------
+
+// Assuming User model is imported like this
+const User = mongoose.model('User');
+
+// Add a post save hook
+postSchema.post('save', async function(doc) {
+  if (doc.isNew) { // Check if it's a new document
+    await User.findByIdAndUpdate(doc.author, { $inc: { totalPosts: 1 } });
+  }
+});
+
+// Add a post remove hook
+postSchema.post('remove', async function(doc) {
+  await User.findByIdAndUpdate(doc.author, { $inc: { totalPosts: -1 } });
+});
+
+
 
 let Post = mongoose.model("Post", postSchema);
 

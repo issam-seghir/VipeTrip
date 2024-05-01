@@ -21,8 +21,8 @@ const multer = require("multer");
 const path = require("node:path");
 const fs = require("node:fs");
 
-const MAX_FILE_SIZE_MB = 3;
-const MAX_FILE_SIZE_POST_MB = 1;
+const MAX_FILE_SIZE_MB = 2;
+const MAX_FILE_SIZE_POST_MB = 2;
 const GLOBAL_DIR = "public/global";
 const POSTS_DIR = "public/posts";
 
@@ -32,15 +32,18 @@ const getUniqueFilename = (file) => {
 	return `${file.fieldname}-${uniqueSuffix}${path.extname(file.originalname)}`;
 };
 
+// Function to create directory if it doesn't exist
+const ensureDirExists = (dirPath) => {
+	const dir = path.join(process.cwd(), dirPath);
+	fs.mkdirSync(dir, { recursive: true });
+};
+
 //? -------- Storage Config -------------
 
 const storage = multer.diskStorage({
 	//* If no destination is given, the operating system's default directory for temporary files is used.
 	destination: function (req, file, cb) {
-		const dir = path.join(process.cwd(), GLOBAL_DIR);
-		// Create directory if it doesn't exist
-		fs.mkdirSync(dir, { recursive: true });
-
+		ensureDirExists(GLOBAL_DIR);
 		cb(null, GLOBAL_DIR);
 	},
 	//* If no filename is given, each file will be given a random name that doesn't include any file extension.
@@ -50,9 +53,12 @@ const storage = multer.diskStorage({
 });
 
 const storagePost = multer.diskStorage({
+	//* If no destination is given, the operating system's default directory for temporary files is used.
 	destination: function (req, file, cb) {
+		ensureDirExists(POSTS_DIR);
 		cb(null, POSTS_DIR);
 	},
+	//* If no filename is given, each file will be given a random name that doesn't include any file extension.
 	filename: function (req, file, cb) {
 		cb(null, getUniqueFilename(file));
 	},

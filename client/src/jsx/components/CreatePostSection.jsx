@@ -27,6 +27,7 @@ import { useNavigate } from "react-router-dom";
 import { PFormDropdown } from "./Form/PFormDropdown";
 import { PFormMentionTagTextArea } from "./Form/PFormMentionTagTextArea";
 import { useDebounce } from "@uidotdev/usehooks";
+import { convertModelToFormData } from "./../utils/index";
 
 
 const privacies = ["onlyMe", "friends", "public"];
@@ -78,10 +79,13 @@ export function CreatePostSection() {
 
 	async function handleCreatePost(data) {
 		try {
+			console.log("-------------- issubmitting ---------------");
 			console.log(data);
-			const res = await createPost(data).unwrap();
+			// Convert data to FormData
+			const formData = convertModelToFormData(data);
+			const res = await createPost(formData).unwrap();
 			if (res) {
-				reset();
+				// reset();
 				toast.current.show({
 					severity: "success",
 					summary: "Post Created 🎉",

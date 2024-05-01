@@ -20,8 +20,8 @@ const verifyJWT = (req, res, next) => {
 		req.user = { id: decoded.id };
 		next();
 	} catch (error) {
-		log.error("JWT verification error:\n", error);
-		return next(new createError.Forbidden("Invalid or expired token"));
+		log.error("verifyJWT middlware:\n", error);
+		return next(new createError.Forbidden("Invalid or expired ACCESS_TOKEN "));
 	}
 };
 

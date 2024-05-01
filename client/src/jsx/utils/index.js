@@ -152,3 +152,62 @@ export function fuzzySearch(query, data) {
 	}
 	return [];
 }
+
+
+/**
+ * Converts a JavaScript object into a FormData instance.
+ *
+ * @param {Object|Array|Date|File|number|string} val - The value to be converted.
+ * @param {FormData} [formData=new FormData()] - The FormData instance to append to.
+ * @param {string} [namespace=""] - The namespace for the key in the FormData instance.
+ * @returns {FormData} The FormData instance with the appended key-value pairs.
+ *
+ * @example
+ * // Convert an object with primitive values
+ * const obj = { name: 'John', age: 30 };
+ * const formData = convertModelToFormData(obj);
+ *
+ * @example
+ * // Convert an object with an array
+ * const obj = { name: 'John', hobbies: ['reading', 'gaming'] };
+ * const formData = convertModelToFormData(obj);
+ *
+ * @example
+ * // Convert an object with a File instance
+ * const obj = { name: 'John', profilePic: new File([''], 'filename') };
+ * const formData = convertModelToFormData(obj);
+ *
+ * @example
+ * // Convert an object with a nested object
+ * const obj = { name: 'John', address: { city: 'New York', country: 'USA' } };
+ * const formData = convertModelToFormData(obj);
+ */
+
+export function convertModelToFormData(val, formData = new FormData(), namespace = "") {
+	if (val !== undefined && val !== null) {
+		if (val instanceof Date) {
+			formData.append(namespace, val.toISOString());
+		} else if (Array.isArray(val)) {
+			val.forEach((element, i) => {
+				if (element instanceof File) {
+					formData.append(`${namespace}`, element);
+				} else {
+					convertModelToFormData(element, formData, `${namespace}[${i}]`);
+				}
+			});
+		} else if (typeof val === "object" && !(val instanceof File)) {
+			Object.keys(val).forEach((propertyName) => {
+				convertModelToFormData(
+					val[propertyName],
+					formData,
+					namespace ? `${namespace}[${propertyName}]` : propertyName
+				);
+			});
+		} else if (val instanceof File) {
+			formData.append(namespace, val);
+		} else {
+			formData.append(namespace, val.toString());
+		}
+	}
+	return formData;
+}

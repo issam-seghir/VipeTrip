@@ -1,5 +1,6 @@
 /* eslint-disable unicorn/no-useless-undefined */
 import { safeRegex } from "safe-regex";
+import uFuzzy from "@leeoniya/ufuzzy";
 
 
 
@@ -111,4 +112,43 @@ export function getCookie(name) {
     const parts = value.split(`; ${name}=`);
     if (parts.length === 2) return parts.pop().split(";").shift();
     return null;
+}
+
+
+/**
+ * Debounces a function, delaying its execution until after a specified delay.
+ * @param {Function} func - The function to debounce.
+ * @param {number} delay - The amount of time to delay in milliseconds.
+ * @returns {Function} The debounced function.
+ * @example
+ * const debouncedFunc = debounce(() => console.log('Hello'), 500);
+ * debouncedFunc(); // 'Hello' will be logged to the console after 500ms.
+ */
+export function debounce(func, delay) {
+		let debounceTimer;
+		return function () {
+			const args = arguments;
+			clearTimeout(debounceTimer);
+			debounceTimer = setTimeout(() => func.apply(this, args), delay);
+		};
+	}
+
+	/**
+ * Performs a fuzzy search on an array of data.
+ * @param {string} query - The search query.
+ * @param {Array} data - The data to search through.
+ * @returns {Array} The search results.
+ * @example
+ * const data = ['apple', 'banana', 'cherry'];
+ * const results = fuzzySearch('ap', data); // ['apple']
+ */
+export function fuzzySearch(query, data) {
+	const uf = new uFuzzy();
+	const idxs = uf.filter(data, query);
+	if (idxs && idxs.length > 0) {
+		const info = uf.info(idxs, data, query);
+		const order = uf.sort(info, data, query);
+		return order.map((i) => data[info.idx[i]]);
+	}
+	return [];
 }

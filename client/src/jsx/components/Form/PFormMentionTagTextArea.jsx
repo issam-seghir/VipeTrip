@@ -3,11 +3,11 @@ import sectionImg2 from "@assets/images/Contemplative Urban Dreamer.png";
 import sectionImg5 from "@assets/images/Contemporary Billiards Lounge with Ambient Lighting.png";
 import sectionImg4 from "@assets/images/poster.png";
 import sectionImg3 from "@assets/images/wallpaper.png";
+import { debounce, fuzzySearch } from "@utils/index";
 import { Mention } from "primereact/mention";
 import { classNames } from "primereact/utils";
 import { useState } from "react";
 import { Controller } from "react-hook-form";
-import { useDebounce, useMediaQuery } from "@uidotdev/usehooks";
 
 const users = [
 	{
@@ -99,58 +99,40 @@ users.forEach((user) => {
 	];
 });
 
-const tagSuggestions = ["primereact", "primefaces", "primeng", "primevue","test"];
+const tagSuggestions = ["primereact", "primefaces", "primeng", "primevue", "test"];
 
 export const PFormMentionTagTextArea = ({
 	control,
 	defaultValue = "",
 	name,
-    placeholder,
+	placeholder,
 	pt,
 	className,
 	inputClassName,
 	errorMessage,
-	autoResize=true,
-    autoFocus=true,
+	autoResize = true,
+	autoFocus = true,
 	disabled,
 }) => {
 	const [multipleSuggestions, setMultipleSuggestions] = useState([]);
 
-	// const onMultipleSearch = (event) => {
-	// 	const trigger = event.trigger;
+	const onMultipleSearch = debounce(function (event) {
+		// Your search logic here
+		const trigger = event.trigger;
+		const query = event.query.trim();
+		if (query.length > 0) {
+			let suggestions;
+			if (trigger === "@") {
+				suggestions = fuzzySearch(query, users);
+			} else if (trigger === "#") {
+				suggestions = fuzzySearch(query, tagSuggestions);
+			}
+			setMultipleSuggestions(suggestions);
+		} else {
+			setMultipleSuggestions(trigger === "@" ? [...users] : [...tagSuggestions]);
+		}
+	}, 500);
 
-	// 	if (trigger === "@") {
-	// 		//in a real application, make a request to a remote url with the query and return suggestions, for demo we filter at client side
-	// 		setTimeout(() => {
-	// 			const query = event.query;
-	// 			let suggestions;
-
-	// 			suggestions =
-	// 				query.trim().length > 0
-	// 					? users.filter((user) => {
-	// 							return user.name.toLowerCase().startsWith(query.toLowerCase());
-	// 					  })
-	// 					: [...users];
-	// 			console.log("suggestions", suggestions);
-	// 			setMultipleSuggestions(suggestions);
-	// 		}, 250);
-	// 	} else if (trigger === "#") {
-	// 		setTimeout(() => {
-	// 			const query = event.query;
-	// 			let suggestions;
-
-	// 			suggestions =
-	// 				query.trim().length > 0
-	// 					? tagSuggestions.filter((tag) => {
-	// 							return tag.toLowerCase().startsWith(query.toLowerCase());
-	// 					  })
-	// 					: [...tagSuggestions];
-	// 			console.log("suggestions", suggestions);
-
-	// 			setMultipleSuggestions(suggestions);
-	// 		}, 250);
-	// 	}
-	// };
 	const itemTemplate = (suggestion) => {
 		return (
 			<div className="flex align-items-center">

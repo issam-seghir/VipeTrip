@@ -26,6 +26,7 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { PFormDropdown } from "./Form/PFormDropdown";
 import { PFormMentionTagTextArea } from "./Form/PFormMentionTagTextArea";
+import { useDebounce } from "@uidotdev/usehooks";
 
 
 const privacies = ["onlyMe", "friends", "public"];
@@ -52,7 +53,8 @@ export function CreatePostSection() {
 
 	const errorMessage = createPostResult?.isError ? createPostResult?.error : errorsForm;
 
-	// console.log("getValues", getValues());
+	console.log("getValues", getValues());
+	console.log("errors", errorsForm);
 	const getFormErrorMessage = (name) => {
 		if (errorMessage[name]) {
 			// Check if the error message is an array
@@ -103,16 +105,17 @@ export function CreatePostSection() {
 	const [showCreatePostDialog, setShowCreatePostDialog] = useState(false);
 
 	const description = watch("description");
+	const debouncedDescription = useDebounce(description, 500); // Debounce the email input by 500ms
+
 	const images = watch("images");
 
 	// Set mentions and tags from description input
 	useEffect(() => {
-		const mentions = description?.match(/@\w+/g) || [];
-		const tags = description?.match(/#\w+/g) || [];
+		const mentions = debouncedDescription?.match(/@\w+/g) || [];
+		const tags = debouncedDescription?.match(/#\w+/g) || [];
 		setValue("mentions", mentions, { shouldValidate: true });
 		setValue("tags", tags, { shouldValidate: true });
-	}, [description, setValue]);
-
+	}, [debouncedDescription, setValue]);
 
 	// create new post dialog Actions Handlers
 	const handleMediaOpen = () => {

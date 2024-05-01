@@ -207,7 +207,6 @@ export function CreatePostSection() {
 
 	// for fileUploads
 	const [savedPhotos, setSavedPhotos] = useState([]);
-	const [totalNumber, setTotalNumber] = useState(0);
 
 	const handleEmojiClick = (emojiObject) => {
 		const prevValue = getValues("description");
@@ -356,14 +355,13 @@ export function CreatePostSection() {
 								control={control}
 								getValues={getValues}
 								setValue={setValue}
+								onPhotoRemove={onPhotoRemove}
 								images={images}
 								resetField={resetField}
 								showFileUploadDialog={showFileUploadDialog}
 								setShowFileUploadDialog={setShowFileUploadDialog}
 								setSavedFiles={setSavedPhotos}
 								savedFiles={savedPhotos}
-								totalNumber={totalNumber}
-								setTotalNumber={setTotalNumber}
 							/>
 							<Button
 								label="Emoji"

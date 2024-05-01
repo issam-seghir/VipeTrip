@@ -14,9 +14,7 @@ import { Controller } from "react-hook-form";
 export function FileUploadDialog({
 	showFileUploadDialog,
 	setShowFileUploadDialog,
-	setSavedFiles,
-	totalNumber,
-	setTotalNumber,
+	onPhotoRemove,
 	control,
 	getValues,
 	setValue,
@@ -27,19 +25,17 @@ export function FileUploadDialog({
 	const toast = useRef(null);
 
 	const onTemplateRemove = (file, callback) => {
-		setTotalNumber((totalNumber) => totalNumber - 1);
-		setSavedFiles((files) => {
-			const updatedFiles = files.filter((f) => f.name !== file.name);
-			fileUploadRef.current.setFiles(updatedFiles); // Update the FileUpload component's internal files state
-			return updatedFiles;
-		});
+		// setSavedFiles((files) => {
+		// 	const updatedFiles = files.filter((f) => f.name !== file.name);
+		// 	fileUploadRef.current.setFiles(updatedFiles); // Update the FileUpload component's internal files state
+		// 	return updatedFiles;
+		// });
+		onPhotoRemove(file);
 		// );
 		callback();
 	};
 
 	const onTemplateClear = () => {
-		setTotalNumber(0);
-		// setSavedFiles([]);
 		resetField("images");
 	};
 
@@ -76,7 +72,14 @@ export function FileUploadDialog({
 							src={image.objectURL}
 							width={100}
 						/>
-						<div className="text-left">
+
+						<Tooltip
+							key={props.index}
+							target={`.desc-${props.index}`}
+							content={image.name}
+							position="bottom"
+						/>
+						<div className={`desc-${props.index} text-left`}>
 							<div className="white-space-nowrap overflow-hidden text-overflow-ellipsis w-12rem">
 								{image.name}
 							</div>

@@ -1,30 +1,42 @@
 /* eslint-disable unicorn/no-useless-undefined */
+import { safeRegex } from "safe-regex";
+
+
 
 /**
- * Converts bytes to megabytes.
- * @param {number} byte - The number of bytes to convert.
- * @returns {number} The converted value in megabytes.
- * @example
- * // returns "1.00"
- * byteToMb(1048576);
- */
-import safeRegex from "safe-regex";
-
-function byteToMb(byte) {
-	return (byte / 1024 / 1024).toFixed(2);
-}
-
-/**
- * Converts megabytes to bytes.
+ ** Converts megabytes to bytes.
  * @param {number} mb - The number of megabytes to convert.
  * @returns {number} The converted value in bytes.
  * @example
  * // returns 1048576
  * mbToByte(1);
  */
-function mbToByte(mb) {
+export function mbToByte(mb) {
 	return mb * 1024 * 1024;
 }
+
+/**
+ * * Converts size in bytes to megabytes.
+ *
+ * @param {number} sizeInBytes - The size in bytes.
+ * @param {number} [decimalsNum=2] - The number of decimal places to keep in the result.
+ * @returns {number} The size in megabytes.
+ *
+ * @example
+ * // returns 1.00
+ * byteToMb(1048576);
+ *
+ * @example
+ * // returns 1.5
+ * byteToMb(1572864, 1);
+ */
+export const byteToMb = (sizeInBytes, decimalsNum = 2) => {
+	const result = sizeInBytes / (1024 * 1024);
+	const fixedResult = result.toFixed(decimalsNum);
+	return +Number.parseFloat(fixedResult).toString();
+};
+
+
 
 /**
  * Generates a UUID.
@@ -33,7 +45,7 @@ function mbToByte(mb) {
  * // returns a UUID string
  * uuid();
  */
-function uuid() {
+export function uuid() {
 	return crypto.randomUUID();
 }
 
@@ -45,7 +57,7 @@ function uuid() {
  * // returns true
  * signChecker("10%");
  */
-function signChecker(percent) {
+export function signChecker(percent) {
 	const numericPercent = Number.parseFloat(percent); // Convert string percentage to a number
 	return numericPercent > 0;
 }
@@ -67,7 +79,7 @@ function signChecker(percent) {
  * 	throw createError(500, "One or more regular expressions are not safe.");
  * }
  */
-function isRegexSave(...regexes) {
+export function isRegexSave(...regexes) {
 	const unsafeRegexes = regexes.filter((regex) => !safeRegex(regex));
 	return {
 		allSafe: unsafeRegexes.length === 0,
@@ -75,37 +87,28 @@ function isRegexSave(...regexes) {
 	};
 }
 
+
 /**
- * * Converts size in bytes to megabytes.
+ * *Retrieves the value of a specified cookie from the document's cookie string.
  *
- * @param {number} sizeInBytes - The size in bytes.
- * @param {number} [decimalsNum=2] - The number of decimal places to keep in the result.
- * @returns {number} The size in megabytes.
- *
- * @example
- * // returns 1.00
- * sizeInMB(1048576);
+ * @param {string} name - The name of the cookie to retrieve.
+ * @returns {string|null} The value of the cookie if found, null otherwise.
  *
  * @example
- * // returns 1.5
- * sizeInMB(1572864, 1);
+ * // Set a cookie for demonstration
+ * document.cookie = "username=John Doe";
+ *
+ * // Get the cookie
+ * const username = getCookie("username");
+ * console.log(username); // "John Doe"
+ *
+ * // Try to get a non-existent cookie
+ * const nonExistent = getCookie("nonExistent");
+ * console.log(nonExistent); // null
  */
-const sizeInMB = (sizeInBytes, decimalsNum = 2) => {
-	const result = sizeInBytes / (1024 * 1024);
-	const fixedResult = result.toFixed(decimalsNum);
-	return +Number.parseFloat(fixedResult).toString();
-};
-
-
-export default {
-	byteToMb,
-	mbToByte,
-	uuid,
-	signChecker,
-	isRegexSave,
-};
 export function getCookie(name) {
-	const value = `; ${document.cookie}`;
-	const parts = value.split(`; ${name}=`);
-	if (parts.length === 2) return parts.pop().split(";").shift();
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(";").shift();
+    return null;
 }

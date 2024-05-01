@@ -75,7 +75,7 @@ postSchema.plugin(mongooseAlgolia, {
 	indexName: "posts", //The name of the index in Algolia, you can also pass in a function
 	selector: "-password -email -rememberMe -socialAccounts.accessToken -refreshToken", //  You can decide which field that are getting synced to Algolia (same as selector in mongoose)
 	populate: {
-		path: "userId",
+		path: "author",
 		select: "author",
 	},
 	// If you want to prevent some documents from being synced to algolia

@@ -6,47 +6,25 @@ import { Tag } from "primereact/tag";
 import { Tooltip } from "primereact/tooltip";
 
 import { Toast } from "primereact/toast";
-import { useRef, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useRef } from "react";
+import { Controller } from "react-hook-form";
 
 const MAX_FILES = 5; // Set your limit
 export function FileUploadDialog({
 	showFileUploadDialog,
 	setShowFileUploadDialog,
-	savedFiles,
 	setSavedFiles,
 	totalNumber,
 	setTotalNumber,
-	control
+	control,
+	getValues,
+	setValue,
+	resetField,
+	images,
 }) {
 	const fileUploadRef = useRef(null);
-
 	const toast = useRef(null);
-	console.log("savedFiles");
-	console.log(savedFiles);
 
-	const onTemplateSelect = (e) => {
-		const selectedFiles = e.files;
-		console.log("selected Files");
-		console.log(selectedFiles);
-		if (totalNumber + selectedFiles.length > MAX_FILES) {
-			// Show an error message
-			toast.current.show({
-				severity: "error",
-				sticky: true,
-				summary: "Validation Error",
-				detail: `Maximum number of files exceeded. Limit is ${MAX_FILES}.`,
-			});
-			// Remove the excess files
-			const excessFiles = new Set(selectedFiles.slice(0, totalNumber + selectedFiles.length - MAX_FILES));
-			const updatedFiles = selectedFiles.filter((file) => !excessFiles.has(file));
-			setSavedFiles((prevFiles) => [...prevFiles, ...updatedFiles]);
-			setTotalNumber((prevNumber) => prevNumber + updatedFiles.length);
-		} else if (totalNumber < MAX_FILES) {
-			setSavedFiles((prevFiles) => [...prevFiles, ...selectedFiles]);
-			setTotalNumber((prevNumber) => prevNumber + selectedFiles.length);
-		}
-	};
 
 	const onTemplateRemove = (file, callback) => {
 		setTotalNumber((totalNumber) => totalNumber - 1);
@@ -61,7 +39,8 @@ export function FileUploadDialog({
 
 	const onTemplateClear = () => {
 		setTotalNumber(0);
-		setSavedFiles([]);
+		// setSavedFiles([]);
+		resetField("images");
 	};
 
 	const headerTemplate = (options) => {
@@ -77,7 +56,7 @@ export function FileUploadDialog({
 				{cancelButton}
 				<div className="flex align-items-center gap-3 ml-auto">
 					<span>
-						{totalNumber} / {MAX_FILES}
+						{images?.length || 0}  / {MAX_FILES}
 					</span>
 				</div>
 			</div>
@@ -85,20 +64,20 @@ export function FileUploadDialog({
 	};
 
 	const itemTemplate = (file, props) => {
-		const realFile = savedFiles.find((f) => f.name === file.name);
+		const image = images?.find((f) => f.name === file.name);
 		return (
-			realFile && (
+			image && (
 				<div className="flex align-items-center flex-wrap">
 					<div className="flex align-items-center" style={{ width: "40%" }}>
 						<img
 							className="border-round-md"
-							alt={realFile.name}
+							alt={image.name}
 							role="presentation"
-							src={realFile.objectURL}
+							src={image.objectURL}
 							width={100}
 						/>
 						<span className="flex flex-column text-left ml-3">
-							{realFile.name}
+							{image.name}
 							<small>{new Date().toLocaleDateString()}</small>
 						</span>
 					</div>
@@ -108,7 +87,7 @@ export function FileUploadDialog({
 						type="button"
 						icon="pi pi-times"
 						className="p-button-outlined p-button-rounded p-button-danger ml-auto"
-						onClick={() => onTemplateRemove(realFile, props.onRemove)}
+						onClick={() => onTemplateRemove(images, props.onRemove)}
 					/>
 				</div>
 			)
@@ -172,17 +151,33 @@ export function FileUploadDialog({
 				control={control}
 				render={({ field: { onChange, value } }) => (
 					<FileUpload
-						name="demo[]"
 						customUpload
 						multiple
 						accept="image/*"
 						uploadOptions={uploadOptions}
 						chooseOptions={chooseOptions}
 						cancelOptions={cancelOptions}
-						maxFileSize={1_000_000}
+						// maxFileSize={1_000_000}
 						onSelect={(e) => {
-							  onChange(e.files);
-								onTemplateSelect(e);
+							// Filter out the files that have already been selected
+							const newFiles = [...e.files].filter(
+								(file) => !value.some((selectedFile) => selectedFile.name === file.name)
+							);
+
+							if (value.length + newFiles.length > MAX_FILES) {
+								// Select only the first MAX_FILES - value.length files
+								const filesToSelect = newFiles.slice(0, MAX_FILES - value.length);
+								onChange([...value, ...filesToSelect]);
+
+								toast.current.show({
+									severity: "error",
+									sticky: true,
+									summary: "Validation Error",
+									detail: `Maximum number of Photos exceeded. Limit is ${MAX_FILES}.`,
+								});
+							} else {
+								onChange([...value, ...newFiles]);
+							}
 						}}
 						onError={onTemplateClear}
 						onClear={onTemplateClear}

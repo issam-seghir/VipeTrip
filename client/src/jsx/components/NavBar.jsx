@@ -10,9 +10,12 @@ import { Toolbar } from "primereact/toolbar";
 import React, { Fragment, useRef } from "react";
 import { AlgoliaAutocomplete } from "./AlgoliaAutoComplete";
 import { useNavigate } from "react-router-dom";
+import { Button } from "primereact/button";
+import { selectCurrentUser } from "@store/slices/authSlice";
+import { useSelector } from "react-redux";
 
 // const searchClient = algoliasearch(import.meta.env.VITE_ALGOLIA_APP_ID, import.meta.env.VITE_ALOGOLIA_SEARCH_API);
-const appId = "latency";import { Button } from "primereact/button";
+const appId = "latency";
 
 const apiKey = "6be0576ff61c053d5f9a3225e2a90f76";
 const searchClient = algoliasearch(appId, apiKey);
@@ -72,6 +75,7 @@ const querySuggestionsPlugin = createQuerySuggestionsPlugin({
 	},
 });
 
+
 export function ProductItem({ hit, components }) {
 
 	return (
@@ -89,6 +93,8 @@ export default function CustomDemo() {
 	const menuLeft = useRef(null);
 	const toast = useRef(null);
 	const navigate = useNavigate();
+	const user = useSelector(selectCurrentUser);
+console.log(user?.picturePath);
 	const items = [
 		{
 			label: "Options",
@@ -195,10 +201,10 @@ export default function CustomDemo() {
 						aria-controls="popup_menu_left"
 						aria-haspopup
 						onClick={(event) => menuLeft.current.toggle(event)}
-						image="https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png"
+						image={user.picturePath}
 						shape="circle"
 					/>
-					<span className="font-bold text-bluegray-50">Amy Elsner</span>
+					<span className="font-bold text-bluegray-50">{user?.fullName}</span>
 				</div>
 			</div>
 		</React.Fragment>

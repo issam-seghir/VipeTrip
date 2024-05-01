@@ -130,6 +130,7 @@ export function CreatePostSection() {
 		setError,
 		setValue,
 		getValues,
+		resetField,
 		clearErrors,
 		control,
 		formState: { errors: errorsForm, isSubmitting, isValidating, isValid },
@@ -195,6 +196,7 @@ export function CreatePostSection() {
 	// for mentions/tags overlay suggestion
 	const [multipleSuggestions, setMultipleSuggestions] = useState([]);
 	const description = watch("description");
+	const images = watch("images");
 
 	useEffect(() => {
 		const mentions = description?.match(/@\w+/g) || [];
@@ -213,9 +215,8 @@ export function CreatePostSection() {
 	};
 
 	const onPhotoRemove = (photo) => {
-		const updatedPhotos = savedPhotos.filter((savedPhoto) => savedPhoto.name !== photo.name);
-		setSavedPhotos(updatedPhotos);
-		setTotalNumber((prevNumber) => prevNumber - 1);
+		    const updatedPhotos = images.filter((image) => image.name !== photo.name);
+			setValue("images", updatedPhotos, { shouldValidate: true });
 	};
 
 	const handlePollOpen = () => {
@@ -353,6 +354,10 @@ export function CreatePostSection() {
 							/>
 							<FileUploadDialog
 								control={control}
+								getValues={getValues}
+								setValue={setValue}
+								images={images}
+								resetField={resetField}
 								showFileUploadDialog={showFileUploadDialog}
 								setShowFileUploadDialog={setShowFileUploadDialog}
 								setSavedFiles={setSavedPhotos}
@@ -484,7 +489,9 @@ export function CreatePostSection() {
 						/>
 
 						{/* Photos Preview */}
-						{savedPhotos.length > 0 && <PhotosPreview photos={savedPhotos} onPhotoRemove={onPhotoRemove} />}
+						{/* error label */}
+						{getFormErrorMessage("images")}
+						{images?.length > 0 && <PhotosPreview photos={images} onPhotoRemove={onPhotoRemove} />}
 					</div>
 				</form>
 			</Dialog>

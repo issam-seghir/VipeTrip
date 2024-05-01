@@ -12,16 +12,13 @@ import { useRef } from "react";
 import { Controller } from "react-hook-form";
 
 export function FileUploadDialog({
+	control,
+	images,
+	resetField,
+	onPhotoRemove,
 	showFileUploadDialog,
 	setShowFileUploadDialog,
-	onPhotoRemove,
-	control,
-	getValues,
-	setValue,
-	resetField,
-	images,
 }) {
-	const fileUploadRef = useRef(null);
 	const toast = useRef(null);
 
 	const onTemplateRemove = (file, callback) => {
@@ -183,27 +180,9 @@ export function FileUploadDialog({
 						headerTemplate={headerTemplate}
 						itemTemplate={itemTemplate}
 						emptyTemplate={emptyTemplate}
-						files={value}
 					/>
 				)}
 			/>
-			{/* <FileUpload
-				ref={fileUploadRef}
-				name="demo[]"
-				customUpload
-				multiple
-				accept="image/*"
-				uploadOptions={uploadOptions}
-				chooseOptions={chooseOptions}
-				cancelOptions={cancelOptions}
-				maxFileSize={1_000_000}
-				onSelect={onTemplateSelect}
-				onError={onTemplateClear}
-				onClear={onTemplateClear}
-				headerTemplate={headerTemplate}
-				itemTemplate={itemTemplate}
-				emptyTemplate={emptyTemplate}
-			/> */}
 		</Dialog>
 	);
 }

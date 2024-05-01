@@ -122,9 +122,11 @@
 	position: relative;
 	display: grid;
 	grid-template-columns: 18vw auto 20vw;
-	column-gap: 2rem;
+	column-gap: 3rem;
 	padding-block: 2rem;
-	padding-inline: 6rem;
+	padding-inline: 15rem;
+	max-width: 122rem;
+	margin: 0 auto;
 
 	&-left {
 		position: sticky;
@@ -142,6 +144,12 @@
 
 	&-middle {
 		border-radius: 1rem;
+	}
+
+	@media screen and (max-width: 768px) {
+		grid-template-columns: 1fr;
+		padding-inline: 1rem;
+
 	}
 }
 

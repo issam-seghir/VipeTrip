@@ -17,108 +17,21 @@ import { Avatar } from "primereact/avatar";
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
 import { Divider } from "primereact/divider";
-import { Dropdown } from "primereact/dropdown";
 import { Mention } from "primereact/mention";
 import { Toast } from "primereact/toast";
 import { classNames } from "primereact/utils";
 import { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { PFormDropdown } from "./Form/PFormDropdown";
+import { PFormMentionTagTextArea } from "./Form/PFormMentionTagTextArea";
 
-const users = [
-	{
-		name: "User 1",
-		id: 1,
-		profileImage: "https://picsum.photos/100/100",
-	},
-	{
-		name: "User 2",
-		id: 2,
-		profileImage: "https://picsum.photos/100/100",
-	},
-	{
-		name: "User 3",
-		id: 3,
-		profileImage: "https://picsum.photos/100/100",
-	},
-	{
-		name: "User 4",
-		id: 4,
-		profileImage: "https://picsum.photos/100/100",
-	},
-	{
-		name: "User 5",
-		id: 5,
-		profileImage: "https://picsum.photos/100/100",
-	},
-	{
-		name: "User 6",
-		id: 6,
-		profileImage: "https://picsum.photos/100/100",
-	},
-	{
-		name: "User 7",
-		id: 7,
-		profileImage: "https://picsum.photos/100/100",
-	},
-	// ... other users
-];
-
-users.forEach((user) => {
-	user.stories = [
-		{
-			url: sectionImg1,
-			duration: 5000,
-			header: {
-				heading: user.name,
-				subheading: "Posted 30m ago",
-				profileImage: user.profileImage,
-			},
-		},
-		{
-			url: sectionImg2,
-			duration: 5000,
-			header: {
-				heading: user.name,
-				subheading: "Posted 30m ago",
-				profileImage: user.profileImage,
-			},
-		},
-		{
-			url: sectionImg3,
-			duration: 5000,
-			header: {
-				heading: user.name,
-				subheading: "Posted 30m ago",
-				profileImage: user.profileImage,
-			},
-		},
-		{
-			url: sectionImg4,
-			duration: 5000,
-			header: {
-				heading: user.name,
-				subheading: "Posted 30m ago",
-				profileImage: user.profileImage,
-			},
-		},
-		{
-			url: sectionImg5,
-			duration: 5000,
-			header: {
-				heading: user.name,
-				subheading: "Posted 30m ago",
-				profileImage: user.profileImage,
-			},
-		},
-		// ... other stories ...
-	];
-});
 
 const privacies = ["onlyMe", "friends", "public"];
-const tagSuggestions = ["primereact", "primefaces", "primeng", "primevue"];
 
 export function CreatePostSection() {
+	const navigate = useNavigate();
 	const user = useSelector(selectCurrentUser);
 	const toast = useRef(null);
 
@@ -127,22 +40,19 @@ export function CreatePostSection() {
 		handleSubmit,
 		watch,
 		reset,
-		setError,
 		setValue,
 		getValues,
 		resetField,
-		clearErrors,
 		control,
-		formState: { errors: errorsForm, isSubmitting, isValidating, isValid },
+		formState: { errors: errorsForm, isSubmitting },
 	} = useForm({
 		mode: "onChange",
 		resolver: zodResolver(createPostSchema),
 	});
-	console.log("errorsForm", errorsForm);
-	console.log("values", getValues());
 
 	const errorMessage = createPostResult?.isError ? createPostResult?.error : errorsForm;
 
+	// console.log("getValues", getValues());
 	const getFormErrorMessage = (name) => {
 		if (errorMessage[name]) {
 			// Check if the error message is an array
@@ -180,24 +90,22 @@ export function CreatePostSection() {
 			console.error(error);
 			toast.current.show({
 				severity: "error",
-				summary: "Login Failed 💢",
-				detail: error?.data?.message || "email or password not correct",
+				summary: "Error",
+				detail: error?.data?.message || "Failed to create post",
 			});
 		}
 	}
 
 	const onSubmit = (data) => {
-		console.log("---------------- Submitting ---------------");
 		handleCreatePost(data);
 	};
 
 	const [showCreatePostDialog, setShowCreatePostDialog] = useState(false);
 
-	// for mentions/tags overlay suggestion
-	const [multipleSuggestions, setMultipleSuggestions] = useState([]);
 	const description = watch("description");
 	const images = watch("images");
 
+	// Set mentions and tags from description input
 	useEffect(() => {
 		const mentions = description?.match(/@\w+/g) || [];
 		const tags = description?.match(/#\w+/g) || [];
@@ -205,29 +113,25 @@ export function CreatePostSection() {
 		setValue("tags", tags, { shouldValidate: true });
 	}, [description, setValue]);
 
-	// for fileUploads
-	const [savedPhotos, setSavedPhotos] = useState([]);
 
+	// create new post dialog Actions Handlers
+	const handleMediaOpen = () => {
+		setShowFileUploadDialog(true);
+	};
 	const handleEmojiClick = (emojiObject) => {
 		const prevValue = getValues("description");
 		setValue("description", `${prevValue} ${emojiObject?.emoji}`, { shouldValidate: true });
 	};
-
-	const onPhotoRemove = (photo) => {
-		console.log("photo", photo);
-		    const updatedPhotos = images.filter((image) => image.name !== photo.name);
-			console.log("updatedPhotos", updatedPhotos);
-			setValue("images", updatedPhotos, { shouldValidate: true });
-	};
-
 	const handlePollOpen = () => {
 		// handle poll click
 	};
 
-	const [showFileUploadDialog, setShowFileUploadDialog] = useState(false);
-	const handleMediaOpen = () => {
-		setShowFileUploadDialog(!showFileUploadDialog);
+	const onPhotoRemove = (photo) => {
+		const updatedPhotos = images.filter((image) => image.name !== photo.name);
+		setValue("images", updatedPhotos, { shouldValidate: true });
 	};
+
+	const [showFileUploadDialog, setShowFileUploadDialog] = useState(false);
 
 	// Creat Post Actions Handlers
 	const emojiPicker = useRef(null);
@@ -236,98 +140,43 @@ export function CreatePostSection() {
 		emojiPicker.current.toggle(e);
 	};
 
-	const onMultipleSearch = (event) => {
-		const trigger = event.trigger;
-
-		if (trigger === "@") {
-			//in a real application, make a request to a remote url with the query and return suggestions, for demo we filter at client side
-			setTimeout(() => {
-				const query = event.query;
-				let suggestions;
-
-				suggestions =
-					query.trim().length > 0
-						? users.filter((user) => {
-								return user.name.toLowerCase().startsWith(query.toLowerCase());
-						  })
-						: [...users];
-				console.log("suggestions", suggestions);
-				setMultipleSuggestions(suggestions);
-			}, 250);
-		} else if (trigger === "#") {
-			setTimeout(() => {
-				const query = event.query;
-				let suggestions;
-
-				suggestions =
-					query.trim().length > 0
-						? tagSuggestions.filter((tag) => {
-								return tag.toLowerCase().startsWith(query.toLowerCase());
-						  })
-						: [...tagSuggestions];
-
-				setMultipleSuggestions(suggestions);
-			}, 250);
-		}
-	};
-	const itemTemplate = (suggestion) => {
-		return (
-			<div className="flex align-items-center">
-				<img alt={suggestion.name} src={suggestion.profileImage} />
-				<span className="flex flex-column ml-2">
-					{suggestion.name}
-					<small style={{ fontSize: ".75rem", color: "var(--text-color-secondary)" }}>
-						@{suggestion.name}
-					</small>
-				</span>
+	const CreatePostWidget = ({ onClick }) => (
+		<div
+			className="cursor-pointer flex flex-column justify-content-between gap-3 p-3 w-full border-1 surface-border border-round"
+			onClick={onClick}
+			onKeyDown={() => {}}
+			tabIndex={0}
+			role="button"
+		>
+			<div className="flex justify-content-between gap-2">
+				<Avatar
+					size="large"
+					onClick={() => navigate(`/profile/${user?.id}`)}
+					image={user?.picturePath}
+					alt={user?.fullName}
+					shape="circle"
+				/>
+				<div className="pl-6 p-2 flex-1 text-left border-1 surface-border border-round-3xl">
+					What&apos;s on your mind?
+				</div>
 			</div>
-		);
-	};
-
-	const multipleItemTemplate = (suggestion, options) => {
-		const trigger = options.trigger;
-		if (trigger === "@" && suggestion?.name) {
-			return itemTemplate(suggestion);
-		} else if (trigger === "#" && !suggestion?.name) {
-			return <span>{suggestion}</span>;
-		}
-
-		return null;
-	};
+			<div className="flex gap-2">
+				<Button label="Media" icon="pi pi-image" iconPos="left" className="p-button-text" />
+				<Button
+					label="Emoji"
+					icon={<Icon icon="uil:smile" className="pi p-button-icon-left" />}
+					iconPos="left"
+					className="p-button-text"
+				/>
+				<Button label="Poll" icon="pi pi-chart-bar" iconPos="left" className="p-button-text" />
+			</div>
+		</div>
+	);
 
 	return (
 		<>
 			{/* Create New post Widget */}
-			<div
-				className="cursor-pointer flex flex-column justify-content-between gap-2 p-3 w-full border-1 surface-border border-round"
-				onClick={() => setShowCreatePostDialog(true)}
-				onKeyDown={() => {}}
-				tabIndex={0}
-				role="button"
-			>
-				<div className="flex justify-content-between align-items-center gap-2">
-					<Avatar
-						size="large"
-						// onClick={(event) => menuLeft.current.toggle(event)}
-						image={user?.picturePath}
-						alt={user?.fullName}
-						shape="circle"
-					/>
-					<div className="pl-6 p-2 w-full border-1 surface-border border-round-3xl">
-						What&apos;s on your mind?
-					</div>
-				</div>
-				<div className="flex gap-2">
-					<Button label="Media" icon="pi pi-image" iconPos="left" className="p-button-text" />
-					<Button
-						label="Emoji"
-						icon={<Icon icon="uil:smile" className="pi p-button-icon-left" />}
-						iconPos="left"
-						className="p-button-text"
-					/>
-					<Button label="Poll" icon="pi pi-chart-bar" iconPos="left" className="p-button-text" />
-				</div>
-			</div>
+			<CreatePostWidget onClick={() => setShowCreatePostDialog(true)} />
 
 			{/* react hook form dev tool  */}
 			{isDev && <DevTool control={control} placement="top-left" />}
@@ -336,14 +185,15 @@ export function CreatePostSection() {
 			<Dialog
 				header={<h2 className="text-center">Create Post</h2>}
 				visible={showCreatePostDialog}
-				style={{ width: "50vw" }}
+				style={{ width: "40%" }}
+				contentClassName="py-0"
+				breakpoints={{ "960px": "75vw", "640px": "90vw" }}
 				onHide={() => setShowCreatePostDialog(false)}
 				draggable={false}
 				dismissableMask={true}
 				closeOnEscape={true}
 				footer={
-					// <form onSubmit={handleSubmit(onSubmit)}>
-					<div className="p-dialog-footer">
+					<>
 						{/* Creat Post Actions */}
 						<div className="flex m-2 gap-2">
 							<Button
@@ -355,15 +205,11 @@ export function CreatePostSection() {
 							/>
 							<FileUploadDialog
 								control={control}
-								getValues={getValues}
-								setValue={setValue}
-								onPhotoRemove={onPhotoRemove}
 								images={images}
 								resetField={resetField}
+								onPhotoRemove={onPhotoRemove}
 								showFileUploadDialog={showFileUploadDialog}
 								setShowFileUploadDialog={setShowFileUploadDialog}
-								setSavedFiles={setSavedPhotos}
-								savedFiles={savedPhotos}
 							/>
 							<Button
 								label="Emoji"
@@ -390,8 +236,7 @@ export function CreatePostSection() {
 							loading={isSubmitting || createPostResult?.isLoading}
 							onClick={handleSubmit(onSubmit)}
 						/>
-					</div>
-					// </form>
+					</>
 				}
 			>
 				<form onSubmit={handleSubmit(onSubmit)}>
@@ -407,85 +252,33 @@ export function CreatePostSection() {
 							/>
 							<div className="flex flex-column gap-1">
 								<h5 className="text-xl">{user?.fullName} </h5>
-								<Controller
-									defaultValue={"public"}
-									name={"privacy"}
+								<PFormDropdown
 									control={control}
-									render={({ field, fieldState }) => (
-										<>
-											<Dropdown
-												id={field.name}
-												value={field.value}
-												focusInputRef={field.ref}
-												{...field}
-												className={classNames(
-													{ "p-invalid": fieldState.error },
-													"w-fit h-2rem pl-2"
-												)}
-												options={privacies}
-												onChange={(e) => field.onChange(e.value)}
-												highlightOnSelect={false}
-												pt={{
-													item: "p-1 pl-4",
-													itemLabel: "p-1",
-													input: "p-1",
-												}}
-											/>
-
-											{/* error label */}
-											<label
-												htmlFor={field.name}
-												style={{ textWrap: "balance" }}
-												className={classNames({
-													"p-error": errorMessage || fieldState.error,
-												})}
-											>
-												{getFormErrorMessage(field.name)}
-											</label>
-										</>
-									)}
+									defaultValue="public"
+									name="privacy"
+									options={privacies}
+									className="w-fit h-2rem pl-2 surface-card"
+									pt={{
+										item: "p-1 pl-4",
+										itemLabel: "p-1",
+										input: "p-1",
+									}}
+									highlightOnSelect={false}
+									errorMessage={errorMessage}
 								/>
 							</div>
 						</div>
 						{/* content input area  */}
-						<Controller
-							defaultValue={""}
-							name={"description"}
+						<PFormMentionTagTextArea
+							defaultValue=""
+							name="description"
 							control={control}
-							render={({ field, fieldState }) => (
-								<div className="flex flex-column ">
-									<Mention
-										id={field.name}
-										value={field.value}
-										{...field}
-										className={classNames({ "p-invalid": fieldState.error }, "flex mb-2")}
-										inputClassName="w-full h-25rem max-h-29rem overflow-auto"
-										onChange={(e) => field.onChange(e.target.value)}
-										trigger={["@", "#"]}
-										suggestions={multipleSuggestions}
-										onSearch={onMultipleSearch}
-										field={["name"]}
-										placeholder="Enter @ to mention people, # to mention tag"
-										itemTemplate={multipleItemTemplate}
-										autoResize={true}
-									/>
-									{/* error label */}
-									<label
-										htmlFor={field.name}
-										style={{ textWrap: "balance" }}
-										className={classNames(
-											{
-												"p-error": errorMessage || fieldState.error,
-											},
-											"inline-flex flex-column"
-										)}
-									>
-										{getFormErrorMessage(field.name)}
-										{getFormErrorMessage("mentions")}
-										{getFormErrorMessage("tags")}
-									</label>
-								</div>
-							)}
+							className="flex mb-2"
+							inputClassName="w-full  surface-card border-transparent shadow-none"
+							placeholder="Enter @ to mention people, # to mention tag"
+							autoResize={true}
+							autoFocus={true}
+							errorMessage={errorMessage}
 						/>
 
 						{/* Photos Preview */}

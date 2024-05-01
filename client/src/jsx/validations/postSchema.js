@@ -2,9 +2,9 @@ import { stringNonEmpty} from "@utils/zodUtils";
 import { z } from "zod";
 import { byteToMb } from "@utils/index.js";
 //? -------- Constant ---------
-const MAX_FILES = 5; // Set your limit
-const MAX_FILE_SIZE = 0.5;
-const ACCEPTED_IMAGE_TYPES = new Set(["image/jpeg", "image/jpg", "image/png", "image/webp"]);
+export const MAX_FILES = 5; // Set your limit
+export const MAX_FILE_SIZE = 2;
+export const ACCEPTED_IMAGE_TYPES = new Set(["image/jpeg", "image/jpg", "image/png", "image/webp"]);
 
 	/* 	.optional()
 		.or(z.literal("")) // fix optional for url / email / instanseOf / custome  ..., */

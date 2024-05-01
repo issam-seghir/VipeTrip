@@ -5,11 +5,12 @@ import { FileUpload } from "primereact/fileupload";
 import { Tag } from "primereact/tag";
 import { Tooltip } from "primereact/tooltip";
 
+import { mbToByte } from "@utils/index.js";
+import { ACCEPTED_IMAGE_TYPES, MAX_FILES, MAX_FILE_SIZE } from "@validations/postSchema";
 import { Toast } from "primereact/toast";
 import { useRef } from "react";
 import { Controller } from "react-hook-form";
 
-const MAX_FILES = 5; // Set your limit
 export function FileUploadDialog({
 	showFileUploadDialog,
 	setShowFileUploadDialog,
@@ -24,7 +25,6 @@ export function FileUploadDialog({
 }) {
 	const fileUploadRef = useRef(null);
 	const toast = useRef(null);
-
 
 	const onTemplateRemove = (file, callback) => {
 		setTotalNumber((totalNumber) => totalNumber - 1);
@@ -56,7 +56,7 @@ export function FileUploadDialog({
 				{cancelButton}
 				<div className="flex align-items-center gap-3 ml-auto">
 					<span>
-						{images?.length || 0}  / {MAX_FILES}
+						{images?.length || 0} / {MAX_FILES}
 					</span>
 				</div>
 			</div>
@@ -68,7 +68,7 @@ export function FileUploadDialog({
 		return (
 			image && (
 				<div className="flex align-items-center flex-wrap">
-					<div className="flex align-items-center" style={{ width: "40%" }}>
+					<div className="flex flex-1 gap-4 align-items-center">
 						<img
 							className="border-round-md"
 							alt={image.name}
@@ -76,12 +76,14 @@ export function FileUploadDialog({
 							src={image.objectURL}
 							width={100}
 						/>
-						<span className="flex flex-column text-left ml-3">
-							{image.name}
-							<small>{new Date().toLocaleDateString()}</small>
-						</span>
+						<div className="text-left">
+							<div className="white-space-nowrap overflow-hidden text-overflow-ellipsis w-12rem">
+								{image.name}
+							</div>
+							<div>{new Date().toLocaleDateString()}</div>
+						</div>
+						<Tag value={props.formatSize} severity="warning" className="px-3 py-2" />
 					</div>
-					<Tag value={props.formatSize} severity="warning" className="px-3 py-2" />
 
 					<Button
 						type="button"
@@ -153,11 +155,11 @@ export function FileUploadDialog({
 					<FileUpload
 						customUpload
 						multiple
-						accept="image/*"
+						accept={[...ACCEPTED_IMAGE_TYPES].join(",")}
+						maxFileSize={mbToByte(MAX_FILE_SIZE)}
 						uploadOptions={uploadOptions}
 						chooseOptions={chooseOptions}
 						cancelOptions={cancelOptions}
-						// maxFileSize={1_000_000}
 						onSelect={(e) => {
 							// Filter out the files that have already been selected
 							const newFiles = [...e.files].filter(

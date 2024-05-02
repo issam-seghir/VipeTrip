@@ -47,5 +47,6 @@ export const api = createApi({
 	baseQuery: baseQueryWithReauth,
 	refetchOnFocus: true,
 	refetchOnReconnect: true,
+	keepUnusedDataFor: 60,
 	endpoints: (builder) => ({}),
 });

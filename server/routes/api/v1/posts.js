@@ -2,7 +2,7 @@ const express = require("express");
 
 const router = express.Router();
 const {
-	getFeedPosts,
+	getAllPosts,
 	getUserPosts,
 	sharePost,
 	getSinglePost,
@@ -18,7 +18,7 @@ const { createPostSchema } = require("@validations/postSchema");
 router
 	.route("/")
 	.post(uploadPost.array("images", 5), multerErrorHandler(upload), validate(createPostSchema), createPost);
-router.route("/").get(getFeedPosts);
+router.route("/").get(getAllPosts);
 router.route("/:postId").get(getSinglePost).delete(deletePost).put(updatePost);
 
 router.route("/:postId/share").post(sharePost);

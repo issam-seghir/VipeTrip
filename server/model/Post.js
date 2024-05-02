@@ -3,6 +3,9 @@ const autopopulate = require("mongoose-autopopulate");
 const mongooseAlgolia = require("@issam-seghir/mongoose-algolia").algoliaIntegration;
 const { ENV } = require("@/validations/envSchema");
 
+const User = mongoose.model("User");
+const { normalize } = require("@utils/plugins");
+
 const Schema = mongoose.Schema;
 
 const postSchema = new Schema(
@@ -11,12 +14,12 @@ const postSchema = new Schema(
 			type: Schema.Types.ObjectId,
 			ref: "User",
 			required: true,
-			autopopulate: true,
+			// autopopulate: true,
 		},
 		sharedFrom: {
 			type: Schema.Types.ObjectId,
 			ref: "Post",
-			autopopulate: true,
+			// autopopulate: true,
 		},
 		privacy: {
 			type: String,
@@ -66,17 +69,21 @@ const postSchema = new Schema(
 	{ timestamps: true }
 );
 
-// Algolia Search Plugin
+//* Apply plugins
+// normalize : remove _id and __v and private field  from the response
+postSchema.plugin(normalize);
 postSchema.plugin(autopopulate);
+
+// Algolia Search Plugin
 
 postSchema.plugin(mongooseAlgolia, {
 	appId: ENV.ALGOLIA_APP_ID,
 	apiKey: ENV.ALGOLIA_ADMIN_API_KEY,
 	indexName: "posts", //The name of the index in Algolia, you can also pass in a function
 	selector: "-password -email -rememberMe -socialAccounts.accessToken -refreshToken", //  You can decide which field that are getting synced to Algolia (same as selector in mongoose)
-	populate: {
-		path: "author",
-	},
+	// populate: {
+	// 	path: "author",
+	// },
 	// If you want to prevent some documents from being synced to algolia
 	// },
 	// filter: function (doc) {
@@ -87,22 +94,17 @@ postSchema.plugin(mongooseAlgolia, {
 
 //? --------- Middlewares ----------------
 
-// Assuming User model is imported like this
-const User = mongoose.model('User');
-
 // Add a post save hook
-postSchema.post('save', async function(doc) {
-  if (doc.isNew) { // Check if it's a new document
-    await User.findByIdAndUpdate(doc.author, { $inc: { totalPosts: 1 } });
-  }
-});
+// postSchema.post('save', async function(doc) {
+//   if (doc.isNew) { // Check if it's a new document
+//     await User.findByIdAndUpdate(doc.author, { $inc: { totalPosts: 1 } });
+//   }
+// });
 
-// Add a post remove hook
-postSchema.post('remove', async function(doc) {
-  await User.findByIdAndUpdate(doc.author, { $inc: { totalPosts: -1 } });
-});
-
-
+// // Add a post remove hook
+// postSchema.post('remove', async function(doc) {
+//   await User.findByIdAndUpdate(doc.author, { $inc: { totalPosts: -1 } });
+// });
 
 let Post = mongoose.model("Post", postSchema);
 

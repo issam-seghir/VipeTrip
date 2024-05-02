@@ -46,8 +46,6 @@ export function CreatePostSection() {
 
 	const errorMessage = createPostResult?.isError ? createPostResult?.error : errorsForm;
 
-	console.log("getValues", getValues());
-	console.log("errors", errorsForm);
 	const getFormErrorMessage = (name) => {
 		if (errorMessage[name]) {
 			// Check if the error message is an array

@@ -1,5 +1,6 @@
 const Post = require("@model/Post");
 const User = require("@model/User");
+const mongoose = require("mongoose");
 const { asyncWrapper } = require("@middleware/asyncWrapper");
 const createError = require("http-errors");
 
@@ -11,7 +12,7 @@ const createPost = asyncWrapper(async (req, res) => {
 	/** @type {createPostSchemaBody} */
 	const { description, mentions, tags, privacy } = req.body;
 	const images = req?.files?.map((file) => file.path) || []; // Get paths of uploaded files
-	console.log(req.body);
+
 	// Check if the user exists
 	const user = await User.findById(req.user.id);
 	if (!user) {
@@ -20,7 +21,6 @@ const createPost = asyncWrapper(async (req, res) => {
 
 	// Remove the '@' from each mention
 	const mentionNames = mentions.map((mention) => mention.replace("@", ""));
-	console.log(mentionNames);
 	// Find all mentioned users by their firstName or lastName
 	const mentionedUsers = await User.find({ fullName: { $in: mentionNames } });
 	const mentionIds = mentionedUsers.map((user) => user.id);
@@ -79,25 +79,17 @@ const updatePost = asyncWrapper(async (req, res) => {
 	res.status(200).json(updatedPost);
 });
 
-const getFeedPosts = asyncWrapper(async (req, res) => {
+const getAllPosts = asyncWrapper(async (req, res) => {
 	const page = Number.parseInt(req.query.page) || 1; // Get the page number from the query parameters, default to 1
 	const limit = Number.parseInt(req.query.limit) || 10; // Get the limit from the query parameters, default to 10
 	const skip = (page - 1) * limit;
+	 const posts = await Post.find().sort({ createdAt: -1 })
+	 .sort({ createdAt: -1 }) // Sort by creation date in descending order
+	 .skip(skip) // Skip the posts before the current page
+	 .limit(limit) // Limit the number of posts
+	 .lean()
+	res.status(201).json({ message: "Get all Posts successfully", data: posts });
 
-	const posts = await Post.find()
-		.sort({ createdAt: -1 }) // Sort by creation date in descending order
-		.skip(skip) // Skip the posts before the current page
-		.limit(limit) // Limit the number of posts
-		.exec();
-
-	const totalPosts = await Post.countDocuments();
-
-	res.status(200).json({
-		totalPosts,
-		totalPages: Math.ceil(totalPosts / limit),
-		currentPage: page,
-		posts,
-	});
 });
 
 const getUserPosts = asyncWrapper(async (req, res) => {
@@ -164,7 +156,7 @@ module.exports = {
 	createPost,
 	updatePost,
 	deletePost,
-	getFeedPosts,
+	getAllPosts,
 	getUserPosts,
 	getSinglePost,
 	sharePost,

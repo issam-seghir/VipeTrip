@@ -3,27 +3,25 @@ import { toTitleCase } from "@jsx/utils";
 import { formatDistanceToNow } from "date-fns";
 import { Avatar } from "primereact/avatar";
 import { Button } from "primereact/button";
+import { Menu } from "primereact/menu";
 import { Skeleton } from "primereact/skeleton";
 import { Tooltip } from "primereact/tooltip";
 import { classNames } from "primereact/utils";
-import { useNavigate } from "react-router-dom";
-import { Menu } from "primereact/menu";
 import { useRef } from "react";
+import { useNavigate } from "react-router-dom";
+
 const items = [
 	{
 		items: [
 			{
 				label: "Settings",
 				icon: "pi pi-cog",
-				command: () => {
-
-				},
+				command: () => {},
 			},
 			{
 				label: "Logout",
 				icon: "pi pi-sign-out",
-				command: () => {
-				},
+				command: () => {},
 			},
 		],
 	},
@@ -31,7 +29,7 @@ const items = [
 export function FeedPostsSection() {
 	const navigate = useNavigate();
 	const optionsMenu = useRef(null);
-
+const serverUrl = import.meta.env.VITE_SERVER_URL;
 	const { data: posts, isFetching, isLoading, isError, error } = useGetAllPostsQuery();
 	if (isLoading) {
 		return (
@@ -72,13 +70,23 @@ export function FeedPostsSection() {
 						<div className="flex aligne-items-center gap-2 flex-1">
 							<Avatar
 								size="large"
+								icon="pi pi-user"
+								className="p-overlay"
 								onClick={() => navigate(`/profile/${post?.author?.id}`)}
 								image={post?.author?.picturePath}
 								alt={post?.author?.fullName}
 								shape="circle"
 							/>
 							<div className="flex flex-column">
-								<div className="font-bold">{toTitleCase(post?.author?.fullName)}</div>
+								<div
+									onKeyDown={() => {}}
+									onClick={() => navigate(`/profile/${post?.author?.id}`)}
+									tabIndex={0}
+									role="button"
+									className="font-bold p-1 cursor-pointer hover:text-primary-500"
+								>
+									{toTitleCase(post?.author?.fullName)}
+								</div>
 								<div className="text-xs text-400 flex gap-2">
 									{formatDistanceToNow(new Date(post?.createdAt), { addSuffix: true })}
 									{post?.privacy === "onlyMe" && (
@@ -120,7 +128,9 @@ export function FeedPostsSection() {
 											<Tooltip
 												key={post.id}
 												target={`.pi-pencil`}
-												content={"edited"}
+												content={`edited : ${formatDistanceToNow(new Date(post?.updatedAt), {
+													addSuffix: true,
+												})}`}
 												position="bottom"
 											/>
 										</>
@@ -145,6 +155,16 @@ export function FeedPostsSection() {
 						/>
 					</div>
 					<div className="flex p-1">{post?.description}</div>
+					<div className="post-images">
+						{post?.images.map((path, index) => (
+							<img
+								key={index}
+								className="border-round-md"
+								src={`${serverUrl}/${path}}`}
+								alt={`Post ${post.id}`}
+							/>
+						))}
+					</div>
 				</div>
 			))}
 			<div id="scroll-anchor" />

@@ -169,7 +169,6 @@ export  function StoriesSection() {
 		<>
 			{/* Stories Carousel Section */}
 			<Carousel
-				className="mb-4"
 				value={users}
 				numVisible={3}
 				numScroll={3}

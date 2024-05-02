@@ -14,12 +14,12 @@ const postSchema = new Schema(
 			type: Schema.Types.ObjectId,
 			ref: "User",
 			required: true,
-			// autopopulate: true,
+			autopopulate: true,
 		},
 		sharedFrom: {
 			type: Schema.Types.ObjectId,
 			ref: "Post",
-			// autopopulate: true,
+			autopopulate: true,
 		},
 		privacy: {
 			type: String,

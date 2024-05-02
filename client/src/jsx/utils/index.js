@@ -211,3 +211,17 @@ export function convertModelToFormData(val, formData = new FormData(), namespace
 	}
 	return formData;
 }
+
+/**
+ * Capitalizes the first character of each word of a  string.
+ * @param {string} string - The string to capitalize.
+ * @returns {string} The capitalized string.
+ * @example
+ * toTitleCase('hello world'); // 'Hello World'
+ */
+export function toTitleCase(string) {
+	return string
+		.split(" ")
+		.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+		.join(" ");
+}

@@ -4,6 +4,7 @@ export const postApi = api.enhanceEndpoints({ addTagTypes: ["Post"] }).injectEnd
 	endpoints: (builder) => ({
 		getAllPosts: builder.query({
 			query: () => "posts",
+			transformResponse: (response) => response.data,
 			providesTags: (result) =>
 				result
 					? [...result.map(({ id }) => ({ type: "Post", id })), { type: "Post", id: "LIST" }]

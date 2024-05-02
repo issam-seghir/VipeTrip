@@ -45,7 +45,7 @@ export const api = createApi({
 	// defaults to 'api'
 	reducerPath: "api",
 	baseQuery: baseQueryWithReauth,
-	refetchOnFocus: true,
+	// refetchOnFocus: true,
 	refetchOnReconnect: true,
 	keepUnusedDataFor: 60,
 	endpoints: (builder) => ({}),

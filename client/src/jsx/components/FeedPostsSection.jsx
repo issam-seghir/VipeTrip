@@ -1,18 +1,15 @@
 import { useGetAllPostsQuery } from "@jsx/store/api/postApi";
 import { toTitleCase } from "@jsx/utils";
-import { formatDistanceToNow } from "date-fns";
+import { formatDistanceToNow,format } from "date-fns";
 import { Avatar } from "primereact/avatar";
 import { Button } from "primereact/button";
 import { Menu } from "primereact/menu";
 import { Skeleton } from "primereact/skeleton";
 import { Tooltip } from "primereact/tooltip";
 import { classNames } from "primereact/utils";
-import { useRef } from "react";
-import { useNavigate } from "react-router-dom";
-import { Galleria } from "primereact/galleria";
-import { Image } from "primereact/image";
-import { LazyLoadImage } from "react-lazy-load-image-component";
+import { useRef, useState } from "react";
 import "react-lazy-load-image-component/src/effects/blur.css";
+import { useNavigate } from "react-router-dom";
 import { Gallery } from "./Gallery";
 
 const items = [
@@ -34,7 +31,9 @@ const items = [
 export function FeedPostsSection() {
 	const navigate = useNavigate();
 	const optionsMenu = useRef(null);
-const serverUrl = import.meta.env.VITE_SERVER_URL;
+	const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(true);
+
+	const serverUrl = import.meta.env.VITE_SERVER_URL;
 	const { data: posts, isFetching, isLoading, isError, error } = useGetAllPostsQuery();
 	if (isLoading) {
 		return (
@@ -92,47 +91,55 @@ const serverUrl = import.meta.env.VITE_SERVER_URL;
 								>
 									{toTitleCase(post?.author?.fullName)}
 								</div>
-								<div className="text-xs text-400 flex gap-2">
-									{formatDistanceToNow(new Date(post?.createdAt), { addSuffix: true })}
+								<div className={`text-xs text-400 flex gap-2`}>
+									<div className={`createData-tooltip-${post.id} `}>
+										{formatDistanceToNow(new Date(post?.createdAt), { addSuffix: true })}
+										<Tooltip
+											key={post.id}
+											target={`.createData-tooltip-${post.id}`}
+											content={format(new Date(post?.createdAt), "EEEE, MMMM d, yyyy, h:mm a")}
+											position="bottom"
+										/>
+									</div>
 									{post?.privacy === "onlyMe" && (
 										<>
 											<Tooltip
 												key={post.id}
-												target={`.tooltip.pi-lock`}
+												target={`.privacy-tooltip-${post.id}`}
 												content={"private"}
 												position="bottom"
 											/>
-											<i className="pi pi-lock tooltip"></i>
+											<i className={`pi pi-lock privacy-tooltip-${post.id}`}></i>
 										</>
 									)}
 									{post?.privacy === "friends" && (
 										<>
 											<Tooltip
 												key={post.id}
-												target={`.tooltip.pi-users`}
+												target={`.privacy-tooltip-${post.id}`}
 												content={"shard with friends only"}
 												position="bottom"
 											/>
-											<i className="pi pi-users tooltip"></i>
+											<i className={`pi pi-users privacy-tooltip-${post.id}`}></i>
 										</>
 									)}
 									{post?.privacy === "public" && (
 										<>
 											<Tooltip
 												key={post.id}
-												target={`.tooltip.pi-globe`}
+												target={`.privacy-tooltip-${post.id}`}
 												content={"public"}
 												position="bottom"
 											/>
-											<i className="pi pi-globe tooltip"></i>
+											<i className={`pi pi-globe privacy-tooltip-${post.id}`}></i>
 										</>
 									)}
 									{post?.edited && (
 										<>
-											<i className="pi pi-pencil"></i>
+											<i className={`pi edited-tooltip-${post.id} pi-pencil`}></i>
 											<Tooltip
 												key={post.id}
-												target={`.pi-pencil`}
+												target={`.edited-tooltip-${post.id}`}
 												content={`edited : ${formatDistanceToNow(new Date(post?.updatedAt), {
 													addSuffix: true,
 												})}`}
@@ -159,22 +166,18 @@ const serverUrl = import.meta.env.VITE_SERVER_URL;
 							onClick={(event) => optionsMenu.current.toggle(event)}
 						/>
 					</div>
-					<div className="flex p-1">{post?.description}</div>
-						<Gallery images={post?.images} />
-						{/* {post?.images.map((imgPath, index) => (
-							<div key={index} className={`image-${index + 1} `}>
-								<LazyLoadImage
-									className={`image image-${index + 1} border-round-xl`}
-									src={`${serverUrl}/${imgPath}`}
-									alt={`Post ${post.id}`}
-									wrapperProps={{
-										// If you need to, you can tweak the effect transition using the wrapper style.
-										style: { transitionDelay: "1s" },
-									}}
-									effect="blur"
-								/>
-							</div>
-						))} */}
+					<div className="flex-inline p-1">
+						{isDescriptionExpanded ? post?.description : post?.description.slice(0, 100)}
+						{post?.description.length > 100 && (
+							<Button
+								className="p-button-text w-fit h-fit p-0 ml-1 text-sm vertical-align-baseline  border-none shadow-none"
+								onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
+							>
+								{!isDescriptionExpanded && "... Show More"}
+							</Button>
+						)}
+					</div>
+					<Gallery images={post?.images} />
 				</div>
 			))}
 			<div id="scroll-anchor" />

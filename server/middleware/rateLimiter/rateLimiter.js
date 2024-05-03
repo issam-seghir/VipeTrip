@@ -25,7 +25,7 @@ var ratelimiter = async () => {
 		storeClient: mongoConn,
 		dbName: ENV.DATABASE_NAME,
 		keyPrefix: "middleware",
-		points: 10, // 10 requests
+		points: 15, // 15 requests
 		duration: 1, // per 1 second by IP
 		tableName: "rate_limits", // Name of the collection to use for storing rate limit data
 	});

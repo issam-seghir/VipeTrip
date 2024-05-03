@@ -11,7 +11,7 @@ const createError = require("http-errors");
 const createPost = asyncWrapper(async (req, res) => {
 	/** @type {createPostSchemaBody} */
 	const { description, mentions, tags, privacy } = req.body;
-	const images = req?.files?.map((file) => file.path.replace("public/", "")) || [];
+	const images = req?.files?.map((file) => file.path.replace("public\\", "")) || [];
 
 	// Check if the user exists
 	const user = await User.findById(req.user.id);
@@ -89,7 +89,6 @@ const getAllPosts = asyncWrapper(async (req, res) => {
 		.sort({ createdAt: -1 }) // Sort by creation date in descending order
 		.skip(skip) // Skip the posts before the current page
 		.limit(limit); // Limit the number of posts
-
 
 	// console.log(posts);
 	res.status(201).json({ message: "Get all Posts successfully", data: posts });

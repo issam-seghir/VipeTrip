@@ -28,7 +28,8 @@ export function CreatePostSection() {
 	const navigate = useNavigate();
 	const user = useSelector(selectCurrentUser);
 	const toast = useRef(null);
-
+const descriptionRef = useRef(null);
+const [cursorPosition, setCursorPosition] = useState(null);
 	const [createPost, createPostResult] = useCreatePostMutation();
 	const {
 		handleSubmit,
@@ -114,10 +115,21 @@ export function CreatePostSection() {
 	const handleMediaOpen = () => {
 		setShowFileUploadDialog(true);
 	};
-	const handleEmojiClick = (emojiObject) => {
-		const prevValue = getValues("description");
-		setValue("description", `${prevValue} ${emojiObject?.emoji}`, { shouldValidate: true });
-	};
+	// const handleEmojiClick = (emojiObject) => {
+	// 	const prevValue = getValues("description");
+	// 	setValue("description", `${prevValue} ${emojiObject?.emoji}`, { shouldValidate: true });
+	// };
+const handleEmojiClick = (emojiObject) => {
+	const start = cursorPosition;
+	const text = getValues("description");
+	const before = text.slice(0, Math.max(0, start));
+	const after = text.slice(start);
+	setValue("description", before + emojiObject?.emoji + after, { shouldValidate: true });
+	setTimeout(() => {
+		descriptionRef.current.selectionStart = descriptionRef.current.selectionEnd = start + emojiObject?.emoji.length;
+	}, 0);
+};
+
 	const handlePollOpen = () => {
 		// handle poll click
 	};
@@ -270,6 +282,8 @@ export function CreatePostSection() {
 							defaultValue=""
 							name="description"
 							control={control}
+							descriptionRef={descriptionRef}
+							setCursorPosition={setCursorPosition}
 							className="flex mb-2"
 							inputClassName="w-full  surface-card border-transparent shadow-none"
 							placeholder="Enter @ to mention people, # to mention tag"

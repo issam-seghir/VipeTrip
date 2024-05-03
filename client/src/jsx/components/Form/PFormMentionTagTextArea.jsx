@@ -104,6 +104,8 @@ const tagSuggestions = ["primereact", "primefaces", "primeng", "primevue", "test
 export const PFormMentionTagTextArea = ({
 	control,
 	defaultValue = "",
+	descriptionRef,
+	setCursorPosition,
 	name,
 	placeholder,
 	pt,
@@ -189,6 +191,11 @@ export const PFormMentionTagTextArea = ({
 						id={field.name}
 						value={field.value}
 						{...field}
+						ref={(e) => {
+							field.ref(e);
+							descriptionRef.current = e;
+						}}
+						onBlur={(e) => setCursorPosition(e.target.selectionStart)}
 						className={classNames({ "p-invalid": fieldState.error }, className)}
 						inputClassName={inputClassName}
 						onChange={(e) => field.onChange(e.target.value)}

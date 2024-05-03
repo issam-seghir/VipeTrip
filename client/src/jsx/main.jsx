@@ -7,12 +7,7 @@ import PrivateRoute from "@components/PrivateRoute.jsx";
 import App from "@jsx/App.jsx";
 import { BookMarks } from "@pages/BookMarks";
 import { ForgetPasswordRequest } from "@pages/ForgetPasswordRequest";
-import { Home } from "@pages/Home";
 import { HomeLayout } from "@pages/HomeLayout";
-import { Messages } from "@pages/Messages";
-import { Notifications } from "@pages/Notifications";
-import { Settings } from "@pages/Settings";
-import { Explore } from "@pages/Explore";
 // import { Login } from "@pages/Login";
 import Profile from "@pages/Profile";
 import { Register } from "@pages/Register";
@@ -27,8 +22,14 @@ import { PersistGate } from "redux-persist/integration/react";
 import Error from "./pages/Error";
 // const Loading = React.lazy(() => import("@pages/Loading"));
 // const Login = lazy(() => import("@pages/Login"));
+import { Loader } from "./components/Loader";
 
 const Login = lazy(() => import("@pages/Login").then((module) => ({ default: module.Login })));
+const Home = lazy(() => import("@pages/Home").then((module) => ({ default: module.Home })));
+const Explore = lazy(() => import("@pages/Explore").then((module) => ({ default: module.Explore })));
+const Notifications = lazy(() => import("@pages/Notifications").then((module) => ({ default: module.Notifications })));
+const Messages = lazy(() => import("@pages/Messages").then((module) => ({ default: module.Messages })));
+const Settings = lazy(() => import("@pages/Settings").then((module) => ({ default: module.Settings })));
 // const Scheduler = React.lazy(() => import("@pages/Scheduler"));
 // const Orders = React.lazy(() => import("@pages/Orders"));
 // const Map = React.lazy(() => import("@pages/Map"));
@@ -86,7 +87,7 @@ export const router = createBrowserRouter(
 				{
 					index: true,
 					element: (
-						<Suspense fallback={<div className="text-4xl text-bluegray-700">Loading .....</div>}>
+						<Suspense fallback={<Loader/>}>
 							<Login />
 						</Suspense>
 					),
@@ -113,13 +114,13 @@ export const router = createBrowserRouter(
 							children: homeRoutes,
 						},
 					],
-
 				},
 			],
 		},
 	],
 	{ basename: import.meta.env.BASE_URL }
 );
+
 
 
 ReactDOM.createRoot(document.getElementById("root")).render(

@@ -24,8 +24,7 @@ const log = require("@/utils/chalkLogger");
 const { generateMockUser } = require("@utils/mockSchema");
 const { normalize } = require("@utils/plugins");
 const passport = require("passport");
-const {passportConfig} = require("@config/PassportjsConfig");
-
+const { passportConfig } = require("@config/PassportjsConfig");
 
 // global mongoose plugins
 mongoose.plugin(normalize);
@@ -71,7 +70,6 @@ app.use(compression());
 
 //serve static files
 app.use(express.static(join(__dirname, "public")));
-
 // disable "x-powered-by Express" in the req header
 app.disable("x-powered-by");
 
@@ -79,7 +77,6 @@ app.disable("x-powered-by");
 app.use(passport.initialize());
 // all Oauth here : google , facebook ...
 passportConfig(passport);
-
 
 app.use("/api/v1", require("@api/v1"));
 

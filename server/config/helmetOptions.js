@@ -1,5 +1,11 @@
-module.exports = {
+// @ts-check
+const { isProd } = require("@config/const.js");
+const { ENV } = require("@/validations/envSchema");
+
+const helmetOptions = {
 	crossOriginResourcePolicy: {
-		policy: "cross-origin",
+		policy: isProd ? "same-origin" : "cross-origin", // fix laoding image in frontend
 	},
 };
+
+module.exports = { helmetOptions };

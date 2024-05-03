@@ -11,7 +11,7 @@ const createError = require("http-errors");
 const createPost = asyncWrapper(async (req, res) => {
 	/** @type {createPostSchemaBody} */
 	const { description, mentions, tags, privacy } = req.body;
-	const images = req?.files?.map((file) => file.path) || []; // Get paths of uploaded files
+	const images = req?.files?.map((file) => file.path.replace("public/", "")) || [];
 
 	// Check if the user exists
 	const user = await User.findById(req.user.id);
@@ -83,13 +83,15 @@ const getAllPosts = asyncWrapper(async (req, res) => {
 	const page = Number.parseInt(req.query.page) || 1; // Get the page number from the query parameters, default to 1
 	const limit = Number.parseInt(req.query.limit) || 10; // Get the limit from the query parameters, default to 10
 	const skip = (page - 1) * limit;
+
 	const posts = await Post.find()
 		.select("-mentions") // Exclude the __v field
 		.sort({ createdAt: -1 }) // Sort by creation date in descending order
 		.skip(skip) // Skip the posts before the current page
 		.limit(limit); // Limit the number of posts
 
-	console.log(posts);
+
+	// console.log(posts);
 	res.status(201).json({ message: "Get all Posts successfully", data: posts });
 });
 

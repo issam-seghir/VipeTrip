@@ -9,6 +9,10 @@ import { Tooltip } from "primereact/tooltip";
 import { classNames } from "primereact/utils";
 import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { Galleria } from "primereact/galleria";
+import { Image } from "primereact/image";
+import { LazyLoadImage } from "react-lazy-load-image-component";
+import "react-lazy-load-image-component/src/effects/blur.css";
 
 const items = [
 	{
@@ -155,14 +159,27 @@ const serverUrl = import.meta.env.VITE_SERVER_URL;
 						/>
 					</div>
 					<div className="flex p-1">{post?.description}</div>
-					<div className="post-images">
-						{post?.images.map((path, index) => (
-							<img
-								key={index}
-								className="border-round-md"
-								src={`${serverUrl}/${path}}`}
-								alt={`Post ${post.id}`}
-							/>
+					<div className={`image-grid image-grid-${post?.images.length}`}>
+						{post?.images.map((imgPath, index) => (
+							<div key={index} className={`image-${index + 1} `}>
+								<LazyLoadImage
+									className={`image image-${index + 1} border-round-xl`}
+									src={`${serverUrl}/${imgPath}`}
+									alt={`Post ${post.id}`}
+									wrapperProps={{
+										// If you need to, you can tweak the effect transition using the wrapper style.
+										style: { transitionDelay: "1s" },
+									}}
+									effect="blur"
+								/>
+								{/* <img
+									className={`image image-${index + 1} border-round-xl`}
+									src={`${serverUrl}/${imgPath}`}
+
+									alt={`Post ${post.id}`}
+									loading="lazy"
+								/> */}
+							</div>
 						))}
 					</div>
 				</div>

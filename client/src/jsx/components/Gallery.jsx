@@ -6,12 +6,15 @@ const serverUrl = import.meta.env.VITE_SERVER_URL;
 // Wrap Gallery with trackWindowScroll HOC so it receives
 // a scrollPosition prop to pass down to the images
 const TrackedGallery = ({ images, scrollPosition }) => {
+	    const gridClass =
+			images.length === 1 ? "one" : images.length === 2 ? "two" : images.length === 3 ? "three" : images.length === 4 ? "four" : "five";
+
 	return (
-		<div className={`image-grid`}>
+		<div className={`image-grid ${gridClass}`}>
 			{images?.map((imgPath, index) => (
-				<div key={index} className={`image-${index + 1} `}>
+				<div key={index} className={`image-item`}>
 					<LazyLoadImage
-						className={`image image-${index + 1} border-round-xl`}
+						className={`image  border-round-xl`}
 						src={`${serverUrl}/${imgPath}`}
 						alt={`Post ${index}`}
 						wrapperProps={{

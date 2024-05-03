@@ -154,25 +154,66 @@
 
 .image-grid {
 	display: grid;
-	grid-template: "img-1 img-1" 2fr "img-2 img-3" 1fr / 1fr 1fr;
-	gap: 0.5rem;
+	grid-gap: 0.4rem;
+
+}
+
+.image-grid.one {
+	grid-template-areas: "img1";
+}
+
+.image-grid.two {
+	grid-template-areas: "img1 img2";
+}
+
+.image-grid.three {
+	grid-template-areas:
+		"img1 img2"
+		"img1 img3";
+}
+
+.image-grid.four {
+	grid-template-areas:
+		"img1 img1 img1"
+		"img2 img3 img4";
+}
+
+.image-grid.five {
+	grid-template-areas:
+		"img1 img1 img1 img2 img2 img2"
+		"img3 img3 img4 img4 img5 img5";
+}
+
+.image-grid.two,.image-grid.three,.image-grid.four,.image-grid.five {
+	 max-height: 26rem; 
+
+}
+
+.image-item {
+	position: relative;
+	overflow: hidden;
+}
+.image-item:nth-child(1) {
+	grid-area: img1;
+}
+.image-item:nth-child(2) {
+	grid-area: img2;
+}
+.image-item:nth-child(3) {
+	grid-area: img3;
+}
+.image-item:nth-child(4) {
+	grid-area: img4;
+}
+.image-item:nth-child(5) {
+	grid-area: img5;
 }
 
 .image {
+	width: 100%;
 	height: 100%;
+
 	object-fit: cover;
-}
-
-.image-1 {
-	grid-area: img-1;
-}
-
-.image-2 {
-	grid-area: img-2;
-}
-
-.image-3 {
-	grid-area: img-3;
 }
 
 // .overlay {

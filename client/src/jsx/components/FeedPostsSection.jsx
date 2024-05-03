@@ -13,6 +13,7 @@ import { Galleria } from "primereact/galleria";
 import { Image } from "primereact/image";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import "react-lazy-load-image-component/src/effects/blur.css";
+import { Gallery } from "./Gallery";
 
 const items = [
 	{
@@ -159,8 +160,8 @@ const serverUrl = import.meta.env.VITE_SERVER_URL;
 						/>
 					</div>
 					<div className="flex p-1">{post?.description}</div>
-					<div className={`image-grid image-grid-${post?.images.length}`}>
-						{post?.images.map((imgPath, index) => (
+						<Gallery images={post?.images} />
+						{/* {post?.images.map((imgPath, index) => (
 							<div key={index} className={`image-${index + 1} `}>
 								<LazyLoadImage
 									className={`image image-${index + 1} border-round-xl`}
@@ -172,16 +173,8 @@ const serverUrl = import.meta.env.VITE_SERVER_URL;
 									}}
 									effect="blur"
 								/>
-								{/* <img
-									className={`image image-${index + 1} border-round-xl`}
-									src={`${serverUrl}/${imgPath}`}
-
-									alt={`Post ${post.id}`}
-									loading="lazy"
-								/> */}
 							</div>
-						))}
-					</div>
+						))} */}
 				</div>
 			))}
 			<div id="scroll-anchor" />

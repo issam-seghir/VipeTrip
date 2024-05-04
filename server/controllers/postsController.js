@@ -89,9 +89,9 @@ const getAllPosts = asyncWrapper(async (req, res) => {
 		.sort({ createdAt: -1 }) // Sort by creation date in descending order
 		.skip(skip) // Skip the posts before the current page
 		.limit(limit); // Limit the number of posts
-  const user = await User.findById(req.user.id);
+	const user = await User.findById(req.user.id);
 
-  posts = await Promise.all(
+	posts = await Promise.all(
 		posts.map(async (post) => {
 			if (!post.viewedBy.includes(user.id)) {
 				post.viewedBy.push(user.id);
@@ -104,7 +104,7 @@ const getAllPosts = asyncWrapper(async (req, res) => {
 			}
 			return post;
 		})
-  );
+	);
 
 	// console.log(posts);
 	res.status(201).json({ message: "Get all Posts successfully", data: posts });
@@ -188,8 +188,8 @@ const likeDislikePost = asyncWrapper(async (req, res, next) => {
 	// Check if the user has already liked the post
 	const existingLike = await Like.findOne({ postId, userId, type: "Post" });
 	if (existingLike) {
-		// If the user has already liked the post, delete the Like document
-		await Like.deleteOne({ _id: existingLike._id });
+		// If the user has already liked the post, delete the document
+		await Like.findOneAndDelete({ _id: existingLike._id });
 		return res.status(200).json({ message: "Post unliked successfully" });
 	}
 
@@ -197,7 +197,7 @@ const likeDislikePost = asyncWrapper(async (req, res, next) => {
 	const like = new Like({ postId, userId, type: "Post" });
 	await like.save();
 
-	res.status(200).json({ message: "Post liked successfully",data: like });
+	res.status(200).json({ message: "Post liked successfully", data: like });
 });
 
 module.exports = {

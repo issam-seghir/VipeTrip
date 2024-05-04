@@ -120,7 +120,7 @@ postSchema.post("save", async function (doc) {
 });
 
 // Add a post remove hook
-postSchema.post("remove", async function (doc) {
+postSchema.post("deleteOne", async function (doc) {
 	await User.findByIdAndUpdate(doc.author, { $inc: { totalPosts: -1 } });
 });
 

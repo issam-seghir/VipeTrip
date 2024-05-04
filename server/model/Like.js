@@ -9,12 +9,10 @@ const likeSchema = new Schema(
 			type: Schema.Types.ObjectId,
 			ref: "User",
 			required: true,
-			autopopulate: true,
 		},
 		commentId: {
 			type: Schema.Types.ObjectId,
 			ref: "Comment",
-			autopopulate: true,
 		},
 		postId: {
 			type: Schema.Types.ObjectId,
@@ -48,15 +46,12 @@ likeSchema.pre("save", async function () {
 });
 
 // Middleware to decrements  totalLikes in Post or Comment when user remove  like from  Post or comment
-likeSchema.pre("remove", async function () {
-	try {
-		if (this.type === "Post") {
-			await this.model("Post").updateOne({ _id: this.postId }, { $inc: { totalLikes: -1 } });
-		} else if (this.type === "Comment") {
-			await this.model("Comment").updateOne({ _id: this.commentId }, { $inc: { totalLikes: -1 } });
-		}
-	} catch (error) {
-		console.log(error);
+likeSchema.pre("findOneAndDelete", async function () {
+	const like = await this.model.findOne(this.getQuery());
+	if (like.type === "Post") {
+		await like.model("Post").updateOne({ _id: like.postId }, { $inc: { totalLikes: -1 } });
+	} else if (like.type === "Comment") {
+		await like.model("Comment").updateOne({ _id: like.commentId }, { $inc: { totalLikes: -1 } });
 	}
 });
 

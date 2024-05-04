@@ -23,11 +23,13 @@ const { pinoLog } = require("@config/pinoConfig");
 const log = require("@/utils/chalkLogger");
 const { generateMockUser } = require("@utils/mockSchema");
 const { normalize } = require("@utils/plugins");
+const autopopulate = require("mongoose-autopopulate");
 const passport = require("passport");
 const { passportConfig } = require("@config/PassportjsConfig");
 
 // global mongoose plugins
 mongoose.plugin(normalize);
+mongoose.plugin(autopopulate);
 
 const PORT = ENV.PORT;
 

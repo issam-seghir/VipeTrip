@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const autopopulate = require("mongoose-autopopulate");
 const mongooseAlgolia = require("@issam-seghir/mongoose-algolia").algoliaIntegration;
 const { ENV } = require("@/validations/envSchema");
 
@@ -71,9 +70,6 @@ const postSchema = new Schema(
 );
 
 //* Apply plugins
-// normalize : remove _id and __v and private field  from the response
-postSchema.plugin(normalize);
-postSchema.plugin(autopopulate);
 
 // Algolia Search Plugin
 

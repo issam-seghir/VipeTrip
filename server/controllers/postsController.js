@@ -155,39 +155,37 @@ const sharePost = asyncWrapper(async (req, res) => {
 	// Increase the share count of the original post
 	await originalPost.incrementShares();
 
-	res.status(200).json({ message: "Post shared successfully", sharedPost });
+	res.status(200).json({ message: "Post shared successfully", data: sharedPost });
 });
-
 
 const likeDislikePost = asyncWrapper(async (req, res, next) => {
-  const { postId } = req.params;
-  const userId = req?.user?.id;
+	const { postId } = req.params;
+	const userId = req?.user?.id;
 
-  const post = await Post.findById(postId);
-  if (!post) {
-    return next(new Error('Post not found'));
-  }
+	const post = await Post.findById(postId);
+	if (!post) {
+		return next(new Error("Post not found"));
+	}
 
-  const user = await User.findById(userId);
-  if (!user) {
-    return next(new Error('User not found'));
-  }
+	const user = await User.findById(userId);
+	if (!user) {
+		return next(new Error("User not found"));
+	}
 
-  // Check if the user has already liked the post
-  const existingLike = await Like.findOne({ postId, userId , type: 'Post'});
-  if (existingLike) {
-    // If the user has already liked the post, delete the Like document
-    await Like.deleteOne({ _id: existingLike._id });
-    return res.status(200).json({ message: 'Post unliked successfully' });
-  }
+	// Check if the user has already liked the post
+	const existingLike = await Like.findOne({ postId, userId, type: "Post" });
+	if (existingLike) {
+		// If the user has already liked the post, delete the Like document
+		await Like.deleteOne({ _id: existingLike._id });
+		return res.status(200).json({ message: "Post unliked successfully" });
+	}
 
-  // If the user has not liked the post, create a new Like document
-  const like = new Like({ postId, userId ,type:"Post"});
-  await like.save();
+	// If the user has not liked the post, create a new Like document
+	const like = new Like({ postId, userId, type: "Post" });
+	await like.save();
 
-  res.status(200).json({ message: 'Post liked successfully', like });
+	res.status(200).json({ message: "Post liked successfully",data: like });
 });
-
 
 module.exports = {
 	createPost,

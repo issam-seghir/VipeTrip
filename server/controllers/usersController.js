@@ -22,6 +22,8 @@ const getUser = asyncWrapper(async (req, res, next) => {
 	if (!user) {
 		return next(new createError.NotFound("User not found"));
 	}
+
+	 await user.incrementViewedProfile();
 	res.json({ success: "get user success", user });
 });
 

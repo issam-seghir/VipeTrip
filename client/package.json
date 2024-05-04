@@ -78,6 +78,7 @@
 		"date-fns": "^3.0.5",
 		"emoji-picker-react": "^4.9.2",
 		"instantsearch.js": "^4.67.0",
+		"numeral": "^2.0.6",
 		"passport-linkedin-oauth2": "^2.0.0",
 		"primeflex": "^3.3.1",
 		"primeicons": "^6.0.1",

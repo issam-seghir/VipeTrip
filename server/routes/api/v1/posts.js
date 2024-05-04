@@ -4,6 +4,7 @@ const router = express.Router();
 const {
 	getAllPosts,
 	getUserPosts,
+	likeDislikePost,
 	sharePost,
 	getSinglePost,
 	createPost,
@@ -22,5 +23,6 @@ router.route("/").get(getAllPosts);
 router.route("/:postId").get(getSinglePost).delete(deletePost).put(updatePost);
 
 router.route("/:postId/share").post(sharePost);
+router.route("/:postId/likeDislike").post(likeDislikePost);
 
 module.exports = router;

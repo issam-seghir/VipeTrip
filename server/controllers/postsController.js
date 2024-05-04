@@ -1,5 +1,6 @@
 const Post = require("@model/Post");
 const User = require("@model/User");
+const Like = require("@model/Like");
 const mongoose = require("mongoose");
 const { asyncWrapper } = require("@middleware/asyncWrapper");
 const createError = require("http-errors");
@@ -89,7 +90,9 @@ const getAllPosts = asyncWrapper(async (req, res) => {
 		.sort({ createdAt: -1 }) // Sort by creation date in descending order
 		.skip(skip) // Skip the posts before the current page
 		.limit(limit); // Limit the number of posts
-
+	posts.forEach((post) => {
+		post.incrementImpressions();
+	});
 	// console.log(posts);
 	res.status(201).json({ message: "Get all Posts successfully", data: posts });
 });
@@ -117,6 +120,7 @@ const getSinglePost = asyncWrapper(async (req, res) => {
 	if (!post) {
 		return res.status(404).json({ message: "Post not found" });
 	}
+	post.incrementImpressions();
 
 	res.status(200).json(post);
 });
@@ -126,8 +130,8 @@ const sharePost = asyncWrapper(async (req, res) => {
 	const { userId, description, mentions, tags } = req.body;
 	const attachments = req.files.map((file) => file.path); // Get paths of uploaded files
 
-	const post = await Post.findById(postId);
-	if (!post) {
+	const originalPost = await Post.findById(postId);
+	if (!originalPost) {
 		return res.status(404).json({ message: "Post not found" });
 	}
 
@@ -137,22 +141,53 @@ const sharePost = asyncWrapper(async (req, res) => {
 	}
 
 	// Create a new post
-	const newPost = new Post({
+	const sharedPost = new Post({
 		userId,
 		description,
 		attachments,
 		mentions,
 		tags,
-		sharedFrom: post._id,
+		sharedFrom: originalPost._id,
 	});
 
-	await newPost.save();
+	await sharedPost.save();
 
 	// Increase the share count of the original post
-	await Post.findByIdAndUpdate(postId, { $inc: { totalShares: 1 } });
+	await originalPost.incrementShares();
 
-	res.status(200).json({ message: "Post shared successfully", newPost });
+	res.status(200).json({ message: "Post shared successfully", sharedPost });
 });
+
+
+const likeDislikePost = asyncWrapper(async (req, res, next) => {
+  const { postId } = req.params;
+  const userId = req?.user?.id;
+
+  const post = await Post.findById(postId);
+  if (!post) {
+    return next(new Error('Post not found'));
+  }
+
+  const user = await User.findById(userId);
+  if (!user) {
+    return next(new Error('User not found'));
+  }
+
+  // Check if the user has already liked the post
+  const existingLike = await Like.findOne({ postId, userId , type: 'Post'});
+  if (existingLike) {
+    // If the user has already liked the post, delete the Like document
+    await Like.deleteOne({ _id: existingLike._id });
+    return res.status(200).json({ message: 'Post unliked successfully' });
+  }
+
+  // If the user has not liked the post, create a new Like document
+  const like = new Like({ postId, userId ,type:"Post"});
+  await like.save();
+
+  res.status(200).json({ message: 'Post liked successfully', like });
+});
+
 
 module.exports = {
 	createPost,
@@ -161,5 +196,6 @@ module.exports = {
 	getAllPosts,
 	getUserPosts,
 	getSinglePost,
+	likeDislikePost,
 	sharePost,
 };

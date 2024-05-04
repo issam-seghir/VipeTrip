@@ -79,6 +79,7 @@ const [cursorPosition, setCursorPosition] = useState(null);
 				toast.current.show({
 					severity: "success",
 					summary: "Post Created 🎉",
+					position: "top-center",
 					detail: "Your post has been created successfully",
 				});
 			}
@@ -86,6 +87,7 @@ const [cursorPosition, setCursorPosition] = useState(null);
 			console.error(error);
 			toast.current.show({
 				severity: "error",
+				position: "top-center",
 				summary: "Error",
 				detail: error?.data?.message || "Failed to create post",
 			});

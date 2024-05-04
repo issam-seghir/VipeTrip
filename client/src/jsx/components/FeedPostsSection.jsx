@@ -1,4 +1,4 @@
-import { useGetAllPostsQuery } from "@jsx/store/api/postApi";
+import { useGetAllPostsQuery, useLikeDislikePostMutation } from "@jsx/store/api/postApi";
 import { toTitleCase } from "@jsx/utils";
 import { formatDistanceToNow,format } from "date-fns";
 import { Avatar } from "primereact/avatar";
@@ -11,6 +11,8 @@ import { useRef, useState } from "react";
 import "react-lazy-load-image-component/src/effects/blur.css";
 import { useNavigate } from "react-router-dom";
 import { Gallery } from "./Gallery";
+import numeral from "numeral";
+import { AvatarGroup } from "primereact/avatargroup";
 
 const items = [
 	{
@@ -32,9 +34,10 @@ export function FeedPostsSection() {
 	const navigate = useNavigate();
 	const optionsMenu = useRef(null);
 	const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(true);
-
 	const serverUrl = import.meta.env.VITE_SERVER_URL;
+
 	const { data: posts, isFetching, isLoading, isError, error } = useGetAllPostsQuery();
+	const [likeDislikePost, likeDislikePostResult] = useLikeDislikePostMutation();
 	if (isLoading) {
 		return (
 			<div>
@@ -166,6 +169,7 @@ export function FeedPostsSection() {
 							onClick={(event) => optionsMenu.current.toggle(event)}
 						/>
 					</div>
+					{/* Post Body */}
 					<div className="flex-inline p-1">
 						{isDescriptionExpanded ? post?.description : post?.description.slice(0, 100)}
 						{post?.description.length > 100 && (
@@ -178,6 +182,65 @@ export function FeedPostsSection() {
 						)}
 					</div>
 					<Gallery images={post?.images} />
+
+					{/* Post Footer (actions) */}
+					<div className="flex text-sm text-500 gap-2 mx-2 justify-content-end align-items-center">
+						<AvatarGroup>
+							<Avatar
+								image="https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png"
+								style={{ width: "1.75rem", height: "1.75rem",marginInlineEnd:"0.2rem" }}
+								shape="circle"
+							/>
+							<Avatar
+								image="https://primefaces.org/cdn/primereact/images/avatar/asiyajavayant.png"
+								style={{ width: "1.75rem", height: "1.75rem" ,marginInlineEnd:"0.2rem"}}
+								shape="circle"
+							/>
+							<Avatar
+								image="https://primefaces.org/cdn/primereact/images/avatar/onyamalimba.png"
+								style={{ width: "1.75rem", height: "1.75rem" ,marginInlineEnd:"0.2rem"}}
+								shape="circle"
+							/>
+						</AvatarGroup>
+						{post?.totalLikes > -1 && (
+							<div className="flex-1">{numeral(post?.totalLikes).format("0a")} likes</div>
+						)}
+						{post?.totalComments > -1 && <div>{numeral(post?.totalComments).format("0a")} comments</div>}
+						{post?.totalShares > -1 && <div>{numeral(post?.totalShares).format("0a")} shares</div>}
+					</div>
+
+					<div className="flex gap-1">
+						<div className="flex-1">
+							<Button
+								icon="pi pi-thumbs-up"
+								className="p-button-text"
+								onClick={() => {
+									likeDislikePost(post?.id);
+								}}
+							/>
+							<Button
+								icon="pi pi-comment"
+								className="p-button-text"
+								onClick={() => {
+									/* Handle comment action here */
+								}}
+							/>
+							<Button
+								icon="pi pi-share-alt"
+								className="p-button-text"
+								onClick={() => {
+									/* Handle share action here */
+								}}
+							/>
+						</div>
+						<Button
+							icon="pi pi-bookmark"
+							className="p-button-text "
+							onClick={() => {
+								/* Handle bookmark action here */
+							}}
+						/>
+					</div>
 				</div>
 			))}
 			<div id="scroll-anchor" />

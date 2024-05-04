@@ -66,7 +66,7 @@ let userSchema = new Schema(
 			type: Number,
 			default: 1,
 		},
-		impressions: {
+		Postimpressions: {
 			type: Number,
 			default: 1,
 		},
@@ -106,9 +106,9 @@ userSchema.methods.incrementViewedProfile = function () {
 	return this.save();
 };
 
-// instance methode to increment Impressions
-userSchema.methods.incrementImpressions = function () {
-	this.impressions += 1;
+// instance methode to increment Postimpressions
+userSchema.methods.incrementPostimpressions = function () {
+	this.Postimpressions += 1;
 	return this.save();
 };
 

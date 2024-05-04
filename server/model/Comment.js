@@ -1,6 +1,9 @@
 const mongoose = require("mongoose");
 
 const Schema = mongoose.Schema;
+const Post = mongoose.model("Post");
+
+
 const commentSchema = new Schema(
 	{
 		userId: {
@@ -31,11 +34,6 @@ const commentSchema = new Schema(
 			type: Boolean,
 			default: false,
 		},
-		attachments: [
-			{
-				type: String,
-			},
-		],
 		mentions: [
 			{
 				type: Schema.Types.ObjectId,
@@ -45,5 +43,19 @@ const commentSchema = new Schema(
 	},
 	{ timestamps: true }
 );
+
+//? --------- Middlewares ----------------
+
+// Middleware to increments totalComments in Post  when user add Comment to a Post
+
+commentSchema.pre("save", function (next) {
+	Post.updateOne({ _id: this.postId }, { $inc: { totalComments: 1 } }, next);
+});
+
+// Middleware to decrements totalComments in Post  when user add Comment to a Post
+
+commentSchema.pre("remove", function (next) {
+	Post.updateOne({ _id: this.postId }, { $inc: { totalComments: -1 } }, next);
+});
 
 module.exports = mongoose.model("Comment", commentSchema);

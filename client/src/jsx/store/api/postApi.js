@@ -54,9 +54,9 @@ export const postApi = api.enhanceEndpoints({ addTagTypes: ["Post"] }).injectEnd
 			}),
 			invalidatesTags: (result, error, id) => [{ type: "Post", id }],
 		}),
-		likePost: builder.mutation({
+		likeDislikePost: builder.mutation({
 			query: (id) => ({
-				url: `posts/${id}/like`,
+				url: `posts/${id}/likeDislike`,
 				method: "POST",
 			}),
 			invalidatesTags: (result, error, id) => [{ type: "Post", id }],
@@ -70,4 +70,5 @@ export const {
 	useDeletePostMutation,
 	useGetPostQuery,
 	useGetAllPostsQuery,
+	useLikeDislikePostMutation,
 } = postApi;

@@ -19,6 +19,7 @@ const postSchema = new Schema(
 		sharedFrom: {
 			type: Schema.Types.ObjectId,
 			ref: "Post",
+			default: null,
 			autopopulate: true,
 		},
 		privacy: {
@@ -92,19 +93,40 @@ postSchema.plugin(mongooseAlgolia, {
 	debug: true, //  logged out in your console
 });
 
+//? --------- instance method ----------------
+
+postSchema.methods.incrementImpressions = async function () {
+	try {
+		await User.updateOne({ _id: this.author }, { $inc: { Postimpressions: 1 } });
+	} catch (error) {
+		console.log("incrementImpressions not working");
+		console.log(error);
+	}
+};
+
+postSchema.methods.incrementShares = async function () {
+	try {
+		await this.model("Post").updateOne({ _id: this._id }, { $inc: { totalShares: 1 } });
+	} catch (error) {
+		console.log("incrementShares not working");
+		console.log(error);
+	}
+};
+
 //? --------- Middlewares ----------------
 
 // Add a post save hook
-// postSchema.post('save', async function(doc) {
-//   if (doc.isNew) { // Check if it's a new document
-//     await User.findByIdAndUpdate(doc.author, { $inc: { totalPosts: 1 } });
-//   }
-// });
+postSchema.post("save", async function (doc) {
+	if (doc.isNew) {
+		// Check if it's a new document
+		await User.findByIdAndUpdate(doc.author, { $inc: { totalPosts: 1 } });
+	}
+});
 
-// // Add a post remove hook
-// postSchema.post('remove', async function(doc) {
-//   await User.findByIdAndUpdate(doc.author, { $inc: { totalPosts: -1 } });
-// });
+// Add a post remove hook
+postSchema.post("remove", async function (doc) {
+	await User.findByIdAndUpdate(doc.author, { $inc: { totalPosts: -1 } });
+});
 
 let Post = mongoose.model("Post", postSchema);
 

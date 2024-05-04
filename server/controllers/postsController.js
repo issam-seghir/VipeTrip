@@ -85,26 +85,50 @@ const getAllPosts = asyncWrapper(async (req, res) => {
 	const limit = Number.parseInt(req.query.limit) || 10; // Get the limit from the query parameters, default to 10
 	const skip = (page - 1) * limit;
 
+	const user = await User.findById(req.user.id);
+
+	// Get the IDs of the posts that the user has liked
+	const userLikes = await Like.find({ userId: user.id, type: "Post" });
+	const likedPostIds = new Set(userLikes.map((like) => like.postId._id.toString()));
+console.log(likedPostIds);
+
 	let posts = await Post.find()
 		.sort({ createdAt: -1 }) // Sort by creation date in descending order
 		.skip(skip) // Skip the posts before the current page
 		.limit(limit); // Limit the number of posts
-	const user = await User.findById(req.user.id);
 
-	posts = await Promise.all(
-		posts.map(async (post) => {
-			if (!post.viewedBy.includes(user.id)) {
-				post.viewedBy.push(user.id);
-				await post.save();
-			}
-			// If the post belongs to the user, increment the user's postsImpressions
-			if (post.author.equals(user.id)) {
-				user.postImpressions++;
-				await user.save();
-			}
-			return post;
-		})
-	);
+	const viewedPosts = new Set();
+	let postImpressions = 0;
+
+posts = posts.map((post) => {
+	post.likedByUser = likedPostIds.has(post._id.toString()); // Set the likedByUser virtual property
+	return post;
+});
+	// posts = posts.map((post) => {
+	// 	    const likedByUser = likedPostIds.has(post._id.toString()); // Calculate the likedByUser field
+	// 		// Create a new object that includes all properties of the post and the likedByUser field
+	// 		const postWithLikedByUser = { ...post.toObject(), likedByUser };
+
+	// 	if (!post.viewedBy.includes(user.id)) {
+	// 		post.viewedBy.push(user.id);
+	// 		viewedPosts.add(post._id);
+	// 	}
+	// 	// If the post belongs to the user, increment the user's postsImpressions
+	// 	if (post.author === user.id.toString()) {
+	// 		postImpressions++;
+	// 	}
+	// 	return postWithLikedByUser;
+	// });
+
+	// // Update the viewedBy field of each post
+	// if (viewedPosts.size > 0) {
+	// 	await Post.updateMany({ _id: { $in: [...viewedPosts] } }, { $push: { viewedBy: user.id } });
+	// }
+
+	// // Update the postImpressions field of the user
+	// if (postImpressions > 0) {
+	// 	await User.updateOne({ _id: user.id }, { $inc: { postImpressions: postImpressions } });
+	// }
 
 	// console.log(posts);
 	res.status(201).json({ message: "Get all Posts successfully", data: posts });
@@ -200,6 +224,18 @@ const likeDislikePost = asyncWrapper(async (req, res, next) => {
 	res.status(200).json({ message: "Post liked successfully", data: like });
 });
 
+const getLikeState = asyncWrapper(async (req, res, next) => {
+	const { postId } = req.params;
+	const userId = req?.user?.id;
+
+	// Check if the user has already liked the post
+	const existingLike = await Like.findOne({ postId, userId, type: "Post" });
+
+	return existingLike
+		? res.status(200).json({ message: "User has liked this post", liked: true })
+		: res.status(200).json({ message: "User has not liked this post", liked: false });
+});
+
 module.exports = {
 	createPost,
 	updatePost,
@@ -207,6 +243,7 @@ module.exports = {
 	getAllPosts,
 	getUserPosts,
 	getSinglePost,
+	getLikeState,
 	likeDislikePost,
 	sharePost,
 };

@@ -109,6 +109,10 @@ postSchema.methods.incrementShares = async function () {
 	}
 };
 
+//? --------- virtual (set / get) methods ----------------
+
+postSchema.virtual("likedByUser");
+
 //? --------- Middlewares ----------------
 
 // Add a post save hook

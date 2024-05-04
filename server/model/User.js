@@ -106,12 +106,6 @@ userSchema.methods.incrementViewedProfile = function () {
 	return this.save();
 };
 
-// instance methode to increment Postimpressions
-userSchema.methods.incrementPostimpressions = function () {
-	this.Postimpressions += 1;
-	return this.save();
-};
-
 //? --------- Middlewares ----------------
 
 //? --------- static methods ----------------

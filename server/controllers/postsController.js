@@ -85,14 +85,27 @@ const getAllPosts = asyncWrapper(async (req, res) => {
 	const limit = Number.parseInt(req.query.limit) || 10; // Get the limit from the query parameters, default to 10
 	const skip = (page - 1) * limit;
 
-	const posts = await Post.find()
-		.select("-mentions") // Exclude the __v field
+	let posts = await Post.find()
 		.sort({ createdAt: -1 }) // Sort by creation date in descending order
 		.skip(skip) // Skip the posts before the current page
 		.limit(limit); // Limit the number of posts
-	posts.forEach((post) => {
-		post.incrementImpressions();
-	});
+  const user = await User.findById(req.user.id);
+
+  posts = await Promise.all(
+		posts.map(async (post) => {
+			if (!post.viewedBy.includes(user.id)) {
+				post.viewedBy.push(user.id);
+				await post.save();
+			}
+			// If the post belongs to the user, increment the user's postsImpressions
+			if (post.author.equals(user.id)) {
+				user.postImpressions++;
+				await user.save();
+			}
+			return post;
+		})
+  );
+
 	// console.log(posts);
 	res.status(201).json({ message: "Get all Posts successfully", data: posts });
 });

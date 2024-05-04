@@ -47,6 +47,14 @@ const postSchema = new Schema(
 			type: Number,
 			default: 0,
 		},
+		viewedBy: [
+			{
+				type: Schema.Types.ObjectId,
+				ref: "User",
+				default: [],
+				autopopulate: true,
+			},
+		],
 		edited: {
 			type: Boolean,
 			default: false,
@@ -56,6 +64,7 @@ const postSchema = new Schema(
 				type: Schema.Types.ObjectId,
 				ref: "User",
 				default: [],
+				autopopulate: true,
 			},
 		],
 		tags: [
@@ -90,15 +99,6 @@ postSchema.plugin(mongooseAlgolia, {
 });
 
 //? --------- instance method ----------------
-
-postSchema.methods.incrementImpressions = async function () {
-	try {
-		await User.updateOne({ _id: this.author }, { $inc: { Postimpressions: 1 } });
-	} catch (error) {
-		console.log("incrementImpressions not working");
-		console.log(error);
-	}
-};
 
 postSchema.methods.incrementShares = async function () {
 	try {

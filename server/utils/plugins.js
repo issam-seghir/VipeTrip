@@ -40,7 +40,7 @@ const normalize = (schema) => {
 
 			// apply the transformation to each sub-document
 			for (let prop in ret) {
-				if (Array.isArray(ret[prop])) {
+				if (Array.isArray(ret[prop]) && (ret[prop]?._id?.toHexString()) ){
 					ret[prop].forEach((item) => {
 						if (item?._id) {
 							try {

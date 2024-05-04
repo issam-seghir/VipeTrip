@@ -81,7 +81,7 @@ let userSchema = new Schema(
 );
 
 //* Apply plugins
-// normalize : remove _id and __v and private field  from the response
+
 userSchema.plugin(normalize);
 
 // Algolia Search Plugin

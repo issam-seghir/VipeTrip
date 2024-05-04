@@ -1,6 +1,7 @@
-import { useGetLikeStateQuery, useLikeDislikePostMutation } from "@jsx/store/api/postApi";
-import { toTitleCase } from "@jsx/utils";
+import { useLikeDislikePostMutation } from "@jsx/store/api/postApi";
+import { randomNumberBetween, toTitleCase } from "@jsx/utils";
 import { format, formatDistanceToNow } from "date-fns";
+import { useAnimate } from "framer-motion";
 import numeral from "numeral";
 import { Avatar } from "primereact/avatar";
 import { AvatarGroup } from "primereact/avatargroup";
@@ -12,7 +13,7 @@ import { useRef, useState } from "react";
 import "react-lazy-load-image-component/src/effects/blur.css";
 import { useNavigate } from "react-router-dom";
 import { Gallery } from "./Gallery";
-import { useAnimate } from "framer-motion";
+
 const items = [
 	{
 		items: [
@@ -33,31 +34,75 @@ const items = [
 export function Post({ post }) {
 	const navigate = useNavigate();
 	const optionsMenu = useRef(null);
-    const [scope, animate] = useAnimate();
+	const [scope, animate] = useAnimate();
 	const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(true);
 	const serverUrl = import.meta.env.VITE_SERVER_URL;
 
+	// if (scope?.current) {
+	// 	animate([
+	// 		// Scale down
+	// 		[".likeButton", { scale: 0.8 }, { duration: 0.1, at: "<" }],
+	// 		// And scale back up
+	// 		[".likeButton", { scale: 1 }, { duration: 0.1 }],
+	// 	]);
+	// }
+	const handleLikeButton = () => {
+		likeDislikePost(post?.id);
+		const sparkles = Array.from({ length: 20 });
+		const sparklesAnimation = sparkles.map((_, index) => [
+			`.sparkle-${index}`,
+			{
+				x: randomNumberBetween(-100, 100),
+				y: randomNumberBetween(-100, 100),
+				scale: randomNumberBetween(1.5, 2.5),
+				opacity: 0,
+			},
+			{
+				duration: 0.4,
+				at: "<",
+			},
+		]);
+		const sparklesFadeOut = sparkles.map((_, index) => [
+			`.sparkle-${index}`,
+			{
+				opacity: 1,
+				scale: 1,
+			},
+			{
+				duration: 0.3,
+				at: "<",
+			},
+		]);
 
+		const sparklesReset = sparkles.map((_, index) => [
+			`.sparkle-${index}`,
+			{
+				x: 0,
+				y: 0,
+				opacity: 0,
+			},
+			{
+				duration: 0.000_001,
+			},
+		]);
+		if (scope?.current) {
+			animate([
+				...sparklesReset,
+				[".likeButton", { scale: 0.8 }, { duration: 0.1, at: "<" }],
+				[".likeButton", { scale: 1 }, { duration: 0.1 }],
+				...sparklesAnimation,
+				...sparklesFadeOut,
 
-if(scope?.current) {
-    animate([
-	// Scale down
-	[".likeButton", { scale: 0.8 }, { duration: 0.1, at: "<" }],
-	// And scale back up
-	[".likeButton", { scale: 1 }, { duration: 0.1 }],
-]);
-}
-	// const {
-	// 	data: likeState,
-	// 	isFetching: likeStateFetching,
-	// 	isLoading: likeStateLoading,
-	// 	isError: likeStateError,
-	// 	error: likeStateErrorData,
-	// } = useGetLikeStateQuery(post?.id, { skip: !post?.id });
+			]);
+		}
+	};
 	const [likeDislikePost, likeDislikePostResult] = useLikeDislikePostMutation();
 
 	return (
-		<div className="flex flex-column justify-content-between gap-3 p-3 w-full border-1 surface-border border-round">
+		<div
+			ref={scope}
+			className="flex flex-column justify-content-between gap-3 p-3 w-full border-1 surface-border border-round"
+		>
 			{/* Post header  */}
 			<div className="flex">
 				<div className="flex aligne-items-center gap-2 flex-1">
@@ -194,14 +239,33 @@ if(scope?.current) {
 			</div>
 
 			<div className="flex gap-1">
-				<div ref={scope} className="flex flex-1">
+				<div className="flex flex-1">
 					<Button
-						onClick={() => likeDislikePost(post?.id)}
-						icon="pi pi-thumbs-up"
-						className={classNames("likeButton p-button-text focus:box-shadow-none border-none", {
-							"p-button-success": post?.likedByUser,
-						})}
-					/>
+						onClick={handleLikeButton}
+						icon={post?.likedByUser ? "pi pi-thumbs-up-fill " : "pi pi-thumbs-up"}
+						className="likeButton relative  p-button-text shadow-none border-none"
+					>
+						<span
+							aria-hidden
+							className="pointer-events-none absolute  bottom-0 left-0 right-0 top-0 block"
+							style={{ zIndex: 10 }}
+						>
+							{Array.from({ length: 20 }).map((_, index) => (
+								<svg
+									className={`absolute left-50 top-100  sparkle-${index}`}
+									key={index}
+									viewBox="0 0 122 117"
+									width="10"
+									height="10"
+								>
+									<path
+										style={{ fill: "var(--primary-500)" }}
+										d="M64.39,2,80.11,38.76,120,42.33a3.2,3.2,0,0,1,1.83,5.59h0L91.64,74.25l8.92,39a3.2,3.2,0,0,1-4.87,3.4L61.44,96.19,27.09,116.73a3.2,3.2,0,0,1-4.76-3.46h0l8.92-39L1.09,47.92A3.2,3.2,0,0,1,3,42.32l39.74-3.56L58.49,2a3.2,3.2,0,0,1,5.9,0Z"
+									/>
+								</svg>
+							))}
+						</span>
+					</Button>
 					<Button
 						icon="pi pi-comment"
 						className="p-button-text"

@@ -225,3 +225,22 @@ export function toTitleCase(string) {
 		.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
 		.join(" ");
 }
+
+/**
+ * Generates a random number between two given numbers.
+ *
+ * @param {number} min - The minimum number.
+ * @param {number} max - The maximum number.
+ * @returns {number} A random number between min and max.
+ *
+ * @example
+ * // Returns a number between 1 and 10
+ * randomNumberBetween(1, 10);
+ *
+ * @example
+ * // Returns a number between 100 and 200
+ * randomNumberBetween(100, 200);
+ */
+export const randomNumberBetween = (min, max) => {
+  return Math.floor(Math.random() * (max - min + 1) + min);
+};

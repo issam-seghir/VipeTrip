@@ -17,13 +17,6 @@ export const postApi = api.enhanceEndpoints({ addTagTypes: ["Post"] }).injectEnd
 			}),
 			providesTags: (result, error, id) => [{ type: "Post", id }],
 		}),
-		getLikeState: builder.query({
-			query: (id) => ({
-				url: `posts/${id}/likeDislike`,
-				method: "GET",
-			}),
-			providesTags: (result, error, id) => [{ type: "Post", id }],
-		}),
 		createPost: builder.mutation({
 			query: (body) => ({
 				url: `posts`,

@@ -88,9 +88,9 @@ const getAllPosts = asyncWrapper(async (req, res) => {
 	const user = await User.findById(req.user.id);
 
 	// Get the IDs of the posts that the user has liked
-	const userLikes = await Like.find({ userId: user.id, type: "Post" });
-	const likedPostIds = new Set(userLikes.map((like) => like.postId._id.toString()));
-console.log(likedPostIds);
+	const userLikes = await Like.find({ liker: user.id, type: "Post" });
+	const likedPostIds = new Set(userLikes.map((like) => like.likedPost._id.toString()));
+	console.log(likedPostIds);
 
 	let posts = await Post.find()
 		.sort({ createdAt: -1 }) // Sort by creation date in descending order
@@ -100,14 +100,11 @@ console.log(likedPostIds);
 	const viewedPosts = new Set();
 	let postImpressions = 0;
 
-posts = posts.map((post) => {
-	post.likedByUser = likedPostIds.has(post._id.toString()); // Set the likedByUser virtual property
-	return post;
-});
+	posts = posts.map((post) => {
+		post.likedByUser = likedPostIds.has(post._id.toString()); // Set the likedByUser virtual property
+		return post;
+	});
 	// posts = posts.map((post) => {
-	// 	    const likedByUser = likedPostIds.has(post._id.toString()); // Calculate the likedByUser field
-	// 		// Create a new object that includes all properties of the post and the likedByUser field
-	// 		const postWithLikedByUser = { ...post.toObject(), likedByUser };
 
 	// 	if (!post.viewedBy.includes(user.id)) {
 	// 		post.viewedBy.push(user.id);
@@ -210,7 +207,7 @@ const likeDislikePost = asyncWrapper(async (req, res, next) => {
 	}
 
 	// Check if the user has already liked the post
-	const existingLike = await Like.findOne({ postId, userId, type: "Post" });
+	const existingLike = await Like.findOne({ likedPost: postId, liker: userId, type: "Post" });
 	if (existingLike) {
 		// If the user has already liked the post, delete the document
 		await Like.findOneAndDelete({ _id: existingLike._id });
@@ -218,22 +215,10 @@ const likeDislikePost = asyncWrapper(async (req, res, next) => {
 	}
 
 	// If the user has not liked the post, create a new Like document
-	const like = new Like({ postId, userId, type: "Post" });
+	const like = new Like({ likedPost: postId, liker: userId, type: "Post" });
 	await like.save();
 
 	res.status(200).json({ message: "Post liked successfully", data: like });
-});
-
-const getLikeState = asyncWrapper(async (req, res, next) => {
-	const { postId } = req.params;
-	const userId = req?.user?.id;
-
-	// Check if the user has already liked the post
-	const existingLike = await Like.findOne({ postId, userId, type: "Post" });
-
-	return existingLike
-		? res.status(200).json({ message: "User has liked this post", liked: true })
-		: res.status(200).json({ message: "User has not liked this post", liked: false });
 });
 
 module.exports = {
@@ -243,7 +228,6 @@ module.exports = {
 	getAllPosts,
 	getUserPosts,
 	getSinglePost,
-	getLikeState,
 	likeDislikePost,
 	sharePost,
 };

@@ -12,7 +12,7 @@ import { useRef, useState } from "react";
 import "react-lazy-load-image-component/src/effects/blur.css";
 import { useNavigate } from "react-router-dom";
 import { Gallery } from "./Gallery";
-
+import { useAnimate } from "framer-motion";
 const items = [
 	{
 		items: [
@@ -33,9 +33,20 @@ const items = [
 export function Post({ post }) {
 	const navigate = useNavigate();
 	const optionsMenu = useRef(null);
+    const [scope, animate] = useAnimate();
 	const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(true);
 	const serverUrl = import.meta.env.VITE_SERVER_URL;
 
+
+
+if(scope?.current) {
+    animate([
+	// Scale down
+	[".likeButton", { scale: 0.8 }, { duration: 0.1, at: "<" }],
+	// And scale back up
+	[".likeButton", { scale: 1 }, { duration: 0.1 }],
+]);
+}
 	// const {
 	// 	data: likeState,
 	// 	isFetching: likeStateFetching,
@@ -183,11 +194,13 @@ export function Post({ post }) {
 			</div>
 
 			<div className="flex gap-1">
-				<div className="flex-1">
+				<div ref={scope} className="flex flex-1">
 					<Button
-						icon="pi pi-thumbs-up"
-						className={classNames("p-button-text", { "p-button-success": post?.likedByUser })}
 						onClick={() => likeDislikePost(post?.id)}
+						icon="pi pi-thumbs-up"
+						className={classNames("likeButton p-button-text focus:box-shadow-none border-none", {
+							"p-button-success": post?.likedByUser,
+						})}
 					/>
 					<Button
 						icon="pi pi-comment"

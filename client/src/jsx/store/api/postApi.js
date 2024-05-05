@@ -60,12 +60,11 @@ export const postApi = api.enhanceEndpoints({ addTagTypes: ["Post"] }).injectEnd
 				url: `posts/${id}/likeDislike`,
 				method: "POST",
 			}),
-			// invalidatesTags: (result, error, id) => [{ type: "Post", id }],
 			// Optimistique update like button state
 			onQueryStarted: (id, { dispatch, queryFulfilled }) => {
 				console.log("Mutation started"); // Add this line
 				const patchResult = dispatch(
-					postApi.util.updateQueryData("getAllPosts",undefined, (draft) => {
+					postApi.util.updateQueryData("getAllPosts", undefined, (draft) => {
 						console.log(current(draft));
 						try {
 							const post = draft.find((post) => post.id === id);
@@ -88,6 +87,11 @@ export const postApi = api.enhanceEndpoints({ addTagTypes: ["Post"] }).injectEnd
 				// );
 
 				queryFulfilled.catch(() => {
+					/**
+					 * Alternatively, on failure you can invalidate the corresponding cache tags
+					 * to trigger a re-fetch:
+					 * dispatch(api.util.invalidateTags(['Post']))
+					 */
 					patchResult.undo();
 					// patchResultGetPost.undo();
 				});

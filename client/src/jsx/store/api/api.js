@@ -43,6 +43,7 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
 
 export const api = createApi({
 	// defaults to 'api'
+	// Ctrl + F5 relaod withuoot cash
 	reducerPath: "api",
 	baseQuery: baseQueryWithReauth,
 	// refetchOnFocus: true,

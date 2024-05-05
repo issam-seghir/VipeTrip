@@ -34,7 +34,6 @@ export function FeedPostsSection() {
 		// toast.error("échec de la requet des user");
 	}
 
-	console.log(posts);
 	return (
 		<div className={classNames("bg-red", isFetching)}>
 			{posts.map((post) => (

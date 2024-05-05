@@ -1,4 +1,5 @@
 import { api } from "@jsx/store/api/api";
+import { current } from "immer";
 
 export const postApi = api.enhanceEndpoints({ addTagTypes: ["Post"] }).injectEndpoints({
 	endpoints: (builder) => ({
@@ -59,7 +60,38 @@ export const postApi = api.enhanceEndpoints({ addTagTypes: ["Post"] }).injectEnd
 				url: `posts/${id}/likeDislike`,
 				method: "POST",
 			}),
-			invalidatesTags: (result, error, id) => [{ type: "Post", id }],
+			// invalidatesTags: (result, error, id) => [{ type: "Post", id }],
+			// Optimistique update like button state
+			onQueryStarted: (id, { dispatch, queryFulfilled }) => {
+				console.log("Mutation started"); // Add this line
+				const patchResult = dispatch(
+					postApi.util.updateQueryData("getAllPosts",undefined, (draft) => {
+						console.log(current(draft));
+						try {
+							const post = draft.find((post) => post.id === id);
+							if (post) {
+								post.likedByUser = !post.likedByUser;
+								post.totalLikes += post.likedByUser ? 1 : -1;
+							}
+						} catch (error) {
+							console.error(error);
+						}
+					})
+				);
+				// const patchResultGetPost = dispatch(
+				// 	postApi.util.updateQueryData("getPost", id, (draft) => {
+				// 		if (draft) {
+				// 			draft.likedByUser = !draft.likedByUser;
+				// 			draft.totalLikes += draft.likedByUser ? 1 : -1;
+				// 		}
+				// 	})
+				// );
+
+				queryFulfilled.catch(() => {
+					patchResult.undo();
+					// patchResultGetPost.undo();
+				});
+			},
 		}),
 	}),
 });
@@ -71,5 +103,4 @@ export const {
 	useGetPostQuery,
 	useGetAllPostsQuery,
 	useLikeDislikePostMutation,
-	useGetLikeStateQuery
 } = postApi;

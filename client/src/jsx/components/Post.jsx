@@ -58,6 +58,7 @@ export function Post({ post }) {
 	const shareUrl = `${clientUrl}/posts/${post?.id}`; // Construct the URL of the post
 	const [likeDislikePost, likeDislikePostResult] = useLikeDislikePostMutation();
 	const [bookmarkPost, bookmarkPostResult] = useBookmarkPostMutation();
+	const title = post?.description.split(" ").slice(0, 5).join(" ");
 
 	const handleBookmarkButton = () => {
 		bookmarkPost(post?.id);
@@ -351,19 +352,17 @@ export function Post({ post }) {
 								>
 									<Button icon="pi pi-twitter" className="p-button-text" />
 								</ViberShareButton>
-								<PocketShareButton
-									url={shareUrl}
-									// title={title}
-									className="Demo__some-network__share-button"
-								>
-									<Button icon="pi pi-twitter" className="p-button-text" />
+								<PocketShareButton url={shareUrl} title={title}>
+									<Button
+										icon={<Icon icon="fe:pocket" width="16" height="16" />}
+										className="p-button-text"
+									/>
 								</PocketShareButton>
-								<InstapaperShareButton
-									url={shareUrl}
-									// title={title}
-									className="Demo__some-network__share-button"
-								>
-									<Button icon="pi pi-twitter" className="p-button-text" />
+								<InstapaperShareButton url={shareUrl} title={title} description={post.description}>
+									<Button
+										icon={<Icon icon="cib:instapaper" width="16" height="16" />}
+										className="p-button-text"
+									/>
 								</InstapaperShareButton>
 								<EmailShareButton
 									subject={post.title} // Use the post's title as the subject

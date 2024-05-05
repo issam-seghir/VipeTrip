@@ -28,6 +28,8 @@ import { Icon } from "@iconify/react";
 
 import { OverlayPanel } from "primereact/overlaypanel";
 
+
+
 const items = [
 	{
 		items: [
@@ -50,23 +52,23 @@ export function Post({ post }) {
 	const optionsMenu = useRef(null);
 	const [scope, animate] = useAnimate();
 	const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(true);
-    const [likersDialog, setLikersDialog] = useState(false);
-	const serverUrl = import.meta.env.VITE_SERVER_URL;
+	const [likersDialog, setLikersDialog] = useState(false);
 	const shareOverlay = useRef(null);
-
+	const clientUrl = import.meta.env.VITE_CLIENT_URL;
+	const shareUrl = `${clientUrl}/posts/${post?.id}`; // Construct the URL of the post
 	const [likeDislikePost, likeDislikePostResult] = useLikeDislikePostMutation();
 	const [bookmarkPost, bookmarkPostResult] = useBookmarkPostMutation();
 
 	const handleBookmarkButton = () => {
 		bookmarkPost(post?.id);
-				if (scope?.current) {
-					animate([
-						[".bookmardButton", { scale: 0.8 }, { duration: 0.1, at: "<" }],
-						[".bookmardButton", { scale: 1.2 }, { duration: 0.2 }],
-						[".bookmardButton", { scale: 1 }, { duration: 0.1 }],
-					]);
-				}
-	}
+		if (scope?.current) {
+			animate([
+				[".bookmardButton", { scale: 0.8 }, { duration: 0.1, at: "<" }],
+				[".bookmardButton", { scale: 1.2 }, { duration: 0.2 }],
+				[".bookmardButton", { scale: 1 }, { duration: 0.1 }],
+			]);
+		}
+	};
 	const handleShareButton = (e) => {
 		shareOverlay.current.toggle(e);
 	};
@@ -285,26 +287,26 @@ export function Post({ post }) {
 							<div>
 								<Button icon="pi pi-arrow-right-arrow-left" className="p-button-text" />
 								<FacebookShareButton
-									// url={shareUrl}
+									url={shareUrl}
 									// quote={title}
 									className="Demo__some-network__share-button"
 								>
 									<Button icon="pi pi-facebook" className="p-button-text" />
 								</FacebookShareButton>
 								<FacebookMessengerShareButton
-									// url={shareUrl}
+									url={shareUrl}
 									// title={title}
 
 									className="Demo__some-network__share-button"
 								>
 									<Button
-										icon={<Icon icon="uil:smile" className="pi p-button-icon-left" />}
+										icon={<Icon icon="fe:messanger" className="pi p-button-icon-left" />}
 										iconPos="left"
 										className="p-button-text"
 									/>
 								</FacebookMessengerShareButton>
 								<TwitterShareButton
-									// url={shareUrl}
+									url={shareUrl}
 									// title={title}
 									className="Demo__some-network__share-button"
 								>
@@ -313,28 +315,28 @@ export function Post({ post }) {
 							</div>
 							<div>
 								<LinkedinShareButton
-									// url={shareUrl}
+									url={shareUrl}
 									// title={title}
 									className="Demo__some-network__share-button"
 								>
 									<Button icon="pi pi-linkedin" className="p-button-text" />
 								</LinkedinShareButton>
 								<RedditShareButton
-									// url={shareUrl}
+									url={shareUrl}
 									// title={title}
 									className="Demo__some-network__share-button"
 								>
 									<Button icon="pi pi-reddit" className="p-button-text" />
 								</RedditShareButton>
 								<TelegramShareButton
-									// url={shareUrl}
+									url={shareUrl}
 									// title={title}
 									className="Demo__some-network__share-button"
 								>
 									<Button icon="pi pi-telegram" className="p-button-text" />
 								</TelegramShareButton>
 								<WhatsappShareButton
-									// url={shareUrl}
+									url={shareUrl}
 									// title={title}
 									className="Demo__some-network__share-button"
 								>
@@ -343,32 +345,32 @@ export function Post({ post }) {
 							</div>
 							<div>
 								<ViberShareButton
-									// url={shareUrl}
+									url={shareUrl}
 									// title={title}
 									className="Demo__some-network__share-button"
 								>
 									<Button icon="pi pi-twitter" className="p-button-text" />
 								</ViberShareButton>
 								<PocketShareButton
-									// url={shareUrl}
+									url={shareUrl}
 									// title={title}
 									className="Demo__some-network__share-button"
 								>
 									<Button icon="pi pi-twitter" className="p-button-text" />
 								</PocketShareButton>
 								<InstapaperShareButton
-									// url={shareUrl}
+									url={shareUrl}
 									// title={title}
 									className="Demo__some-network__share-button"
 								>
 									<Button icon="pi pi-twitter" className="p-button-text" />
 								</InstapaperShareButton>
 								<EmailShareButton
-									// url={shareUrl}
-									// title={title}
-									className="Demo__some-network__share-button"
+									subject={post.title} // Use the post's title as the subject
+									body={`Check out this post: ${post.title}`} // Use a custom message as the body
+									url={shareUrl}
 								>
-									<Button icon="pi pi-twitter" className="p-button-text" />
+									<Button icon="pi pi-envelope" className="p-button-text" />
 								</EmailShareButton>
 							</div>
 						</div>

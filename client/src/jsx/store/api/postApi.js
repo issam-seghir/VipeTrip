@@ -16,6 +16,15 @@ export const postApi = api.enhanceEndpoints({ addTagTypes: ["Post"] }).injectEnd
 				url: `posts/${id}`,
 				method: "GET",
 			}),
+			transformResponse: (response) => response.data,
+			providesTags: (result, error, id) => [{ type: "Post", id }],
+		}),
+		getPostLikers: builder.query({
+			query: (id) => ({
+				url: `posts/${id}/likers`,
+				method: "GET",
+			}),
+			transformResponse: (response) => response.data,
 			providesTags: (result, error, id) => [{ type: "Post", id }],
 		}),
 		createPost: builder.mutation({
@@ -106,5 +115,7 @@ export const {
 	useDeletePostMutation,
 	useGetPostQuery,
 	useGetAllPostsQuery,
+	useLazyGetPostLikersQuery,
+	useGetPostLikersQuery,
 	useLikeDislikePostMutation,
 } = postApi;

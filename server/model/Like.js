@@ -13,12 +13,10 @@ const likeSchema = new Schema(
 		likedComment: {
 			type: Schema.Types.ObjectId,
 			ref: "Comment",
-			autopopulate: true,
 		},
 		likedPost: {
 			type: Schema.Types.ObjectId,
 			ref: "Post",
-			autopopulate: true,
 		},
 		type: {
 			type: String,

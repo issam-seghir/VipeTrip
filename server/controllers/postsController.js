@@ -100,10 +100,51 @@ const getAllPosts = asyncWrapper(async (req, res) => {
 	const viewedPosts = new Set();
 	let postImpressions = 0;
 
-	posts = posts.map((post) => {
-		post.likedByUser = likedPostIds.has(post._id.toString()); // Set the likedByUser virtual property
-		return post;
-	});
+	posts = await Promise.all(
+		posts.map(async (post) => {
+			post.likedByUser = likedPostIds.has(post._id.toString()); // Set the likedByUser virtual property
+			// Fetch three random likers
+			const likes = await Like.aggregate([
+				{ $match: { likedPost: post._id, type: "Post" } },
+				{ $sample: { size: 3 } },
+				{
+					$lookup: {
+						from: "users",
+						localField: "liker",
+						foreignField: "_id",
+						as: "liker",
+					},
+				},
+				{ $unwind: "$liker" },
+				{
+					$project: {
+						password: 0,
+						email: 0,
+						rememberMe: 0,
+						"socialAccounts.accessToken": 0,
+						refreshToken: 0,
+
+						// ...
+					},
+				},
+			]);
+			post.firstThreeLikers = likes.map((like) => {
+				// Transform the liker document
+				const liker = like.liker;
+				liker.id = liker._id;
+				delete liker._id;
+				delete liker.__v;
+				delete liker.password;
+				delete liker.socialAccounts.accessToken;
+				delete liker.refreshToken;
+				delete liker.rememberMe;
+				delete liker.email;
+				return liker;
+			});
+
+			return post;
+		})
+	);
 	// posts = posts.map((post) => {
 
 	// 	if (!post.viewedBy.includes(user.id)) {
@@ -221,12 +262,27 @@ const likeDislikePost = asyncWrapper(async (req, res, next) => {
 	res.status(200).json({ message: "Post liked successfully", data: like });
 });
 
+const getPostLikers = asyncWrapper(async (req, res, next) => {
+	const { postId } = req.params;
+
+	const post = await Post.findById(postId);
+	if (!post) {
+		return next(new Error("Post not found"));
+	}
+
+	const likes = await Like.find({ likedPost: postId, type: "Post" }).populate("liker");
+	const likers = likes.map((like) => like.liker);
+
+	res.status(200).json({ message: "Post likers fetched successfully", data: likers });
+});
+
 module.exports = {
 	createPost,
 	updatePost,
 	deletePost,
 	getAllPosts,
 	getUserPosts,
+	getPostLikers,
 	getSinglePost,
 	likeDislikePost,
 	sharePost,

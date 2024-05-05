@@ -2,17 +2,16 @@ import { useLikeDislikePostMutation } from "@jsx/store/api/postApi";
 import { randomNumberBetween, toTitleCase } from "@jsx/utils";
 import { format, formatDistanceToNow } from "date-fns";
 import { useAnimate } from "framer-motion";
-import numeral from "numeral";
 import { Avatar } from "primereact/avatar";
-import { AvatarGroup } from "primereact/avatargroup";
 import { Button } from "primereact/button";
 import { Menu } from "primereact/menu";
 import { Tooltip } from "primereact/tooltip";
-import { classNames } from "primereact/utils";
 import { useRef, useState } from "react";
 import "react-lazy-load-image-component/src/effects/blur.css";
 import { useNavigate } from "react-router-dom";
 import { Gallery } from "./Gallery";
+import {PostStatus} from "./PostStatus"
+
 
 const items = [
 	{
@@ -36,16 +35,10 @@ export function Post({ post }) {
 	const optionsMenu = useRef(null);
 	const [scope, animate] = useAnimate();
 	const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(true);
+    const [likersDialog, setLikersDialog] = useState(false);
 	const serverUrl = import.meta.env.VITE_SERVER_URL;
 
-	// if (scope?.current) {
-	// 	animate([
-	// 		// Scale down
-	// 		[".likeButton", { scale: 0.8 }, { duration: 0.1, at: "<" }],
-	// 		// And scale back up
-	// 		[".likeButton", { scale: 1 }, { duration: 0.1 }],
-	// 	]);
-	// }
+
 	const handleLikeButton = () => {
 		likeDislikePost(post?.id);
 		const sparkles = Array.from({ length: 20 });
@@ -92,7 +85,6 @@ export function Post({ post }) {
 				[".likeButton", { scale: 1 }, { duration: 0.1 }],
 				...sparklesAnimation,
 				...sparklesFadeOut,
-
 			]);
 		}
 	};
@@ -213,10 +205,15 @@ export function Post({ post }) {
 				)}
 			</div>
 			<Gallery images={post?.images} />
-
+			<PostStatus post={post}/ >
 			{/* Post Footer (actions) */}
-			<div className="flex text-sm text-500 gap-2 mx-2 justify-content-end align-items-center">
-				<AvatarGroup>
+			{/* <Dialog visible={likersDialog} onHide={() => setLikersDialog(false)}>
+				{likers?.map((liker) => (
+					<div key={liker.id}>{liker.name}</div>
+				))}
+			</Dialog> */}
+			{/* <div className="flex text-sm text-500 gap-2 mx-2 justify-content-end align-items-center">
+				<AvatarGroup className="cursor-pointer flex-1" onClick={() => setLikersDialog(true)}>
 					<Avatar
 						image="https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png"
 						style={{ width: "1.75rem", height: "1.75rem", marginInlineEnd: "0.2rem" }}
@@ -232,11 +229,21 @@ export function Post({ post }) {
 						style={{ width: "1.75rem", height: "1.75rem", marginInlineEnd: "0.2rem" }}
 						shape="circle"
 					/>
+					{post?.totalLikes > -1 && (
+						<div className="text-sm " id={`likes-state-tooltip-${post.id}`}>
+							{numeral(post?.totalLikes).format("0a")} likes
+							<Tooltip
+								key={post.id}
+								target={`#likes-state-tooltip-${post.id}`}
+								content={`${post?.totalLikes}`}
+								position="bottom"
+							/>
+						</div>
+					)}
 				</AvatarGroup>
-				{post?.totalLikes > -1 && <div className="flex-1">{numeral(post?.totalLikes).format("0a")} likes</div>}
 				{post?.totalComments > -1 && <div>{numeral(post?.totalComments).format("0a")} comments</div>}
 				{post?.totalShares > -1 && <div>{numeral(post?.totalShares).format("0a")} shares</div>}
-			</div>
+			</div> */}
 
 			<div className="flex gap-1">
 				<div className="flex flex-1">

@@ -11,7 +11,22 @@ import "react-lazy-load-image-component/src/effects/blur.css";
 import { useNavigate } from "react-router-dom";
 import { Gallery } from "./Gallery";
 import {PostStatus} from "./PostStatus"
+import {
+	FacebookShareButton,
+	FacebookMessengerShareButton,
+	InstapaperShareButton,
+	TwitterShareButton,
+	RedditShareButton,
+	TelegramShareButton,
+	LinkedinShareButton,
+	WhatsappShareButton,
+	ViberShareButton,
+	EmailShareButton,
+	PocketShareButton
+} from "react-share";
+import { Icon } from "@iconify/react";
 
+import { OverlayPanel } from "primereact/overlaypanel";
 
 const items = [
 	{
@@ -37,13 +52,24 @@ export function Post({ post }) {
 	const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(true);
     const [likersDialog, setLikersDialog] = useState(false);
 	const serverUrl = import.meta.env.VITE_SERVER_URL;
+	const shareOverlay = useRef(null);
 
 	const [likeDislikePost, likeDislikePostResult] = useLikeDislikePostMutation();
 	const [bookmarkPost, bookmarkPostResult] = useBookmarkPostMutation();
 
 	const handleBookmarkButton = () => {
 		bookmarkPost(post?.id);
+				if (scope?.current) {
+					animate([
+						[".bookmardButton", { scale: 0.8 }, { duration: 0.1, at: "<" }],
+						[".bookmardButton", { scale: 1.2 }, { duration: 0.2 }],
+						[".bookmardButton", { scale: 1 }, { duration: 0.1 }],
+					]);
+				}
 	}
+	const handleShareButton = (e) => {
+		shareOverlay.current.toggle(e);
+	};
 	const handleLikeButton = () => {
 		likeDislikePost(post?.id);
 		const sparkles = Array.from({ length: 20 });
@@ -247,17 +273,110 @@ export function Post({ post }) {
 							/* Handle comment action here */
 						}}
 					/>
-					<Button
-						icon="pi pi-share-alt"
-						className="p-button-text"
-						onClick={() => {
-							/* Handle share action here */
+					<Button icon="pi pi-share-alt" className="p-button-text" onClick={handleShareButton} />
+					<OverlayPanel
+						ref={shareOverlay}
+						pt={{
+							content: "p-0",
 						}}
-					/>
+					>
+						<div className="flex flex-wrap w-13rem justify-content-center p-1">
+							{/* ...other components... */}
+							<div>
+								<Button icon="pi pi-arrow-right-arrow-left" className="p-button-text" />
+								<FacebookShareButton
+									// url={shareUrl}
+									// quote={title}
+									className="Demo__some-network__share-button"
+								>
+									<Button icon="pi pi-facebook" className="p-button-text" />
+								</FacebookShareButton>
+								<FacebookMessengerShareButton
+									// url={shareUrl}
+									// title={title}
+
+									className="Demo__some-network__share-button"
+								>
+									<Button
+										icon={<Icon icon="uil:smile" className="pi p-button-icon-left" />}
+										iconPos="left"
+										className="p-button-text"
+									/>
+								</FacebookMessengerShareButton>
+								<TwitterShareButton
+									// url={shareUrl}
+									// title={title}
+									className="Demo__some-network__share-button"
+								>
+									<Button icon="pi pi-twitter" className="p-button-text" />
+								</TwitterShareButton>
+							</div>
+							<div>
+								<LinkedinShareButton
+									// url={shareUrl}
+									// title={title}
+									className="Demo__some-network__share-button"
+								>
+									<Button icon="pi pi-linkedin" className="p-button-text" />
+								</LinkedinShareButton>
+								<RedditShareButton
+									// url={shareUrl}
+									// title={title}
+									className="Demo__some-network__share-button"
+								>
+									<Button icon="pi pi-reddit" className="p-button-text" />
+								</RedditShareButton>
+								<TelegramShareButton
+									// url={shareUrl}
+									// title={title}
+									className="Demo__some-network__share-button"
+								>
+									<Button icon="pi pi-telegram" className="p-button-text" />
+								</TelegramShareButton>
+								<WhatsappShareButton
+									// url={shareUrl}
+									// title={title}
+									className="Demo__some-network__share-button"
+								>
+									<Button icon="pi pi-whatsapp" className="p-button-text" />
+								</WhatsappShareButton>
+							</div>
+							<div>
+								<ViberShareButton
+									// url={shareUrl}
+									// title={title}
+									className="Demo__some-network__share-button"
+								>
+									<Button icon="pi pi-twitter" className="p-button-text" />
+								</ViberShareButton>
+								<PocketShareButton
+									// url={shareUrl}
+									// title={title}
+									className="Demo__some-network__share-button"
+								>
+									<Button icon="pi pi-twitter" className="p-button-text" />
+								</PocketShareButton>
+								<InstapaperShareButton
+									// url={shareUrl}
+									// title={title}
+									className="Demo__some-network__share-button"
+								>
+									<Button icon="pi pi-twitter" className="p-button-text" />
+								</InstapaperShareButton>
+								<EmailShareButton
+									// url={shareUrl}
+									// title={title}
+									className="Demo__some-network__share-button"
+								>
+									<Button icon="pi pi-twitter" className="p-button-text" />
+								</EmailShareButton>
+							</div>
+						</div>
+					</OverlayPanel>
 				</div>
 				<Button
 					icon={post?.bookmarkedByUser ? "pi pi-bookmark-fill " : "pi pi-bookmark"}
-					className="bookMarkButton relative  p-button-text shadow-none border-none"
+					className="bookmardButton relative  p-button-text shadow-none border-none"
 					onClick={handleBookmarkButton}
 				/>
 			</div>

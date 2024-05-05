@@ -62,7 +62,26 @@ export const postApi = api.enhanceEndpoints({ addTagTypes: ["Post"] }).injectEnd
 				url: `posts/${id}/bookmark`,
 				method: "POST",
 			}),
-			invalidatesTags: (result, error, id) => [{ type: "Post", id }],
+			// Optimistique update like button state
+			onQueryStarted: (id, { dispatch, queryFulfilled }) => {
+				console.log("Mutation started : Optimistique update for Bookmark button");
+				const patchResult = dispatch(
+					postApi.util.updateQueryData("getAllPosts", undefined, (draft) => {
+						console.log(current(draft));
+						try {
+							const post = draft.find((post) => post.id === id);
+							if (post) {
+								post.bookmarkedByUser = !post.bookmarkedByUser;
+							}
+						} catch (error) {
+							console.error(error);
+						}
+					})
+				);
+				queryFulfilled.catch(() => {
+					patchResult.undo();
+				});
+			},
 		}),
 		likeDislikePost: builder.mutation({
 			query: (id) => ({
@@ -71,7 +90,7 @@ export const postApi = api.enhanceEndpoints({ addTagTypes: ["Post"] }).injectEnd
 			}),
 			// Optimistique update like button state
 			onQueryStarted: (id, { dispatch, queryFulfilled }) => {
-				console.log("Mutation started"); // Add this line
+				console.log("Mutation started : Optimistique update for like button");
 				const patchResult = dispatch(
 					postApi.util.updateQueryData("getAllPosts", undefined, (draft) => {
 						console.log(current(draft));

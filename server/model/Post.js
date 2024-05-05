@@ -112,8 +112,8 @@ postSchema.methods.incrementShares = async function () {
 //? --------- virtual (set / get) methods ----------------
 
 postSchema.virtual("likedByUser");
+postSchema.virtual("bookmarkedByUser");
 
-// postSchema.virtual("firstThreeLikers");
 postSchema.virtual("firstThreeLikers");
 
 //? --------- Middlewares ----------------

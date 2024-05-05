@@ -60,6 +60,12 @@ let userSchema = new Schema(
 			type: Number,
 			default: 0,
 		},
+		bookmarkedPosts: [
+			{
+				type: mongoose.Schema.Types.ObjectId,
+				ref: "Post",
+			},
+		],
 		location: String,
 		job: String,
 		viewedProfile: {

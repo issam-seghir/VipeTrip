@@ -117,5 +117,6 @@ export const {
 	useGetAllPostsQuery,
 	useLazyGetPostLikersQuery,
 	useGetPostLikersQuery,
+	useBookmarkPostMutation,
 	useLikeDislikePostMutation,
 } = postApi;

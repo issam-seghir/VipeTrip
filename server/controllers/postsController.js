@@ -90,8 +90,9 @@ const getAllPosts = asyncWrapper(async (req, res) => {
 	// Get the IDs of the posts that the user has liked
 	const userLikes = await Like.find({ liker: user.id, type: "Post" });
 	const likedPostIds = new Set(userLikes.map((like) => like.likedPost._id.toString()));
-	console.log(likedPostIds);
 
+	// Get the IDs of the posts that the user has bookmarked
+	const bookmarkedPostIds = new Set(user.bookmarkedPosts.map((post) => post._id.toString()));
 	let posts = await Post.find()
 		.sort({ createdAt: -1 }) // Sort by creation date in descending order
 		.skip(skip) // Skip the posts before the current page
@@ -103,6 +104,7 @@ const getAllPosts = asyncWrapper(async (req, res) => {
 	posts = await Promise.all(
 		posts.map(async (post) => {
 			post.likedByUser = likedPostIds.has(post._id.toString()); // Set the likedByUser virtual property
+			post.bookmarkedByUser = bookmarkedPostIds.has(post._id.toString()); // Set the bookmarkedByUser virtual property
 			// Fetch three random likers
 			const likes = await Like.aggregate([
 				{ $match: { likedPost: post._id, type: "Post" } },
@@ -259,8 +261,37 @@ const likeDislikePost = asyncWrapper(async (req, res, next) => {
 	const like = new Like({ likedPost: postId, liker: userId, type: "Post" });
 	await like.save();
 
-	res.status(200).json({ message: "Post liked successfully", data: like });
+	res.status(200).json({ message: "Post liked successfully" });
 });
+
+const bookmarkPost = asyncWrapper(async (req, res, next) => {
+	const { postId } = req.params;
+	const userId = req?.user?.id;
+
+	const post = await Post.findById(postId);
+	if (!post) {
+		return next(new Error("Post not found"));
+	}
+
+	const user = await User.findById(userId);
+	if (!user) {
+		return next(new Error("User not found"));
+	}
+
+	// Check if the post is already bookmarked
+	const postIndex = user.bookmarkedPosts.indexOf(postId);
+	if (postIndex === -1) {
+		// If the post is not bookmarked, add it to the bookmarks
+		await User.findByIdAndUpdate(userId, { $addToSet: { bookmarkedPosts: postId } });
+		res.send({ message: "Post bookmarked successfully" });
+	} else {
+		// If the post is already bookmarked, remove it from the bookmarks
+		await User.findByIdAndUpdate(userId, { $pull: { bookmarkedPosts: postId } });
+		res.send({ message: "Post unbookmarked successfully" });
+	}
+});
+
+
 
 const getPostLikers = asyncWrapper(async (req, res, next) => {
 	const { postId } = req.params;
@@ -285,5 +316,6 @@ module.exports = {
 	getPostLikers,
 	getSinglePost,
 	likeDislikePost,
+	bookmarkPost,
 	sharePost,
 };

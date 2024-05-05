@@ -1,4 +1,4 @@
-import { useLikeDislikePostMutation } from "@jsx/store/api/postApi";
+import { useLikeDislikePostMutation, useBookmarkPostMutation } from "@jsx/store/api/postApi";
 import { randomNumberBetween, toTitleCase } from "@jsx/utils";
 import { format, formatDistanceToNow } from "date-fns";
 import { useAnimate } from "framer-motion";
@@ -38,7 +38,12 @@ export function Post({ post }) {
     const [likersDialog, setLikersDialog] = useState(false);
 	const serverUrl = import.meta.env.VITE_SERVER_URL;
 
+	const [likeDislikePost, likeDislikePostResult] = useLikeDislikePostMutation();
+	const [bookmarkPost, bookmarkPostResult] = useBookmarkPostMutation();
 
+	const handleBookmarkButton = () => {
+		bookmarkPost(post?.id);
+	}
 	const handleLikeButton = () => {
 		likeDislikePost(post?.id);
 		const sparkles = Array.from({ length: 20 });
@@ -88,7 +93,6 @@ export function Post({ post }) {
 			]);
 		}
 	};
-	const [likeDislikePost, likeDislikePostResult] = useLikeDislikePostMutation();
 
 	return (
 		<div
@@ -205,45 +209,8 @@ export function Post({ post }) {
 				)}
 			</div>
 			<Gallery images={post?.images} />
-			<PostStatus post={post}/ >
-			{/* Post Footer (actions) */}
-			{/* <Dialog visible={likersDialog} onHide={() => setLikersDialog(false)}>
-				{likers?.map((liker) => (
-					<div key={liker.id}>{liker.name}</div>
-				))}
-			</Dialog> */}
-			{/* <div className="flex text-sm text-500 gap-2 mx-2 justify-content-end align-items-center">
-				<AvatarGroup className="cursor-pointer flex-1" onClick={() => setLikersDialog(true)}>
-					<Avatar
-						image="https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png"
-						style={{ width: "1.75rem", height: "1.75rem", marginInlineEnd: "0.2rem" }}
-						shape="circle"
-					/>
-					<Avatar
-						image="https://primefaces.org/cdn/primereact/images/avatar/asiyajavayant.png"
-						style={{ width: "1.75rem", height: "1.75rem", marginInlineEnd: "0.2rem" }}
-						shape="circle"
-					/>
-					<Avatar
-						image="https://primefaces.org/cdn/primereact/images/avatar/onyamalimba.png"
-						style={{ width: "1.75rem", height: "1.75rem", marginInlineEnd: "0.2rem" }}
-						shape="circle"
-					/>
-					{post?.totalLikes > -1 && (
-						<div className="text-sm " id={`likes-state-tooltip-${post.id}`}>
-							{numeral(post?.totalLikes).format("0a")} likes
-							<Tooltip
-								key={post.id}
-								target={`#likes-state-tooltip-${post.id}`}
-								content={`${post?.totalLikes}`}
-								position="bottom"
-							/>
-						</div>
-					)}
-				</AvatarGroup>
-				{post?.totalComments > -1 && <div>{numeral(post?.totalComments).format("0a")} comments</div>}
-				{post?.totalShares > -1 && <div>{numeral(post?.totalShares).format("0a")} shares</div>}
-			</div> */}
+			<PostStatus post={post} />
+			{/* Post Footer */}
 
 			<div className="flex gap-1">
 				<div className="flex flex-1">
@@ -289,11 +256,9 @@ export function Post({ post }) {
 					/>
 				</div>
 				<Button
-					icon="pi pi-bookmark"
-					className="p-button-text "
-					onClick={() => {
-						/* Handle bookmark action here */
-					}}
+					icon={post?.bookmarkedByUser ? "pi pi-bookmark-fill " : "pi pi-bookmark"}
+					className="bookMarkButton relative  p-button-text shadow-none border-none"
+					onClick={handleBookmarkButton}
 				/>
 			</div>
 		</div>

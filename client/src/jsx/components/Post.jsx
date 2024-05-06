@@ -8,7 +8,7 @@ import { Avatar } from "primereact/avatar";
 import { Button } from "primereact/button";
 import { Menu } from "primereact/menu";
 import { Tooltip } from "primereact/tooltip";
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import "react-lazy-load-image-component/src/effects/blur.css";
 import { useNavigate } from "react-router-dom";
 import {
@@ -26,13 +26,13 @@ import {
 import { Gallery } from "./Gallery";
 import { PostStatus } from "./PostStatus";
 
+import { setPostIsDeletedSuccuss } from "@jsx/store/slices/postSlice";
 import { selectCurrentUser } from "@store/slices/authSlice";
-import { ConfirmDialog } from "primereact/confirmdialog";
+import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
 import { OverlayPanel } from "primereact/overlaypanel";
 import { Toast } from "primereact/toast";
-import { useSelector, useDispatch } from "react-redux";
-import { setPostIsDeletedSuccuss } from "@jsx/store/slices/postSlice";
 import { classNames } from "primereact/utils";
+import { useDispatch, useSelector } from "react-redux";
 
 export function Post({ post }) {
 	const navigate = useNavigate();
@@ -54,6 +54,8 @@ export function Post({ post }) {
 	const [bookmarkPost, bookmarkPostResult] = useBookmarkPostMutation();
 	const [deletePost, deletePostResult] = useDeletePostMutation();
 	const title = post?.description.split(" ").slice(0, 5).join(" ");
+
+
 
 	const items = [
 		{
@@ -104,24 +106,37 @@ export function Post({ post }) {
 						className: "border-round-md m-1",
 						style: { backgroundColor: "rgb(247 53 53 / 76%)" },
 						icon: "pi pi-trash",
-						command: async () => {
-							try {
-								await deletePost(post?.id).unwrap();
-								dispatch(setPostIsDeletedSuccuss(true));
-							} catch (error) {
-								console.log(error);
-								toast.current.show({
-									severity: "error",
-									summary: "Error",
-									detail: error?.data?.message || "Failed to delete post",
-									life: 3000,
-								});
-							}
+						command: () => {
+							confirmDialog({
+								tagKey: `delete-post-dialog-${post.id}`,
+								message: "Do you want to delete this post?",
+								header: "Delete Confirmation",
+								icon: "pi pi-info-circle",
+								defaultFocus: "reject",
+								acceptClassName: "p-button-danger",
+								accept: handleDeletePost,
+								reject: () => {},
+							});
 						},
 					},
 			  ]
 			: []),
 	];
+
+	const handleDeletePost = async () => {
+		try {
+			await deletePost(post?.id).unwrap();
+			dispatch(setPostIsDeletedSuccuss(true));
+		} catch (error) {
+			console.log(error);
+			toast.current.show({
+				severity: "error",
+				summary: "Error",
+				detail: error?.data?.message || "Failed to delete post",
+				life: 3000,
+			});
+		}
+	};
 
 	const handleBookmarkButton = () => {
 		bookmarkPost(post?.id);
@@ -196,7 +211,11 @@ export function Post({ post }) {
 			)}
 		>
 			<Toast ref={toast} />
-			<ConfirmDialog />
+			<ConfirmDialog
+				tagKey={`delete-post-dialog-${post.id}`}
+				id={`delete-post-dialog-${post.id}`}
+				key={post?.id}
+			/>
 			{/* Post header  */}
 			<div className="flex">
 				<div className="flex aligne-items-center  gap-2 flex-1">

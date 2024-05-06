@@ -1,8 +1,8 @@
-import { useGetAllPostsQuery} from "@jsx/store/api/postApi";
+import { useGetAllPostsQuery } from "@jsx/store/api/postApi";
 import { classNames } from "primereact/utils";
-import {Post} from "@components/Post"
+import { Post } from "@components/Post";
 import { Skeleton } from "primereact/skeleton";
-import { selectPostDeleteSuccuss , setPostIsDeletedSuccuss } from "@store/slices/postSlice";
+import { selectPostDeleteSuccuss, setPostIsDeletedSuccuss } from "@store/slices/postSlice";
 import { useSelector, useDispatch } from "react-redux";
 import { Toast } from "primereact/toast";
 import { useRef, useEffect } from "react";
@@ -29,8 +29,6 @@ export function FeedPostsSection() {
 			toastShown.current = false; // Reset toastShown.current to false when isPostDeletedSuccuss is false
 		}
 	}, [isPostDeletedSuccuss, dispatch]);
-
-
 
 	const { data: posts, isFetching, isLoading, isError, error } = useGetAllPostsQuery();
 

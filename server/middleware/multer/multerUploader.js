@@ -78,4 +78,4 @@ const uploadPost = multer({
 	fileFilter: fileFilterPost,
 });
 
-module.exports = { upload, uploadPost };
+module.exports = { upload, uploadPost ,POSTS_DIR, GLOBAL_DIR};

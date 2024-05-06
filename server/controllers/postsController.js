@@ -4,6 +4,10 @@ const Like = require("@model/Like");
 const mongoose = require("mongoose");
 const { asyncWrapper } = require("@middleware/asyncWrapper");
 const createError = require("http-errors");
+const fs = require("node:fs");
+const path = require("node:path");
+
+const { POSTS_DIR } = require("@middleware/multer/multerUploader");
 
 /**
  * @typedef {import('@validations/postSchema').createPostSchemaBody} createPostSchemaBody
@@ -42,6 +46,7 @@ const createPost = asyncWrapper(async (req, res) => {
 const deletePost = asyncWrapper(async (req, res, next) => {
 	const { postId } = req.params;
 	const userId = req?.user?.id;
+	console.log(process.cwd());
 	// Find the post by ID
 	const post = await Post.findById(postId);
 	// If the post was not found, send an error
@@ -49,10 +54,27 @@ const deletePost = asyncWrapper(async (req, res, next) => {
 		return res.status(404).json({ message: "Post not found" });
 	}
 	// Check if the user is authorized to delete the post
-	console.log(post.author.id.toString()+ "  " + userId);
 	if (post.author.id.toString() !== userId) {
 		return next(new Error("You are not authorized to delete this post"));
 	}
+
+	// Delete the images
+	post.images.forEach((image) => {
+		const imagePath = path.join(process.cwd(), "public", image);
+		// eslint-disable-next-line security/detect-non-literal-fs-filename
+		fs.unlink(imagePath, (err) => {
+			if (err) {
+				console.error(err);
+			}
+		});
+	});
+
+	// // Delete all comments associated with the post
+	// await Comment.deleteMany({ post: postId });
+
+	// // Delete all likes associated with the post
+	// await Like.deleteMany({ post: postId });
+
 	// Find the post by ID and delete it
 	await Post.findByIdAndDelete(postId);
 

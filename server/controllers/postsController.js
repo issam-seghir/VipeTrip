@@ -85,7 +85,7 @@ const deletePost = asyncWrapper(async (req, res, next) => {
 
 	res.status(200).json({ message: "Post deleted successfully" });
 });
-const updatePost = asyncWrapper(async (req, res,next) => {
+const updatePost = asyncWrapper(async (req, res, next) => {
 	const { postId } = req.params;
 	const userId = req.user.id;
 	const { description, mentions, tags, privacy } = req.body;
@@ -115,7 +115,7 @@ const updatePost = asyncWrapper(async (req, res,next) => {
 		privacy: privacy || post.privacy,
 		images: images.length > 0 ? images : post.images,
 	};
-    const updatedPost = await Post.findByIdAndUpdate(postId, updateData, { new: true });
+	const updatedPost = await Post.findByIdAndUpdate(postId, updateData, { new: true });
 
 	res.status(200).json(updatedPost);
 });
@@ -237,9 +237,9 @@ const getSinglePost = asyncWrapper(async (req, res) => {
 	if (!post) {
 		return res.status(404).json({ message: "Post not found" });
 	}
-	post.incrementImpressions();
 
-	res.status(200).json(post);
+	res.status(201).json({ message: "Get SIngle Post successfully", data: post });
+
 });
 
 const repostPost = asyncWrapper(async (req, res) => {

@@ -12,7 +12,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { Toast } from "primereact/toast";
 import { useRef, useEffect } from "react";
 
-export function FeedPostsSection() {
+export function FeedPostsSection({ setShowDialog }) {
 	// Get the current values of isPostDeletedSuccuss and isPostDeletedFails
 	const toast = useRef(null);
 	const toastShown = useRef(false); // Add a new ref to track whether the toast has been shown
@@ -81,7 +81,7 @@ export function FeedPostsSection() {
 		<div className={classNames("bg-red", isFetching)}>
 			<Toast ref={toast} />
 			{posts.map((post) => (
-				<Post id={post.id} key={post?.id} post={post} />
+				<Post id={post.id} key={post?.id} post={post} setShowDialog={ setShowDialog}/>
 			))}
 			<div id="scroll-anchor" />
 			{/* {isFetchingNextPage && "Loading more..."} */}

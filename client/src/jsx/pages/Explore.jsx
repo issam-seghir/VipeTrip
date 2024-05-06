@@ -1,15 +1,18 @@
+import { CreatePostWidget } from "@components/CreatePostWidget";
+import { FeedPostsSection } from "@components/FeedPostsSection";
+import { PostDialogForm } from "@jsx/components/PostDialogForm";
 import { StoriesSection } from "@jsx/components/StoriesSection";
-import { CreatePostSection } from "@components/CreatePostSection";
-import { FeedPostsSection } from "./../components/FeedPostsSection";
-
+import { useState } from "react";
 
 export function Explore() {
+	const [showPostDialogForm, setShowPostDialogForm] = useState({ open: false, id: null });
 
 	return (
 		<div className="flex flex-column gap-4">
 			<StoriesSection />
-			<CreatePostSection />
-			<FeedPostsSection/>
+			<CreatePostWidget onClick={() => setShowPostDialogForm({ open: true, id: "create-post-dialog" })} />
+			<FeedPostsSection setShowDialog={setShowPostDialogForm} />
+			<PostDialogForm showDialog={showPostDialogForm} setShowDialog={setShowPostDialogForm} />
 		</div>
 	);
 }

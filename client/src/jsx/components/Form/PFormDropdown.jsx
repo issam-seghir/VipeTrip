@@ -33,9 +33,10 @@ export const PFormDropdown = ({
 			return <small className="p-error">* {errorMessage?.data?.message}</small>;
 		}
 	};
+	console.log(options);
 	return (
 		<Controller
-			defaultValue={defaultValue}
+			// defaultValue={defaultValue}
 			name={name}
 			control={control}
 			render={({ field, fieldState }) => (

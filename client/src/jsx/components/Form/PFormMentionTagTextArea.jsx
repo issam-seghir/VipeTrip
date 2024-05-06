@@ -182,7 +182,7 @@ export const PFormMentionTagTextArea = ({
 	};
 	return (
 		<Controller
-			defaultValue={defaultValue}
+			// defaultValue={defaultValue}
 			name={name}
 			control={control}
 			render={({ field, fieldState }) => (

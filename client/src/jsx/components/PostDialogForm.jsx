@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Icon } from "@iconify/react";
 import { EmojiPickerOverlay } from "@jsx/components/EmojiPickerOverlay";
 import { PhotosPreview } from "@jsx/components/PhotosPreview";
-import { useCreatePostMutation ,useUpdatePostMutation} from "@jsx/store/api/postApi";
+import { useCreatePostMutation, useGetPostQuery, useUpdatePostMutation } from "@jsx/store/api/postApi";
 import { selectCurrentUser } from "@store/slices/authSlice";
 import { useDebounce } from "@uidotdev/usehooks";
 import { createPostSchema } from "@validations/postSchema";
@@ -18,19 +18,36 @@ import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { convertModelToFormData } from "./../utils/index";
+import { convertModelToFormData } from "../utils/index";
 import { PFormDropdown } from "./Form/PFormDropdown";
 import { PFormMentionTagTextArea } from "./Form/PFormMentionTagTextArea";
 
-const privacies = ["onlyMe", "friends", "public"];
-
-export function CreatePostSection({ postToEdit = null }) {
+const privacies = [
+	{ label: "onlyMe", value: "onlyMe" },
+	{ label: "friends", value: "friends" },
+	{ label: "public", value: "public" },
+];
+export function PostDialogForm({ showDialog, setShowDialog }) {
 	const navigate = useNavigate();
 	const user = useSelector(selectCurrentUser);
 	const toast = useRef(null);
 	const descriptionRef = useRef(null);
 	const [cursorPosition, setCursorPosition] = useState(null);
 	const [createPost, createPostResult] = useCreatePostMutation();
+	const [updatePost, updatePostResult] = useUpdatePostMutation();
+	const {
+		data: postToEdit,
+		isFetching,
+		isLoading,
+		isSuccess,
+		isError,
+		error,
+	} = useGetPostQuery(showDialog?.id, {
+		skip: showDialog?.id === "create-post-dialog" || !showDialog.id,
+	});
+	const isUpdate = showDialog?.id !== "create-post-dialog";
+
+	console.log("postToEdit", postToEdit);
 	const {
 		handleSubmit,
 		watch,
@@ -43,9 +60,20 @@ export function CreatePostSection({ postToEdit = null }) {
 	} = useForm({
 		mode: "onChange",
 		resolver: zodResolver(createPostSchema),
-		defaultValues: postToEdit ?? {},
 	});
 
+	useEffect(() => {
+		console.log("resrting ....");
+		isUpdate && postToEdit
+			? reset(postToEdit)
+			: reset({
+					description: "",
+					privacy: "public",
+					mentions: [],
+					tags: [],
+					images: [],
+			  });
+	}, [isUpdate, postToEdit, reset]);
 	const errorMessage = createPostResult?.isError ? createPostResult?.error : errorsForm;
 
 	const getFormErrorMessage = (name) => {
@@ -76,7 +104,7 @@ export function CreatePostSection({ postToEdit = null }) {
 			const res = await createPost(formData).unwrap();
 			if (res) {
 				reset();
-				setShowCreatePostDialog(false);
+				setShowDialog({ open: false, id: null });
 				toast.current.show({
 					severity: "success",
 					summary: "Post Created 🎉",
@@ -94,12 +122,39 @@ export function CreatePostSection({ postToEdit = null }) {
 			});
 		}
 	}
+	async function handleUpdatePost(data) {
+		try {
+			// Convert data to FormData
+			const formData = convertModelToFormData(data);
+			const res = await updatePost(formData).unwrap();
+			if (res) {
+				reset();
+				setShowDialog({ open: false, id: null });
+				toast.current.show({
+					severity: "success",
+					summary: "Post Updated 🎉",
+					position: "top-center",
+					detail: "Your post has been Updated successfully",
+				});
+			}
+		} catch (error) {
+			console.error(error);
+			toast.current.show({
+				severity: "error",
+				position: "top-center",
+				summary: "Error",
+				detail: error?.data?.message || "Failed to Updated post",
+			});
+		}
+	}
 
 	const onSubmit = (data) => {
-		handleCreatePost(data);
+		if (isUpdate) {
+			handleUpdatePost({ id: postToEdit?.id, ...data });
+		} else {
+			handleCreatePost(data);
+		}
 	};
-
-	const [showCreatePostDialog, setShowCreatePostDialog] = useState(false);
 
 	const description = watch("description");
 	const debouncedDescription = useDebounce(description, 500); // Debounce the email input by 500ms
@@ -152,55 +207,20 @@ export function CreatePostSection({ postToEdit = null }) {
 		emojiPicker.current.toggle(e);
 	};
 
-	const CreatePostWidget = ({ onClick }) => (
-		<div
-			className="cursor-pointer flex flex-column justify-content-between gap-3 p-3 w-full border-1 surface-border border-round"
-			onClick={onClick}
-			onKeyDown={() => {}}
-			tabIndex={0}
-			role="button"
-		>
-			<div className="flex justify-content-between gap-2">
-				<Avatar
-					size="large"
-					onClick={() => navigate(`/profile/${user?.id}`)}
-					image={user?.picturePath}
-					alt={user?.fullName}
-					shape="circle"
-				/>
-				<div className="pl-6 p-2 flex-1 text-left border-1 surface-border border-round-3xl">
-					What&apos;s on your mind?
-				</div>
-			</div>
-			<div className="flex gap-2">
-				<Button label="Media" icon="pi pi-image" iconPos="left" className="p-button-text" />
-				<Button
-					label="Emoji"
-					icon={<Icon icon="uil:smile" className="pi p-button-icon-left" />}
-					iconPos="left"
-					className="p-button-text"
-				/>
-				<Button label="Poll" icon="pi pi-chart-bar" iconPos="left" className="p-button-text" />
-			</div>
-		</div>
-	);
-
 	return (
 		<>
-			{/* Create New post Widget */}
-			<CreatePostWidget onClick={() => setShowCreatePostDialog(true)} />
-
 			{/* react hook form dev tool  */}
 			{isDev && <DevTool control={control} placement="top-left" />}
 			<Toast ref={toast} />
 			{/* Create New Post Form Dialog */}
 			<Dialog
-				header={<h2 className="text-center">Create Post</h2>}
-				visible={showCreatePostDialog}
+				key={isUpdate ? `${postToEdit?.id}` : "create-post-dialog"}
+				header={<h2 className="text-center">{isUpdate ? "Update Post" : "Create Post"}</h2>}
+				visible={showDialog.open}
 				style={{ width: "40%" }}
 				contentClassName="py-0"
 				breakpoints={{ "960px": "75vw", "640px": "90vw" }}
-				onHide={() => setShowCreatePostDialog(false)}
+				onHide={() => setShowDialog({ open: false, id: null })}
 				draggable={false}
 				dismissableMask={!isSubmitting && !createPostResult?.isLoading}
 				closeOnEscape={true}
@@ -266,7 +286,6 @@ export function CreatePostSection({ postToEdit = null }) {
 								<h5 className="text-xl">{user?.fullName} </h5>
 								<PFormDropdown
 									control={control}
-									defaultValue="public"
 									name="privacy"
 									options={privacies}
 									className="w-fit h-2rem pl-2 surface-card"
@@ -283,7 +302,6 @@ export function CreatePostSection({ postToEdit = null }) {
 						</div>
 						{/* content input area  */}
 						<PFormMentionTagTextArea
-							defaultValue=""
 							name="description"
 							control={control}
 							descriptionRef={descriptionRef}

@@ -85,31 +85,37 @@ const deletePost = asyncWrapper(async (req, res, next) => {
 
 	res.status(200).json({ message: "Post deleted successfully" });
 });
-const updatePost = asyncWrapper(async (req, res) => {
+const updatePost = asyncWrapper(async (req, res,next) => {
 	const { postId } = req.params;
-	const updateData = req.body;
-	// const { userId, description, attachments, mentions, tags } = req.body;
+	const userId = req.user.id;
+	const { description, mentions, tags, privacy } = req.body;
+	const images = req?.files?.map((file) => file.path.replace("public\\", "")) || [];
+
+	// Check if the user exists
+	const user = await User.findById(req.user.id);
+	if (!user) {
+		return res.status(404).json({ message: "User not found" });
+	}
 
 	// Check if the post exists
 	const post = await Post.findById(postId);
 	if (!post) {
 		return res.status(404).json({ message: "Post not found" });
 	}
-
-	// Check if the user is the author of the post
-	if (post?.userId.toString() !== updateData?.userId) {
-		return res.status(403).json({ message: "You can only update your own posts" });
+	// Check if the user is authorized to delete the post
+	if (post.author.id.toString() !== userId) {
+		return next(new Error("You are not authorized to edit this post"));
 	}
 
-	// Update the post
-	const updatedPost = await Post.findByIdAndUpdate(postId, updateData, { new: true });
-
-	// Update the post
-	// post.description = description || post.description;
-	// post.attachments = attachments || post.attachments;
-	// post.mentions = mentions || post.mentions;
-	// post.tags = tags || post.tags;
-	// const updatedPost = await post.save();
+	// Define the update data
+	const updateData = {
+		description: description || post.description,
+		mentions: mentions || post.mentions,
+		tags: tags || post.tags,
+		privacy: privacy || post.privacy,
+		images: images.length > 0 ? images : post.images,
+	};
+    const updatedPost = await Post.findByIdAndUpdate(postId, updateData, { new: true });
 
 	res.status(200).json(updatedPost);
 });
@@ -237,30 +243,30 @@ const getSinglePost = asyncWrapper(async (req, res) => {
 });
 
 const repostPost = asyncWrapper(async (req, res) => {
-	    const { postId } = req.params;
-		const userId = req.user.id;
+	const { postId } = req.params;
+	const userId = req.user.id;
 
-		const originalPost = await Post.findById(postId);
-		if (!originalPost) {
-			return res.status(404).json({ message: "Post not found" });
-		}
+	const originalPost = await Post.findById(postId);
+	if (!originalPost) {
+		return res.status(404).json({ message: "Post not found" });
+	}
 
-		const user = await User.findById(userId);
-		if (!user) {
-			return res.status(404).json({ message: "User not found" });
-		}
-		// Create a new post with a reference to the original post
-		const sharedPost = new Post({
-			author: userId,
-			privacy: originalPost.privacy,
-			description: originalPost.description,
-			images: originalPost.images,
-			mentions: originalPost.mentions,
-			tags: originalPost.tags,
-			sharedFrom: originalPost._id,
-		});
+	const user = await User.findById(userId);
+	if (!user) {
+		return res.status(404).json({ message: "User not found" });
+	}
+	// Create a new post with a reference to the original post
+	const sharedPost = new Post({
+		author: userId,
+		privacy: originalPost.privacy,
+		description: originalPost.description,
+		images: originalPost.images,
+		mentions: originalPost.mentions,
+		tags: originalPost.tags,
+		sharedFrom: originalPost._id,
+	});
 
-		await sharedPost.save();
+	await sharedPost.save();
 
 	// Increase the share count of the original post
 	await originalPost.incrementShares();

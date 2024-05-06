@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Icon } from "@iconify/react";
 import { EmojiPickerOverlay } from "@jsx/components/EmojiPickerOverlay";
 import { PhotosPreview } from "@jsx/components/PhotosPreview";
-import { useCreatePostMutation } from "@jsx/store/api/postApi";
+import { useCreatePostMutation ,useUpdatePostMutation} from "@jsx/store/api/postApi";
 import { selectCurrentUser } from "@store/slices/authSlice";
 import { useDebounce } from "@uidotdev/usehooks";
 import { createPostSchema } from "@validations/postSchema";
@@ -24,12 +24,12 @@ import { PFormMentionTagTextArea } from "./Form/PFormMentionTagTextArea";
 
 const privacies = ["onlyMe", "friends", "public"];
 
-export function CreatePostSection() {
+export function CreatePostSection({ postToEdit = null }) {
 	const navigate = useNavigate();
 	const user = useSelector(selectCurrentUser);
 	const toast = useRef(null);
-const descriptionRef = useRef(null);
-const [cursorPosition, setCursorPosition] = useState(null);
+	const descriptionRef = useRef(null);
+	const [cursorPosition, setCursorPosition] = useState(null);
 	const [createPost, createPostResult] = useCreatePostMutation();
 	const {
 		handleSubmit,
@@ -43,6 +43,7 @@ const [cursorPosition, setCursorPosition] = useState(null);
 	} = useForm({
 		mode: "onChange",
 		resolver: zodResolver(createPostSchema),
+		defaultValues: postToEdit ?? {},
 	});
 
 	const errorMessage = createPostResult?.isError ? createPostResult?.error : errorsForm;
@@ -121,16 +122,17 @@ const [cursorPosition, setCursorPosition] = useState(null);
 	// 	const prevValue = getValues("description");
 	// 	setValue("description", `${prevValue} ${emojiObject?.emoji}`, { shouldValidate: true });
 	// };
-const handleEmojiClick = (emojiObject) => {
-	const start = cursorPosition;
-	const text = getValues("description");
-	const before = text.slice(0, Math.max(0, start));
-	const after = text.slice(start);
-	setValue("description", before + emojiObject?.emoji + after, { shouldValidate: true });
-	setTimeout(() => {
-		descriptionRef.current.selectionStart = descriptionRef.current.selectionEnd = start + emojiObject?.emoji.length;
-	}, 0);
-};
+	const handleEmojiClick = (emojiObject) => {
+		const start = cursorPosition;
+		const text = getValues("description");
+		const before = text.slice(0, Math.max(0, start));
+		const after = text.slice(start);
+		setValue("description", before + emojiObject?.emoji + after, { shouldValidate: true });
+		setTimeout(() => {
+			descriptionRef.current.selectionStart = descriptionRef.current.selectionEnd =
+				start + emojiObject?.emoji.length;
+		}, 0);
+	};
 
 	const handlePollOpen = () => {
 		// handle poll click

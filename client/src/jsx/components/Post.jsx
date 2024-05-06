@@ -1,5 +1,7 @@
-import { useLikeDislikePostMutation, useBookmarkPostMutation } from "@jsx/store/api/postApi";
+import { Icon } from "@iconify/react";
+import { useBookmarkPostMutation, useLikeDislikePostMutation } from "@jsx/store/api/postApi";
 import { randomNumberBetween, toTitleCase } from "@jsx/utils";
+import { useCopyToClipboard } from "@uidotdev/usehooks";
 import { format, formatDistanceToNow } from "date-fns";
 import { useAnimate } from "framer-motion";
 import { Avatar } from "primereact/avatar";
@@ -9,34 +11,32 @@ import { Tooltip } from "primereact/tooltip";
 import { useRef, useState } from "react";
 import "react-lazy-load-image-component/src/effects/blur.css";
 import { useNavigate } from "react-router-dom";
-import { Gallery } from "./Gallery";
-import {PostStatus} from "./PostStatus"
 import {
-	FacebookShareButton,
+	EmailShareButton,
 	FacebookMessengerShareButton,
+	FacebookShareButton,
 	InstapaperShareButton,
-	TwitterShareButton,
+	LinkedinShareButton,
+	PocketShareButton,
 	RedditShareButton,
 	TelegramShareButton,
-	LinkedinShareButton,
-	WhatsappShareButton,
-	ViberShareButton,
-	EmailShareButton,
-	PocketShareButton
+	TwitterShareButton,
+	WhatsappShareButton
 } from "react-share";
-import { Icon } from "@iconify/react";
-import { useCopyToClipboard } from "@uidotdev/usehooks";
+import { Gallery } from "./Gallery";
+import { PostStatus } from "./PostStatus";
 
-import { OverlayPanel } from "primereact/overlaypanel";
 import { selectCurrentUser } from "@store/slices/authSlice";
+import { OverlayPanel } from "primereact/overlaypanel";
+import { Toast } from "primereact/toast";
 import { useSelector } from "react-redux";
-
 
 export function Post({ post }) {
 	const navigate = useNavigate();
+	const toast = useRef(null);
 	const optionsMenu = useRef(null);
 	const [copiedText, copyToClipboard] = useCopyToClipboard();
-	 const hasCopiedText = Boolean(copiedText);
+	const hasCopiedText = Boolean(copiedText);
 
 	const user = useSelector(selectCurrentUser);
 	const [scope, animate] = useAnimate();
@@ -49,44 +49,61 @@ export function Post({ post }) {
 	const [likeDislikePost, likeDislikePostResult] = useLikeDislikePostMutation();
 	const [bookmarkPost, bookmarkPostResult] = useBookmarkPostMutation();
 	const title = post?.description.split(" ").slice(0, 5).join(" ");
-const items = [
-	{
-		label: "Copy link to post",
-		icon: "pi pi-link",
-		command: () => {
-			copyToClipboard(shareUrl);
-			if (hasCopiedText) {
-				console.log("Link copied to clipboard");
-			} else {
-				console.error("Failed to copy link");
-			}
+
+	const items = [
+		{
+			label: "Copy link to post",
+			icon: "pi pi-link",
+			className: "border-round-md m-1",
+			command: () => {
+				copyToClipboard(shareUrl);
+				if (hasCopiedText) {
+					toast.current.show({
+						severity: "success",
+						summary: "Success",
+						detail: "Link copied to clipboard",
+						life: 3000,
+					});
+				} else {
+					toast.current.show({
+						severity: "error",
+						summary: "Error",
+						detail: "Failed to copy link",
+						life: 3000,
+					});
+				}
+			},
 		},
-	},
-	{
-		label: "Unfollow",
-		icon: "pi pi-user-minus",
-		command: () => {},
-	},
-	{
-		label: "Report Post",
-		icon: "pi pi-exclamation-triangle",
-		command: () => {},
-	},
-	{
-		label: "Block User",
-		icon: "pi pi-ban",
-		command: () => {},
-	},
-	...(user.id === post?.author?.id
-		? [
-				{
-					label: "Delete Post",
-					icon: "pi pi-trash",
-					command: () => {},
-				},
-		  ]
-		: []),
-];
+		{
+			label: "Unfollow",
+			className: "border-round-md m-1",
+			icon: "pi pi-user-minus",
+			command: () => {},
+		},
+		{
+			label: "Report Post",
+			className: "border-round-md m-1",
+			icon: "pi pi-exclamation-triangle",
+			command: () => {},
+		},
+		{
+			label: "Block User",
+			className: "border-round-md m-1",
+			icon: "pi pi-ban",
+			command: () => {},
+		},
+		...(user.id === post?.author?.id
+			? [
+					{
+						label: "Delete Post",
+						className: "border-round-md m-1",
+						style: { backgroundColor: "rgb(247 53 53 / 76%)" },
+						icon: "pi pi-trash",
+						command: () => {},
+					},
+			  ]
+			: []),
+	];
 
 	const handleBookmarkButton = () => {
 		bookmarkPost(post?.id);
@@ -156,9 +173,10 @@ const items = [
 			ref={scope}
 			className="flex flex-column justify-content-between gap-3 p-3 w-full border-1 surface-border border-round"
 		>
+			<Toast ref={toast} />
 			{/* Post header  */}
 			<div className="flex">
-				<div className="flex aligne-items-center gap-2 flex-1">
+				<div className="flex aligne-items-center  gap-2 flex-1">
 					<Avatar
 						size="large"
 						icon="pi pi-user"
@@ -241,6 +259,7 @@ const items = [
 					model={items}
 					popup
 					popupAlignment="right"
+					className="surface-card"
 					closeOnEscape
 					ref={optionsMenu}
 					id="popup_menu_right"

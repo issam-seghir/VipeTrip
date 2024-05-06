@@ -39,15 +39,22 @@ const createPost = asyncWrapper(async (req, res) => {
 	res.status(201).json({ message: "Post Created  successfully" });
 });
 
-const deletePost = asyncWrapper(async (req, res) => {
+const deletePost = asyncWrapper(async (req, res, next) => {
 	const { postId } = req.params;
-	// Find the post by ID and delete it
-	const post = await Post.findByIdAndDelete(postId);
-
+	const userId = req?.user?.id;
+	// Find the post by ID
+	const post = await Post.findById(postId);
 	// If the post was not found, send an error
 	if (!post) {
 		return res.status(404).json({ message: "Post not found" });
 	}
+	// Check if the user is authorized to delete the post
+	console.log(post.author.id.toString()+ "  " + userId);
+	if (post.author.id.toString() !== userId) {
+		return next(new Error("You are not authorized to delete this post"));
+	}
+	// Find the post by ID and delete it
+	await Post.findByIdAndDelete(postId);
 
 	res.status(200).json({ message: "Post deleted successfully" });
 });
@@ -290,8 +297,6 @@ const bookmarkPost = asyncWrapper(async (req, res, next) => {
 		res.send({ message: "Post unbookmarked successfully" });
 	}
 });
-
-
 
 const getPostLikers = asyncWrapper(async (req, res, next) => {
 	const { postId } = req.params;

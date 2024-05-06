@@ -25,40 +25,68 @@ import {
 	PocketShareButton
 } from "react-share";
 import { Icon } from "@iconify/react";
+import { useCopyToClipboard } from "@uidotdev/usehooks";
 
 import { OverlayPanel } from "primereact/overlaypanel";
+import { selectCurrentUser } from "@store/slices/authSlice";
+import { useSelector } from "react-redux";
 
-
-
-const items = [
-	{
-		items: [
-			{
-				label: "Settings",
-				icon: "pi pi-cog",
-				command: () => {},
-			},
-			{
-				label: "Logout",
-				icon: "pi pi-sign-out",
-				command: () => {},
-			},
-		],
-	},
-];
 
 export function Post({ post }) {
 	const navigate = useNavigate();
 	const optionsMenu = useRef(null);
+	const [copiedText, copyToClipboard] = useCopyToClipboard();
+	 const hasCopiedText = Boolean(copiedText);
+
+	const user = useSelector(selectCurrentUser);
 	const [scope, animate] = useAnimate();
 	const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(true);
 	const [likersDialog, setLikersDialog] = useState(false);
 	const shareOverlay = useRef(null);
 	const clientUrl = import.meta.env.VITE_CLIENT_URL;
+	const facebookAPIID = import.meta.env.VITE_FACEBOOK_CLIENT_ID;
 	const shareUrl = `${clientUrl}/posts/${post?.id}`; // Construct the URL of the post
 	const [likeDislikePost, likeDislikePostResult] = useLikeDislikePostMutation();
 	const [bookmarkPost, bookmarkPostResult] = useBookmarkPostMutation();
 	const title = post?.description.split(" ").slice(0, 5).join(" ");
+const items = [
+	{
+		label: "Copy link to post",
+		icon: "pi pi-link",
+		command: () => {
+			copyToClipboard(shareUrl);
+			if (hasCopiedText) {
+				console.log("Link copied to clipboard");
+			} else {
+				console.error("Failed to copy link");
+			}
+		},
+	},
+	{
+		label: "Unfollow",
+		icon: "pi pi-user-minus",
+		command: () => {},
+	},
+	{
+		label: "Report Post",
+		icon: "pi pi-exclamation-triangle",
+		command: () => {},
+	},
+	{
+		label: "Block User",
+		icon: "pi pi-ban",
+		command: () => {},
+	},
+	...(user.id === post?.author?.id
+		? [
+				{
+					label: "Delete Post",
+					icon: "pi pi-trash",
+					command: () => {},
+				},
+		  ]
+		: []),
+];
 
 	const handleBookmarkButton = () => {
 		bookmarkPost(post?.id);
@@ -271,12 +299,16 @@ export function Post({ post }) {
 					</Button>
 					<Button
 						icon="pi pi-comment"
-						className="p-button-text"
+						className="p-button-text shadow-none border-none"
 						onClick={() => {
 							/* Handle comment action here */
 						}}
 					/>
-					<Button icon="pi pi-share-alt" className="p-button-text" onClick={handleShareButton} />
+					<Button
+						icon="pi pi-share-alt"
+						className="p-button-text shadow-none border-none"
+						onClick={handleShareButton}
+					/>
 					<OverlayPanel
 						ref={shareOverlay}
 						pt={{
@@ -286,72 +318,46 @@ export function Post({ post }) {
 						<div className="flex flex-wrap w-13rem justify-content-center p-1">
 							{/* ...other components... */}
 							<div>
-								<Button icon="pi pi-arrow-right-arrow-left" className="p-button-text" />
-								<FacebookShareButton
-									url={shareUrl}
-									// quote={title}
-									className="Demo__some-network__share-button"
-								>
+								<Button
+									tooltip="Repost : Share in your feed "
+									tooltipOptions={{ position: "top" }}
+									icon="pi pi-arrow-right-arrow-left"
+									className="p-button-text"
+								/>
+								<FacebookShareButton url={shareUrl} title={title} hashtag={post?.tags[0]}>
 									<Button icon="pi pi-facebook" className="p-button-text" />
 								</FacebookShareButton>
-								<FacebookMessengerShareButton
-									url={shareUrl}
-									// title={title}
-
-									className="Demo__some-network__share-button"
-								>
+								<FacebookMessengerShareButton url={shareUrl} appId={facebookAPIID}>
 									<Button
-										icon={<Icon icon="fe:messanger" className="pi p-button-icon-left" />}
+										icon={<Icon icon="fe:messanger" width="20" height="20" />}
 										iconPos="left"
 										className="p-button-text"
 									/>
 								</FacebookMessengerShareButton>
-								<TwitterShareButton
-									url={shareUrl}
-									// title={title}
-									className="Demo__some-network__share-button"
-								>
+								<TwitterShareButton url={shareUrl} title={title} hashtags={post?.tags}>
 									<Button icon="pi pi-twitter" className="p-button-text" />
 								</TwitterShareButton>
 							</div>
 							<div>
 								<LinkedinShareButton
 									url={shareUrl}
-									// title={title}
-									className="Demo__some-network__share-button"
+									title={title}
+									summary={post.description}
+									source={clientUrl}
 								>
 									<Button icon="pi pi-linkedin" className="p-button-text" />
 								</LinkedinShareButton>
-								<RedditShareButton
-									url={shareUrl}
-									// title={title}
-									className="Demo__some-network__share-button"
-								>
+								<RedditShareButton url={shareUrl} title={title}>
 									<Button icon="pi pi-reddit" className="p-button-text" />
 								</RedditShareButton>
-								<TelegramShareButton
-									url={shareUrl}
-									// title={title}
-									className="Demo__some-network__share-button"
-								>
+								<TelegramShareButton url={shareUrl} title={title}>
 									<Button icon="pi pi-telegram" className="p-button-text" />
 								</TelegramShareButton>
-								<WhatsappShareButton
-									url={shareUrl}
-									// title={title}
-									className="Demo__some-network__share-button"
-								>
+								<WhatsappShareButton url={shareUrl} title={title}>
 									<Button icon="pi pi-whatsapp" className="p-button-text" />
 								</WhatsappShareButton>
 							</div>
 							<div>
-								<ViberShareButton
-									url={shareUrl}
-									// title={title}
-									className="Demo__some-network__share-button"
-								>
-									<Button icon="pi pi-twitter" className="p-button-text" />
-								</ViberShareButton>
 								<PocketShareButton url={shareUrl} title={title}>
 									<Button
 										icon={<Icon icon="fe:pocket" width="16" height="16" />}
@@ -365,11 +371,16 @@ export function Post({ post }) {
 									/>
 								</InstapaperShareButton>
 								<EmailShareButton
-									subject={post.title} // Use the post's title as the subject
-									body={`Check out this post: ${post.title}`} // Use a custom message as the body
+									subject={post.title}
+									body={`Check out this post: ${post.title}`}
 									url={shareUrl}
 								>
-									<Button icon="pi pi-envelope" className="p-button-text" />
+									<Button
+										tooltip="Share in your email"
+										tooltipOptions={{ position: "top" }}
+										icon="pi pi-envelope"
+										className="p-button-text"
+									/>
 								</EmailShareButton>
 							</div>
 						</div>

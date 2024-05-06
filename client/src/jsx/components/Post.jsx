@@ -6,7 +6,6 @@ import {
 	useRepostPostMutation,
 } from "@jsx/store/api/postApi";
 import { randomNumberBetween, toTitleCase } from "@jsx/utils";
-import { useCopyToClipboard } from "@uidotdev/usehooks";
 import { format, formatDistanceToNow } from "date-fns";
 import { useAnimate } from "framer-motion";
 import { Avatar } from "primereact/avatar";
@@ -28,6 +27,7 @@ import {
 	TwitterShareButton,
 	WhatsappShareButton,
 } from "react-share";
+import { useCopyToClipboard } from "usehooks-ts";
 import { Gallery } from "./Gallery";
 import { PostStatus } from "./PostStatus";
 
@@ -44,7 +44,7 @@ export function Post({ post }) {
 	const navigate = useNavigate();
 	const toast = useRef(null);
 	const optionsMenu = useRef(null);
-	const [copiedText, copyToClipboard] = useCopyToClipboard();
+	const [copiedText, copy] = useCopyToClipboard(null);
 	const hasCopiedText = Boolean(copiedText);
 	const dispatch = useDispatch();
 
@@ -73,20 +73,20 @@ export function Post({ post }) {
 			label: "Copy link to post",
 			icon: "pi pi-link",
 			className: "border-round-md m-1",
-			command: () => {
-				copyToClipboard(shareUrl);
-				if (hasCopiedText) {
+			command: async () => {
+				await copy(shareUrl);
+				try {
 					toast.current.show({
 						severity: "success",
 						summary: "Success",
-						detail: "Link copied to clipboard",
+						detail: "Post Link copied to clipboard",
 						life: 3000,
 					});
-				} else {
+				} catch {
 					toast.current.show({
 						severity: "error",
 						summary: "Error",
-						detail: "Failed to copy link",
+						detail: "Failed to copy Post link",
 						life: 3000,
 					});
 				}
@@ -430,6 +430,7 @@ export function Post({ post }) {
 									tooltipOptions={{ position: "top" }}
 									icon="pi pi-arrow-right-arrow-left"
 									className="p-button-text"
+									onClick={handleRepostPost}
 								/>
 								<FacebookShareButton url={shareUrl} title={title} hashtag={post?.tags[0]}>
 									<Button icon="pi pi-facebook" className="p-button-text" />

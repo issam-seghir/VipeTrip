@@ -21,7 +21,6 @@ export const PostStatus = ({ post }) => {
 		isError,
 		error,
 	} = useGetPostLikersQuery(post.id, { skip: !likersDialog });
-	console.log(likers);
 	// if (isLoading) {
 	// 	return (
 	// 		<div>

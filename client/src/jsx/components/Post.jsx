@@ -1,5 +1,5 @@
 import { Icon } from "@iconify/react";
-import { useBookmarkPostMutation, useLikeDislikePostMutation } from "@jsx/store/api/postApi";
+import { useBookmarkPostMutation, useDeletePostMutation, useLikeDislikePostMutation } from "@jsx/store/api/postApi";
 import { randomNumberBetween, toTitleCase } from "@jsx/utils";
 import { useCopyToClipboard } from "@uidotdev/usehooks";
 import { format, formatDistanceToNow } from "date-fns";
@@ -21,15 +21,18 @@ import {
 	RedditShareButton,
 	TelegramShareButton,
 	TwitterShareButton,
-	WhatsappShareButton
+	WhatsappShareButton,
 } from "react-share";
 import { Gallery } from "./Gallery";
 import { PostStatus } from "./PostStatus";
 
 import { selectCurrentUser } from "@store/slices/authSlice";
+import { ConfirmDialog } from "primereact/confirmdialog";
 import { OverlayPanel } from "primereact/overlaypanel";
 import { Toast } from "primereact/toast";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { setPostIsDeletedSuccuss } from "@jsx/store/slices/postSlice";
+import { classNames } from "primereact/utils";
 
 export function Post({ post }) {
 	const navigate = useNavigate();
@@ -37,6 +40,7 @@ export function Post({ post }) {
 	const optionsMenu = useRef(null);
 	const [copiedText, copyToClipboard] = useCopyToClipboard();
 	const hasCopiedText = Boolean(copiedText);
+	const dispatch = useDispatch();
 
 	const user = useSelector(selectCurrentUser);
 	const [scope, animate] = useAnimate();
@@ -48,6 +52,7 @@ export function Post({ post }) {
 	const shareUrl = `${clientUrl}/posts/${post?.id}`; // Construct the URL of the post
 	const [likeDislikePost, likeDislikePostResult] = useLikeDislikePostMutation();
 	const [bookmarkPost, bookmarkPostResult] = useBookmarkPostMutation();
+	const [deletePost, deletePostResult] = useDeletePostMutation();
 	const title = post?.description.split(" ").slice(0, 5).join(" ");
 
 	const items = [
@@ -99,7 +104,20 @@ export function Post({ post }) {
 						className: "border-round-md m-1",
 						style: { backgroundColor: "rgb(247 53 53 / 76%)" },
 						icon: "pi pi-trash",
-						command: () => {},
+						command: async () => {
+							try {
+								await deletePost(post?.id).unwrap();
+								dispatch(setPostIsDeletedSuccuss(true));
+							} catch (error) {
+								console.log(error);
+								toast.current.show({
+									severity: "error",
+									summary: "Error",
+									detail: error?.data?.message || "Failed to delete post",
+									life: 3000,
+								});
+							}
+						},
 					},
 			  ]
 			: []),
@@ -171,9 +189,14 @@ export function Post({ post }) {
 	return (
 		<div
 			ref={scope}
-			className="flex flex-column justify-content-between gap-3 p-3 w-full border-1 surface-border border-round"
+			className={classNames(
+				"flex flex-column justify-content-between gap-3 p-3 w-full border-1 surface-border border-round",
+				{ "pointer-events-none ": deletePostResult.isLoading },
+				{ "opacity-50 ": deletePostResult.isLoading }
+			)}
 		>
 			<Toast ref={toast} />
+			<ConfirmDialog />
 			{/* Post header  */}
 			<div className="flex">
 				<div className="flex aligne-items-center  gap-2 flex-1">

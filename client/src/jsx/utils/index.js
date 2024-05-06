@@ -244,3 +244,22 @@ export function toTitleCase(string) {
 export const randomNumberBetween = (min, max) => {
   return Math.floor(Math.random() * (max - min + 1) + min);
 };
+
+
+
+/**
+ * Waits for the specified number of milliseconds.
+ * @param {number} ms - The number of milliseconds to wait.
+ * @returns {Promise<void>} - A promise that resolves after the specified time.
+ * @example
+ * // Wait for 1 second (1000 milliseconds)
+ * await wait(1000);
+ *
+ * // Wait for 500 milliseconds
+ * wait(500).then(() => {
+ *   console.log('Waited for 500 milliseconds');
+ * });
+ */
+export function wait(ms) {
+	return new Promise((resolve) => setTimeout(resolve, ms));
+}

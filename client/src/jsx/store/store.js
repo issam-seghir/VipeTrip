@@ -5,6 +5,7 @@ import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { setupListeners } from "@reduxjs/toolkit/query";
 import { api } from "@store/api/api";
 import authReducer from "@store/slices/authSlice";
+import postReducer from "@store/slices/postSlice";
 import globalReducer from "@store/slices/globalSlice";
 import { FLUSH, PAUSE, PERSIST, PURGE, REGISTER, REHYDRATE, persistReducer, persistStore } from "redux-persist";
 import storage from "redux-persist/lib/storage";
@@ -20,7 +21,7 @@ const rootPersistConfig = {
 	//! It is also strongly recommended to blacklist any api(s) that you have configured with RTK Query.
 	//! If the api slice reducer is not blacklisted, the api cache will be automatically persisted
 	//! and restored which could leave you with phantom subscriptions from components that do not exist any more.
-	blacklist: [api.reducerPath], //Things u dont want to persist
+	blacklist: [api.reducerPath, "post"], //Things u dont want to persist
 	/*
 		whitelist: ['globalReducer', 'pageReducer',...], //Things u want to persist
 	 */
@@ -29,6 +30,7 @@ const rootPersistConfig = {
 
 const rootReducer = combineReducers({
 	auth: authReducer,
+	post: postReducer,
 	global: globalReducer,
 });
 

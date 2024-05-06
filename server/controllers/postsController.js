@@ -49,6 +49,7 @@ const deletePost = asyncWrapper(async (req, res, next) => {
 	console.log(process.cwd());
 	// Find the post by ID
 	const post = await Post.findById(postId);
+	const user = await User.findById(userId);
 	// If the post was not found, send an error
 	if (!post) {
 		return res.status(404).json({ message: "Post not found" });
@@ -72,8 +73,11 @@ const deletePost = asyncWrapper(async (req, res, next) => {
 	// // Delete all comments associated with the post
 	// await Comment.deleteMany({ post: postId });
 
-	// // Delete all likes associated with the post
-	// await Like.deleteMany({ post: postId });
+	// Delete all likes associated with the post
+	await Like.deleteMany({ likedPost: postId, type: "Post" });
+
+	// Delete All bookmarks associated with the post
+	await User.updateMany({}, { $pull: { bookmarkedPosts: postId } });
 
 	// Find the post by ID and delete it
 	await Post.findByIdAndDelete(postId);

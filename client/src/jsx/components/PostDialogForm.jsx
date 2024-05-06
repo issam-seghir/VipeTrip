@@ -43,9 +43,9 @@ export function PostDialogForm({ showDialog, setShowDialog }) {
 		isError,
 		error,
 	} = useGetPostQuery(showDialog?.id, {
-		skip: showDialog?.id === "create-post-dialog" || !showDialog.id,
+		skip: !showDialog.id,
 	});
-	const isUpdate = showDialog?.id !== "create-post-dialog";
+	const isUpdate = Boolean(showDialog?.id);
 
 	console.log("postToEdit", postToEdit);
 	const {
@@ -129,7 +129,7 @@ export function PostDialogForm({ showDialog, setShowDialog }) {
 			const res = await updatePost(formData).unwrap();
 			if (res) {
 				reset();
-				setShowDialog({ open: false, id: null });
+				setShowDialog({ open: false, id: postToEdit.id });
 				toast.current.show({
 					severity: "success",
 					summary: "Post Updated 🎉",
@@ -214,13 +214,16 @@ export function PostDialogForm({ showDialog, setShowDialog }) {
 			<Toast ref={toast} />
 			{/* Create New Post Form Dialog */}
 			<Dialog
-				key={isUpdate ? `${postToEdit?.id}` : "create-post-dialog"}
+				key={`${postToEdit?.id}`}
 				header={<h2 className="text-center">{isUpdate ? "Update Post" : "Create Post"}</h2>}
 				visible={showDialog.open}
 				style={{ width: "40%" }}
 				contentClassName="py-0"
 				breakpoints={{ "960px": "75vw", "640px": "90vw" }}
-				onHide={() => setShowDialog({ open: false, id: null })}
+				onHide={() => {
+					setShowDialog({ open: false, id: isUpdate ? postToEdit?.id : null });
+					isUpdate && reset(); // Reset the form state
+				}}
 				draggable={false}
 				dismissableMask={!isSubmitting && !createPostResult?.isLoading}
 				closeOnEscape={true}

@@ -10,7 +10,7 @@ export function Explore() {
 	return (
 		<div className="flex flex-column gap-4">
 			<StoriesSection />
-			<CreatePostWidget onClick={() => setShowPostDialogForm({ open: true, id: "create-post-dialog" })} />
+			<CreatePostWidget onClick={() => setShowPostDialogForm({ open: true, id: null })} />
 			<FeedPostsSection setShowDialog={setShowPostDialogForm} />
 			<PostDialogForm showDialog={showPostDialogForm} setShowDialog={setShowPostDialogForm} />
 		</div>

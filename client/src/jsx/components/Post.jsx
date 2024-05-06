@@ -1,5 +1,10 @@
 import { Icon } from "@iconify/react";
-import { useBookmarkPostMutation, useDeletePostMutation, useLikeDislikePostMutation } from "@jsx/store/api/postApi";
+import {
+	useBookmarkPostMutation,
+	useDeletePostMutation,
+	useLikeDislikePostMutation,
+	useRepostPostMutation,
+} from "@jsx/store/api/postApi";
 import { randomNumberBetween, toTitleCase } from "@jsx/utils";
 import { useCopyToClipboard } from "@uidotdev/usehooks";
 import { format, formatDistanceToNow } from "date-fns";
@@ -26,7 +31,7 @@ import {
 import { Gallery } from "./Gallery";
 import { PostStatus } from "./PostStatus";
 
-import { setPostIsDeletedSuccuss } from "@jsx/store/slices/postSlice";
+import { setPostIsDeletedSuccuss, setPostIsRepostedSuccuss } from "@jsx/store/slices/postSlice";
 import { selectCurrentUser } from "@store/slices/authSlice";
 import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
 import { Divider } from "primereact/divider";
@@ -54,9 +59,16 @@ export function Post({ post }) {
 	const [likeDislikePost, likeDislikePostResult] = useLikeDislikePostMutation();
 	const [bookmarkPost, bookmarkPostResult] = useBookmarkPostMutation();
 	const [deletePost, deletePostResult] = useDeletePostMutation();
+	const [repostPost, repostPostResult] = useRepostPostMutation();
 	const title = post?.description.split(" ").slice(0, 5).join(" ");
 
 	const items = [
+		{
+			label: "Repost : Share in your feed",
+			icon: "pi pi-arrow-right-arrow-left",
+			className: "border-round-md m-1",
+			command: handleRepostPost,
+		},
 		{
 			label: "Copy link to post",
 			icon: "pi pi-link",
@@ -136,6 +148,21 @@ export function Post({ post }) {
 			});
 		}
 	};
+
+	async function handleRepostPost() {
+		try {
+			await repostPost(post?.id).unwrap();
+			dispatch(setPostIsRepostedSuccuss(true));
+		} catch (error) {
+			console.log(error);
+			toast.current.show({
+				severity: "error",
+				summary: "Error",
+				detail: error?.data?.message || "Failed to repost post",
+				life: 3000,
+			});
+		}
+	}
 
 	const handleBookmarkButton = () => {
 		bookmarkPost(post?.id);

@@ -50,9 +50,9 @@ export const postApi = api.enhanceEndpoints({ addTagTypes: ["Post"] }).injectEnd
 			}),
 			invalidatesTags: (result, error, id) => [{ type: "Post", id }],
 		}),
-		sharePost: builder.mutation({
+		repostPost: builder.mutation({
 			query: (id) => ({
-				url: `posts/${id}/share`,
+				url: `posts/${id}/repost`,
 				method: "POST",
 			}),
 			invalidatesTags: (result, error, id) => [{ type: "Post", id }],
@@ -130,6 +130,7 @@ export const postApi = api.enhanceEndpoints({ addTagTypes: ["Post"] }).injectEnd
 
 export const {
 	useCreatePostMutation,
+	useRepostPostMutation,
 	useUpdatePostMutation,
 	useDeletePostMutation,
 	useGetPostQuery,

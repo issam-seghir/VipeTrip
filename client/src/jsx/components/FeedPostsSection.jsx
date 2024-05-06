@@ -2,7 +2,12 @@ import { useGetAllPostsQuery } from "@jsx/store/api/postApi";
 import { classNames } from "primereact/utils";
 import { Post } from "@components/Post";
 import { Skeleton } from "primereact/skeleton";
-import { selectPostDeleteSuccuss, setPostIsDeletedSuccuss } from "@store/slices/postSlice";
+import {
+	selectPostDeleteSuccuss,
+	setPostIsDeletedSuccuss,
+	selectPostRespostedSuccuss,
+	setPostIsRepostedSuccuss,
+} from "@store/slices/postSlice";
 import { useSelector, useDispatch } from "react-redux";
 import { Toast } from "primereact/toast";
 import { useRef, useEffect } from "react";
@@ -12,6 +17,7 @@ export function FeedPostsSection() {
 	const toast = useRef(null);
 	const toastShown = useRef(false); // Add a new ref to track whether the toast has been shown
 	const isPostDeletedSuccuss = useSelector(selectPostDeleteSuccuss);
+	const isPostRepostedSuccuss = useSelector(selectPostRespostedSuccuss);
 	const dispatch = useDispatch();
 
 	// show success message when deleting a post
@@ -29,6 +35,20 @@ export function FeedPostsSection() {
 			toastShown.current = false; // Reset toastShown.current to false when isPostDeletedSuccuss is false
 		}
 	}, [isPostDeletedSuccuss, dispatch]);
+	useEffect(() => {
+		if (isPostRepostedSuccuss && !toastShown.current) {
+			toast.current.show({
+				severity: "success",
+				summary: "Post Reposted to your feed  🎉",
+				detail: "Your post has been reposted successfully",
+				life: 3000,
+			});
+			toastShown.current = true; // Set toastShown.current to true after showing the toast
+			dispatch(setPostIsRepostedSuccuss(false));
+		} else if (!isPostRepostedSuccuss) {
+			toastShown.current = false; // Reset toastShown.current to false when isPostRepostedSuccuss is false
+		}
+	}, [isPostRepostedSuccuss, dispatch]);
 
 	const { data: posts, isFetching, isLoading, isError, error } = useGetAllPostsQuery();
 

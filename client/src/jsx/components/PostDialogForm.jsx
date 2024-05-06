@@ -47,7 +47,6 @@ export function PostDialogForm({ showDialog, setShowDialog }) {
 	});
 	const isUpdate = Boolean(showDialog?.id);
 
-	console.log("postToEdit", postToEdit);
 	const {
 		handleSubmit,
 		watch,
@@ -63,7 +62,6 @@ export function PostDialogForm({ showDialog, setShowDialog }) {
 	});
 
 	useEffect(() => {
-		console.log("resrting ....");
 		isUpdate && postToEdit
 			? reset(postToEdit)
 			: reset({
@@ -74,7 +72,14 @@ export function PostDialogForm({ showDialog, setShowDialog }) {
 					images: [],
 			  });
 	}, [isUpdate, postToEdit, reset]);
-	const errorMessage = createPostResult?.isError ? createPostResult?.error : errorsForm;
+	const errorUpdateMessage = updatePostResult?.isError ? updatePostResult?.error : errorsForm;
+	const errorCreateMessage = createPostResult?.isError ? createPostResult?.error : errorsForm;
+	const errorMessage = isUpdate ? errorUpdateMessage : errorCreateMessage;
+
+
+
+
+
 
 	const getFormErrorMessage = (name) => {
 		if (errorMessage[name]) {
@@ -124,9 +129,10 @@ export function PostDialogForm({ showDialog, setShowDialog }) {
 	}
 	async function handleUpdatePost(data) {
 		try {
+
 			// Convert data to FormData
 			const formData = convertModelToFormData(data);
-			const res = await updatePost(formData).unwrap();
+			const res = await updatePost( {id:postToEdit?.id, data : formData}).unwrap();
 			if (res) {
 				reset();
 				setShowDialog({ open: false, id: postToEdit.id });
@@ -150,7 +156,7 @@ export function PostDialogForm({ showDialog, setShowDialog }) {
 
 	const onSubmit = (data) => {
 		if (isUpdate) {
-			handleUpdatePost({ id: postToEdit?.id, ...data });
+			handleUpdatePost(data);
 		} else {
 			handleCreatePost(data);
 		}
@@ -225,8 +231,8 @@ export function PostDialogForm({ showDialog, setShowDialog }) {
 					isUpdate && reset(); // Reset the form state
 				}}
 				draggable={false}
-				dismissableMask={!isSubmitting && !createPostResult?.isLoading}
-				closeOnEscape={true}
+				dismissableMask={!isSubmitting && !createPostResult?.isLoading && !updatePostResult?.isLoading}
+				closeOnEscape={!isSubmitting && !createPostResult?.isLoading && !updatePostResult?.isLoading}
 				footer={
 					<>
 						{/* Creat Post Actions */}
@@ -265,10 +271,16 @@ export function PostDialogForm({ showDialog, setShowDialog }) {
 						<Divider />
 						<Button
 							type="submit"
-							label={createPostResult?.isLoading ? "Creatting..." : "Post"}
+							label={
+								updatePostResult?.isLoading
+									? "Updatting ..."
+									: createPostResult?.isLoading
+									? "Creatting..."
+									: "Post"
+							}
 							className="w-full"
 							iconPos="right"
-							loading={isSubmitting || createPostResult?.isLoading}
+							loading={isSubmitting || createPostResult?.isLoading || updatePostResult?.isLoading}
 							onClick={handleSubmit(onSubmit)}
 						/>
 					</>
@@ -297,7 +309,9 @@ export function PostDialogForm({ showDialog, setShowDialog }) {
 										itemLabel: "p-1",
 										input: "p-1",
 									}}
-									disabled={isSubmitting || createPostResult?.isLoading}
+									disabled={
+										isSubmitting || createPostResult?.isLoading || updatePostResult?.isLoading
+									}
 									highlightOnSelect={false}
 									errorMessage={errorMessage}
 								/>
@@ -314,7 +328,7 @@ export function PostDialogForm({ showDialog, setShowDialog }) {
 							placeholder="Enter @ to mention people, # to mention tag"
 							autoResize={true}
 							autoFocus={true}
-							disabled={isSubmitting || createPostResult?.isLoading}
+							disabled={isSubmitting || createPostResult?.isLoading || updatePostResult?.isLoading}
 							errorMessage={errorMessage}
 						/>
 

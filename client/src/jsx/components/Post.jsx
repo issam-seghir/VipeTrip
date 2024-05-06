@@ -8,7 +8,7 @@ import { Avatar } from "primereact/avatar";
 import { Button } from "primereact/button";
 import { Menu } from "primereact/menu";
 import { Tooltip } from "primereact/tooltip";
-import { useCallback, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import "react-lazy-load-image-component/src/effects/blur.css";
 import { useNavigate } from "react-router-dom";
 import {
@@ -29,6 +29,7 @@ import { PostStatus } from "./PostStatus";
 import { setPostIsDeletedSuccuss } from "@jsx/store/slices/postSlice";
 import { selectCurrentUser } from "@store/slices/authSlice";
 import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
+import { Divider } from "primereact/divider";
 import { OverlayPanel } from "primereact/overlaypanel";
 import { Toast } from "primereact/toast";
 import { classNames } from "primereact/utils";
@@ -54,8 +55,6 @@ export function Post({ post }) {
 	const [bookmarkPost, bookmarkPostResult] = useBookmarkPostMutation();
 	const [deletePost, deletePostResult] = useDeletePostMutation();
 	const title = post?.description.split(" ").slice(0, 5).join(" ");
-
-
 
 	const items = [
 		{
@@ -210,6 +209,26 @@ export function Post({ post }) {
 				{ "opacity-50 ": deletePostResult.isLoading }
 			)}
 		>
+			{/* Check if the post is a repost and display banner */}
+			{post?.sharedFrom && (
+				<>
+					<div className="banner">
+						<i className="pi pi-arrow-right-arrow-left pr-3"></i>
+						Reposted from
+						<span
+							onKeyDown={() => {}}
+							onClick={() => navigate(`/profile/${post?.author?.id}`)}
+							tabIndex={0}
+							role="button"
+							className="font-bold p-1 cursor-pointer text-primary-500"
+						>
+							{toTitleCase(post?.sharedFrom?.author?.fullName)}
+						</span>
+					</div>
+					<Divider className="m-0" />
+				</>
+			)}
+
 			<Toast ref={toast} />
 			<ConfirmDialog
 				tagKey={`delete-post-dialog-${post.id}`}

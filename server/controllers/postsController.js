@@ -75,9 +75,10 @@ const deletePost = asyncWrapper(async (req, res, next) => {
 
 	// Delete all likes associated with the post
 	await Like.deleteMany({ likedPost: postId, type: "Post" });
-
 	// Delete All bookmarks associated with the post
 	await User.updateMany({}, { $pull: { bookmarkedPosts: postId } });
+	// Delete All shared post associated with the post
+	await Post.deleteMany({ sharedFrom: postId });
 
 	// Find the post by ID and delete it
 	await Post.findByIdAndDelete(postId);
@@ -235,32 +236,31 @@ const getSinglePost = asyncWrapper(async (req, res) => {
 	res.status(200).json(post);
 });
 
-const sharePost = asyncWrapper(async (req, res) => {
-	const { postId } = req.params;
-	const { userId, description, mentions, tags } = req.body;
-	const attachments = req.files.map((file) => file.path); // Get paths of uploaded files
+const repostPost = asyncWrapper(async (req, res) => {
+	    const { postId } = req.params;
+		const userId = req.user.id;
 
-	const originalPost = await Post.findById(postId);
-	if (!originalPost) {
-		return res.status(404).json({ message: "Post not found" });
-	}
+		const originalPost = await Post.findById(postId);
+		if (!originalPost) {
+			return res.status(404).json({ message: "Post not found" });
+		}
 
-	const user = await User.findById(userId);
-	if (!user) {
-		return res.status(404).json({ message: "User not found" });
-	}
+		const user = await User.findById(userId);
+		if (!user) {
+			return res.status(404).json({ message: "User not found" });
+		}
+		// Create a new post with a reference to the original post
+		const sharedPost = new Post({
+			author: userId,
+			privacy: originalPost.privacy,
+			description: originalPost.description,
+			images: originalPost.images,
+			mentions: originalPost.mentions,
+			tags: originalPost.tags,
+			sharedFrom: originalPost._id,
+		});
 
-	// Create a new post
-	const sharedPost = new Post({
-		userId,
-		description,
-		attachments,
-		mentions,
-		tags,
-		sharedFrom: originalPost._id,
-	});
-
-	await sharedPost.save();
+		await sharedPost.save();
 
 	// Increase the share count of the original post
 	await originalPost.incrementShares();
@@ -348,5 +348,5 @@ module.exports = {
 	getSinglePost,
 	likeDislikePost,
 	bookmarkPost,
-	sharePost,
+	repostPost,
 };

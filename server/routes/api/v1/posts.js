@@ -6,7 +6,7 @@ const {
 	getUserPosts,
 	getPostLikers,
 	likeDislikePost,
-	sharePost,
+	repostPost,
 	bookmarkPost,
 	getSinglePost,
 	createPost,
@@ -24,7 +24,7 @@ router
 router.route("/").get(getAllPosts);
 router.route("/:postId").get(getSinglePost).delete(deletePost).put(updatePost);
 
-router.route("/:postId/share").post(sharePost);
+router.route("/:postId/repost").post(repostPost);
 router.route("/:postId/likeDislike").post(likeDislikePost);
 router.route("/:postId/likers").get(getPostLikers);
 router.route("/:postId/bookmark").post(bookmarkPost);

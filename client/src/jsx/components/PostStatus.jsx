@@ -103,8 +103,28 @@ export const PostStatus = ({ post }) => {
 					</div>
 				)}
 			</AvatarGroup>
-			{post?.totalComments > -1 && <div>{numeral(post?.totalComments).format("0a")} comments</div>}
-			{post?.totalShares > -1 && <div>{numeral(post?.totalShares).format("0a")} shares</div>}
+			{post?.totalComments > -1 && (
+				<div className="text-sm " id={`comments-state-tooltip-${post.id}`}>
+					{numeral(post?.totalComments).format("0a")} comments
+					<Tooltip
+						key={post.id}
+						target={`#comments-state-tooltip-${post.id}`}
+						content={`${post?.totalComments}`}
+						position="bottom"
+					/>
+				</div>
+			)}
+			{post?.totalShares > -1 && (
+				<div className="text-sm " id={`shares-state-tooltip-${post.id}`}>
+					{numeral(post?.totalShares).format("0a")} shares
+					<Tooltip
+						key={post.id}
+						target={`#shares-state-tooltip-${post.id}`}
+						content={`${post?.totalShares}`}
+						position="bottom"
+					/>
+				</div>
+			)}
 		</div>
 	);
 };

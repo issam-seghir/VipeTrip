@@ -45,7 +45,6 @@ export function Post({ post }) {
 	const toast = useRef(null);
 	const optionsMenu = useRef(null);
 	const [copiedText, copy] = useCopyToClipboard(null);
-	const hasCopiedText = Boolean(copiedText);
 	const dispatch = useDispatch();
 
 	const user = useSelector(selectCurrentUser);
@@ -63,14 +62,24 @@ export function Post({ post }) {
 	const title = post?.description.split(" ").slice(0, 5).join(" ");
 
 	const items = [
+		...(user.id === post?.author?.id
+			? [
+					{
+						label: "Edit Post",
+						className: "border-round-md m-1",
+						icon: "pi pi-file-edit",
+						command: () => {},
+					},
+			  ]
+			: []),
 		{
-			label: "Repost : Share in your feed",
+			label: "Repost to your feed",
 			icon: "pi pi-arrow-right-arrow-left",
 			className: "border-round-md m-1",
 			command: handleRepostPost,
 		},
 		{
-			label: "Copy link to post",
+			label: "Copy Post link",
 			icon: "pi pi-link",
 			className: "border-round-md m-1",
 			command: async () => {

@@ -45,8 +45,6 @@ const createComment = asyncWrapper(async (req, res) => {
 	res.status(201).json({ message: "Comment Created  successfully", data: comment });
 });
 
-
-
 /**
  * @typedef {import('@validations/commentSchema').commentSchemaBody} commentSchemaBody
  */
@@ -71,6 +69,11 @@ const updateComment = asyncWrapper(async (req, res) => {
 		return res.status(404).json({ message: "Comment not found" });
 	}
 
+	// Check if the user is the author of the comment
+	if (comment.author.toString() !== user.id) {
+		return res.status(403).json({ message: "User is not authorized to update this comment" });
+	}
+
 	// Remove the '@' from each mention
 	const mentionNames = mentions.map((mention) => mention.replace("@", ""));
 	// Find all mentioned users by their firstName or lastName
@@ -86,8 +89,39 @@ const updateComment = asyncWrapper(async (req, res) => {
 	res.status(201).json({ message: "Comment updated  successfully", data: comment });
 });
 
+/**
+ * @typedef {import('@validations/commentSchema').commentSchemaBody} commentSchemaBody
+ */
 
+const deleteComment = asyncWrapper(async (req, res) => {
+	/** @type {commentSchemaBody} */
+	const { postId, commentId } = req.params;
 
+	// Check if the user exists
+	const user = await User.findById(req.user.id);
+	if (!user) {
+		return res.status(404).json({ message: "User not found" });
+	}
+	const post = await Post.findById(postId);
+	if (!post) {
+		return res.status(404).json({ message: "Post not found" });
+	}
+
+	const comment = await Comment.findById(commentId);
+	if (!comment) {
+		return res.status(404).json({ message: "Comment not found" });
+	}
+
+	// Check if the user is the author of the comment
+	if (comment.author.toString() !== user.id) {
+		return res.status(403).json({ message: "User is not authorized to delete this comment" });
+	}
+
+	// Delete the comment
+	await comment.remove();
+
+	res.status(200).json({ message: "Comment Deleted  successfully" });
+});
 
 // Add Reply to Comment
 const addReplyToComment = async (req, res) => {
@@ -120,19 +154,15 @@ const getAllComments = asyncWrapper(async (req, res) => {
 
 	let comments = await Comment.find({ post: postId }).populate("author").populate("replies");
 
-  comments = await Promise.all(
+	comments = await Promise.all(
 		comments.map(async (comment) => {
 			comment.likedByUser = likedCommentsIds.has(comment._id.toString()); // Set the likedByUser virtual property
 			return comment;
 		})
-  );
-
+	);
 
 	res.status(201).json({ message: "get All comments", data: comments });
-
 });
-
-
 
 module.exports = {
 	createComment,

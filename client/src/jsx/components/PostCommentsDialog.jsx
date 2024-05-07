@@ -206,17 +206,25 @@ export function PostCommentsDialog({ showDialog, setShowDialog }) {
 						<div className="flex">
 							<div className="flex flex-1">
 								<Button
-									label="Emoji"
-									icon={<Icon icon="uil:smile" className="pi p-button-icon-left" />}
+									type="button"
+									icon={
+										<Icon
+											icon="uil:smile"
+											className="pi p-button-icon-left"
+											width="20"
+											height="20"
+										/>
+									}
 									iconPos="left"
-									className="p-button-text"
+									className="p-button-text p-2"
 									onClick={handleEmojiOpen}
 								/>
 								<EmojiPickerOverlay ref={emojiPicker} handleEmojiClick={handleEmojiClick} />
 							</div>
 							<Button
 								type="submit"
-								label={createCommentResult?.isLoading ? "Creatting..." : "Post"}
+								icon={"pi pi-send"}
+								className="p-button-text p-2"
 								iconPos="right"
 								loading={isSubmitting || createCommentResult?.isLoading}
 								onClick={handleSubmit(onSubmit)}

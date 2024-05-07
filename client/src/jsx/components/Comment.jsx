@@ -31,44 +31,9 @@ export function Comment({ comment }) {
 	const [deleteComment, deleteCommentResult] = useDeleteCommentMutation();
 	const [updateComment, updateCommentResult] = useUpdateCommentMutation();
 
-	const items = [
-		...(user.id === comment?.author?.id
-			? [
-					{
-						label: "Edit Post",
-						className: "border-round-md m-1",
-						icon: "pi pi-file-edit",
-						command: handleUpdateComment,
-					},
-			  ]
-			: []),
-		...(user.id === comment?.author?.id
-			? [
-					{
-						label: "Delete Post",
-						className: "border-round-md m-1",
-						style: { backgroundColor: "rgb(247 53 53 / 76%)" },
-						icon: "pi pi-trash",
-						command: () => {
-							confirmDialog({
-								tagKey: `delete-comment-dialog-${comment.id}`,
-								message: "Do you want to delete this comment?",
-								header: "Delete Confirmation",
-								icon: "pi pi-info-circle",
-								defaultFocus: "reject",
-								acceptClassName: "p-button-danger",
-								accept: handleDeleteComment,
-								reject: () => {},
-							});
-						},
-					},
-			  ]
-			: []),
-	];
-
 	const handleUpdateComment = async (data) => {
 		try {
-			await updateComment({ postId: comment?.post, commentId: comment?.id ,data}).unwrap();
+			await updateComment({ postId: comment?.post, commentId: comment?.id, data }).unwrap();
 			toast.current.show({
 				severity: "success",
 				summary: "Comment Deleted 🎉",
@@ -104,6 +69,41 @@ export function Comment({ comment }) {
 			});
 		}
 	};
+	const items = [
+		...(user.id === comment?.author?.id
+			? [
+					{
+						label: "Edit Post",
+						className: "border-round-md m-1",
+						icon: "pi pi-file-edit",
+						command: handleUpdateComment,
+					},
+			  ]
+			: []),
+		...(user.id === comment?.author?.id
+			? [
+					{
+						label: "Delete Post",
+						className: "border-round-md m-1",
+						style: { backgroundColor: "rgb(247 53 53 / 76%)" },
+						icon: "pi pi-trash",
+						command: () => {
+							confirmDialog({
+								tagKey: `delete-comment-dialog-${comment.id}`,
+								message: "Do you want to delete this comment?",
+								header: "Delete Confirmation",
+								icon: "pi pi-info-circle",
+								defaultFocus: "reject",
+								acceptClassName: "p-button-danger",
+								accept: handleDeleteComment,
+								reject: () => {},
+							});
+						},
+					},
+			  ]
+			: []),
+	];
+
 
 	return (
 		<div className="flex gap-2">

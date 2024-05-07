@@ -8,7 +8,7 @@ const { commentSchema } = require("@validations/commentSchema");
 
 router.route("/").post( createComment).get(getAllComments);
 
-// router.route("/:commentId").get().delete(deleteComment).put(updateComment);
+router.route("/:commentId").delete(deleteComment).put(updateComment);
 
 // router.route("/:commentId/likeDislike").post(likeDislikeComment);
 // router.route("/:commentId/likers").get(getCommentLikers);

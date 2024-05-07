@@ -40,7 +40,7 @@ export const commentApi = api.enhanceEndpoints({ addTagTypes: ["Comment"] }).inj
 				url: `posts/${postId}/comments/${commentId}`,
 				method: "DELETE",
 			}),
-			invalidatesTags: (result, error, id) => [{ type: "Comment", id }],
+			invalidatesTags: (result, error, { postId, commentId }) => [{ type: "Comment", commentId }],
 		}),
 		likeDislikeComment: builder.mutation({
 			query: ({ postId, commentId }) => ({

@@ -117,8 +117,8 @@ const deleteComment = asyncWrapper(async (req, res) => {
 		return res.status(403).json({ message: "User is not authorized to delete this comment" });
 	}
 
-	// Delete the comment
-	await comment.remove();
+	// Find the post by ID and delete it
+	await Comment.findByIdAndDelete(commentId);
 
 	res.status(200).json({ message: "Comment Deleted  successfully" });
 });

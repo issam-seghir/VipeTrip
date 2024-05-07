@@ -1,16 +1,21 @@
-import { useDeleteCommentMutation, useLikeDislikeCommentMutation } from "@jsx/store/api/commentApi";
+import {
+	useDeleteCommentMutation,
+	useLikeDislikeCommentMutation,
+	useUpdateCommentMutation,
+} from "@jsx/store/api/commentApi";
 import { toTitleCase } from "@jsx/utils";
 import { selectCurrentUser } from "@store/slices/authSlice";
+import { format, formatDistanceToNow } from "date-fns";
+import numeral from "numeral";
 import { Avatar } from "primereact/avatar";
 import { Button } from "primereact/button";
+import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
+import { Menu } from "primereact/menu";
+import { Tooltip } from "primereact/tooltip";
 import { useRef, useState } from "react";
 import "react-lazy-load-image-component/src/effects/blur.css";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { format, formatDistanceToNow } from "date-fns";
-import { Tooltip } from "primereact/tooltip";
-import numeral from "numeral";
-import { Menu } from "primereact/menu";
 
 export function Comment({ comment }) {
 	const navigate = useNavigate();
@@ -24,6 +29,81 @@ export function Comment({ comment }) {
 	const shareOverlay = useRef(null);
 	const [likeDislikeComment, likeDislikeCommentResult] = useLikeDislikeCommentMutation();
 	const [deleteComment, deleteCommentResult] = useDeleteCommentMutation();
+	const [updateComment, updateCommentResult] = useUpdateCommentMutation();
+
+	const items = [
+		...(user.id === comment?.author?.id
+			? [
+					{
+						label: "Edit Post",
+						className: "border-round-md m-1",
+						icon: "pi pi-file-edit",
+						command: handleUpdateComment,
+					},
+			  ]
+			: []),
+		...(user.id === comment?.author?.id
+			? [
+					{
+						label: "Delete Post",
+						className: "border-round-md m-1",
+						style: { backgroundColor: "rgb(247 53 53 / 76%)" },
+						icon: "pi pi-trash",
+						command: () => {
+							confirmDialog({
+								tagKey: `delete-comment-dialog-${comment.id}`,
+								message: "Do you want to delete this comment?",
+								header: "Delete Confirmation",
+								icon: "pi pi-info-circle",
+								defaultFocus: "reject",
+								acceptClassName: "p-button-danger",
+								accept: handleDeleteComment,
+								reject: () => {},
+							});
+						},
+					},
+			  ]
+			: []),
+	];
+
+	const handleUpdateComment = async (data) => {
+		try {
+			await updateComment({ postId: comment?.post, commentId: comment?.id ,data}).unwrap();
+			toast.current.show({
+				severity: "success",
+				summary: "Comment Deleted 🎉",
+				detail: "Your Comment has been deleted successfully",
+				life: 3000,
+			});
+		} catch (error) {
+			console.log(error);
+			toast.current.show({
+				severity: "error",
+				summary: "Error",
+				detail: error?.data?.message || "Failed to delete Comment",
+				life: 3000,
+			});
+		}
+	};
+	const handleDeleteComment = async () => {
+		try {
+			await deleteComment({ postId: comment?.post, commentId: comment?.id }).unwrap();
+			toast.current.show({
+				severity: "success",
+				summary: "Comment Deleted 🎉",
+				detail: "Your Comment has been deleted successfully",
+				life: 3000,
+			});
+		} catch (error) {
+			console.log(error);
+			toast.current.show({
+				severity: "error",
+				summary: "Error",
+				detail: error?.data?.message || "Failed to delete Comment",
+				life: 3000,
+			});
+		}
+	};
 
 	return (
 		<div className="flex gap-2">
@@ -38,45 +118,55 @@ export function Comment({ comment }) {
 			/>
 			<div className="flex flex-column gap-1 ">
 				<div className="flex flex-column p-2  border-1 border-round border-200  align-items-start">
-					<div className="flex align-items-center gap-2">
+					<div className="flex w-full align-items-center gap-2">
 						<div
 							onKeyDown={() => {}}
 							onClick={() => navigate(`/profile/${comment?.author?.id}`)}
 							tabIndex={0}
 							role="button"
-							className="font-bold p-1  text-sm cursor-pointer hover:text-primary-500"
+							className="font-bold flex-1 p-1text-sm cursor-pointer hover:text-primary-500"
 						>
 							{toTitleCase(comment?.author?.fullName)}
+							{comment?.edited && (
+								<>
+									<i className={`pi edited-tooltip-${comment?.id} pi-pencil`}></i>
+									<Tooltip
+										key={comment?.id}
+										target={`.edited-tooltip-${comment?.id}`}
+										content={`edited : ${formatDistanceToNow(new Date(comment?.updatedAt), {
+											addSuffix: true,
+										})}`}
+										position="bottom"
+									/>
+								</>
+							)}
 						</div>
-						{comment?.edited && (
+						<ConfirmDialog
+							tagKey={`delete-comment-dialog-${comment?.id}`}
+							id={`delete-comment-dialog-${comment?.id}`}
+							key={comment?.id}
+						/>
+						{user.id === comment?.author?.id && (
 							<>
-								<i className={`pi edited-tooltip-${comment?.id} pi-pencil`}></i>
-								<Tooltip
-									key={comment?.id}
-									target={`.edited-tooltip-${comment?.id}`}
-									content={`edited : ${formatDistanceToNow(new Date(comment?.updatedAt), {
-										addSuffix: true,
-									})}`}
-									position="bottom"
+								<Menu
+									model={items}
+									popup
+									popupAlignment="right"
+									className="surface-card "
+									closeOnEscape
+									ref={optionsMenu}
+									id="popup_menu_right"
+								/>
+								<Button
+									icon="pi pi-ellipsis-h"
+									className="p-button-text p-2 "
+									style={{ width: "1.5rem", height: "1.5rem" }}
+									aria-controls="popup_menu_right"
+									aria-haspopup
+									onClick={(event) => optionsMenu.current.toggle(event)}
 								/>
 							</>
 						)}
-						<Menu
-							// model={items}
-							popup
-							popupAlignment="right"
-							className="surface-card"
-							closeOnEscape
-							ref={optionsMenu}
-							id="popup_menu_right"
-						/>
-						<Button
-							icon="pi pi-ellipsis-h"
-							className="p-button-text w-fit h-fit p-2"
-							aria-controls="popup_menu_right"
-							aria-haspopup
-							onClick={(event) => optionsMenu.current.toggle(event)}
-						/>
 					</div>
 					<div className="flex-inline p-1">
 						{isDescriptionExpanded ? comment?.description : comment?.description.slice(0, 100)}

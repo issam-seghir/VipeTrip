@@ -19,25 +19,17 @@ export const commentApi = api.enhanceEndpoints({ addTagTypes: ["Comment"] }).inj
 			transformResponse: (response) => response.data,
 			providesTags: (result, error, id) => [{ type: "Comment", id }],
 		}),
-		getCommentLikers: builder.query({
-			query: ({ postId, commentId }) => ({
-				url: `posts/${postId}/comments/${commentId}/likers`,
-				method: "GET",
-			}),
-			transformResponse: (response) => response.data,
-			providesTags: (result, error, id) => [{ type: "Comment", id }],
-		}),
 		createComment: builder.mutation({
 			query: ({ postId, data }) => ({
 				url: `posts/${postId}/comments`,
 				method: "POST",
-				body :data,
+				body: data,
 			}),
 			invalidatesTags: [{ type: "Comment", id: "LIST" }],
 		}),
 		updateComment: builder.mutation({
-			query: ({ id, data }) => ({
-				url: `posts/${id}/comments/${id}`,
+			query: ({ postId, commentId, data }) => ({
+				url: `posts/${postId}/comments/${commentId}`,
 				method: "PUT",
 				body: data,
 			}),
@@ -86,6 +78,5 @@ export const {
 	useDeleteCommentMutation,
 	useGetAllCommentsQuery,
 	useGetCommentQuery,
-	useGetCommentLikersQuery,
 	useLikeDislikeCommentMutation,
 } = commentApi;

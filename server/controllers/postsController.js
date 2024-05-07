@@ -276,10 +276,24 @@ const repostPost = asyncWrapper(async (req, res) => {
 		author: userId,
 		privacy: originalPost.privacy,
 		description: originalPost.description,
-		images: originalPost.images,
+		images: [], // Initialize images as an empty array
 		mentions: originalPost.mentions,
 		tags: originalPost.tags,
 		sharedFrom: originalPost._id,
+	});
+
+	// Copy original images
+	originalPost?.images.forEach((image) => {
+		const originalImagePath = path.join(process.cwd(), "public", image);
+		const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+		 const newImageName = `shared-${uniqueSuffix}${path.extname(image)}`;;
+		const newImagePath = path.join(process.cwd(), "public/posts", newImageName);
+		 try {
+				fs.copyFileSync(originalImagePath, newImagePath);
+				sharedPost.images.push(path.join("posts", newImageName));
+			} catch (err) {
+				console.error(`Failed to copy image ${originalImagePath}: `, err);
+			}
 	});
 
 	await sharedPost.save();

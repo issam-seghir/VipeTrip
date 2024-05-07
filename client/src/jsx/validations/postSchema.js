@@ -43,3 +43,9 @@ export const createPostSchema = z.object({
 /**
  * @typedef {z.infer<typeof createPostSchema>} createPostSchemadBody
  */
+
+
+export const commentSchema = createPostSchema.pick({ description: true, mentions: true });
+/**
+ * @typedef {z.infer<typeof commentSchema>} commentBody
+ */

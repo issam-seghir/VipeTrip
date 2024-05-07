@@ -255,6 +255,55 @@ const getSinglePost = asyncWrapper(async (req, res) => {
 		return res.status(404).json({ message: "Post not found" });
 	}
 
+	const user = await User.findById(req.user.id);
+
+	// Get the IDs of the posts that the user has liked
+	const userLikes = await Like.find({ liker: user.id, type: "Post" });
+	const likedPostIds = new Set(userLikes.map((like) => like.likedPost._id.toString()));
+
+	// Get the IDs of the posts that the user has bookmarked
+	const bookmarkedPostIds = new Set(user.bookmarkedPosts.map((post) => post._id.toString()));
+	post.likedByUser = likedPostIds.has(post._id.toString()); // Set the likedByUser virtual property
+	post.bookmarkedByUser = bookmarkedPostIds.has(post._id.toString()); // Set the bookmarkedByUser virtual property
+	// Fetch three random likers
+	const likes = await Like.aggregate([
+		{ $match: { likedPost: post._id, type: "Post" } },
+		{ $sample: { size: 3 } },
+		{
+			$lookup: {
+				from: "users",
+				localField: "liker",
+				foreignField: "_id",
+				as: "liker",
+			},
+		},
+		{ $unwind: "$liker" },
+		{
+			$project: {
+				password: 0,
+				email: 0,
+				rememberMe: 0,
+				"socialAccounts.accessToken": 0,
+				refreshToken: 0,
+
+				// ...
+			},
+		},
+	]);
+	post.firstThreeLikers = likes.map((like) => {
+		// Transform the liker document
+		const liker = like.liker;
+		liker.id = liker._id;
+		delete liker._id;
+		delete liker.__v;
+		delete liker.password;
+		delete liker.socialAccounts.accessToken;
+		delete liker.refreshToken;
+		delete liker.rememberMe;
+		delete liker.email;
+		return liker;
+	});
+
 	res.status(201).json({ message: "Get SIngle Post successfully", data: post });
 });
 

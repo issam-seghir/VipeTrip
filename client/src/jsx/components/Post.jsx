@@ -39,8 +39,8 @@ import { OverlayPanel } from "primereact/overlaypanel";
 import { Toast } from "primereact/toast";
 import { classNames } from "primereact/utils";
 import { useDispatch, useSelector } from "react-redux";
-
-export function Post({ post,setShowDialog }) {
+import { Dialog } from "primereact/dialog";
+export function Post({ post, setShowDialog, setShowCommentDialog }) {
 	const navigate = useNavigate();
 	const toast = useRef(null);
 	const optionsMenu = useRef(null);
@@ -270,8 +270,8 @@ export function Post({ post,setShowDialog }) {
 
 				<Toast ref={toast} />
 				<ConfirmDialog
-					tagKey={`delete-post-dialog-${post.id}`}
-					id={`delete-post-dialog-${post.id}`}
+					tagKey={`delete-post-dialog-${post?.id}`}
+					id={`delete-post-dialog-${post?.id}`}
 					key={post?.id}
 				/>
 				{/* Post header  */}
@@ -297,11 +297,11 @@ export function Post({ post,setShowDialog }) {
 								{toTitleCase(post?.author?.fullName)}
 							</div>
 							<div className={`text-xs text-400 flex gap-2`}>
-								<div className={`createData-tooltip-${post.id} `}>
+								<div className={`createData-tooltip-${post?.id} `}>
 									{formatDistanceToNow(new Date(post?.createdAt), { addSuffix: true })}
 									<Tooltip
-										key={post.id}
-										target={`.createData-tooltip-${post.id}`}
+										key={post?.id}
+										target={`.createData-tooltip-${post?.id}`}
 										content={format(new Date(post?.createdAt), "EEEE, MMMM d, yyyy, h:mm a")}
 										position="bottom"
 									/>
@@ -309,42 +309,42 @@ export function Post({ post,setShowDialog }) {
 								{post?.privacy === "onlyMe" && (
 									<>
 										<Tooltip
-											key={post.id}
-											target={`.privacy-tooltip-${post.id}`}
+											key={post?.id}
+											target={`.privacy-tooltip-${post?.id}`}
 											content={"private"}
 											position="bottom"
 										/>
-										<i className={`pi pi-lock privacy-tooltip-${post.id}`}></i>
+										<i className={`pi pi-lock privacy-tooltip-${post?.id}`}></i>
 									</>
 								)}
 								{post?.privacy === "friends" && (
 									<>
 										<Tooltip
-											key={post.id}
-											target={`.privacy-tooltip-${post.id}`}
+											key={post?.id}
+											target={`.privacy-tooltip-${post?.id}`}
 											content={"shard with friends only"}
 											position="bottom"
 										/>
-										<i className={`pi pi-users privacy-tooltip-${post.id}`}></i>
+										<i className={`pi pi-users privacy-tooltip-${post?.id}`}></i>
 									</>
 								)}
 								{post?.privacy === "public" && (
 									<>
 										<Tooltip
-											key={post.id}
-											target={`.privacy-tooltip-${post.id}`}
+											key={post?.id}
+											target={`.privacy-tooltip-${post?.id}`}
 											content={"public"}
 											position="bottom"
 										/>
-										<i className={`pi pi-globe privacy-tooltip-${post.id}`}></i>
+										<i className={`pi pi-globe privacy-tooltip-${post?.id}`}></i>
 									</>
 								)}
 								{post?.edited && (
 									<>
-										<i className={`pi edited-tooltip-${post.id} pi-pencil`}></i>
+										<i className={`pi edited-tooltip-${post?.id} pi-pencil`}></i>
 										<Tooltip
-											key={post.id}
-											target={`.edited-tooltip-${post.id}`}
+											key={post?.id}
+											target={`.edited-tooltip-${post?.id}`}
 											content={`edited : ${formatDistanceToNow(new Date(post?.updatedAt), {
 												addSuffix: true,
 											})}`}
@@ -420,7 +420,7 @@ export function Post({ post,setShowDialog }) {
 							icon="pi pi-comment"
 							className="p-button-text shadow-none border-none"
 							onClick={() => {
-								/* Handle comment action here */
+								setShowCommentDialog({ open: true, id: post?.id });
 							}}
 						/>
 						<Button
@@ -462,7 +462,7 @@ export function Post({ post,setShowDialog }) {
 									<LinkedinShareButton
 										url={shareUrl}
 										title={title}
-										summary={post.description}
+										summary={post?.description}
 										source={clientUrl}
 									>
 										<Button icon="pi pi-linkedin" className="p-button-text" />
@@ -484,15 +484,15 @@ export function Post({ post,setShowDialog }) {
 											className="p-button-text"
 										/>
 									</PocketShareButton>
-									<InstapaperShareButton url={shareUrl} title={title} description={post.description}>
+									<InstapaperShareButton url={shareUrl} title={title} description={post?.description}>
 										<Button
 											icon={<Icon icon="cib:instapaper" width="16" height="16" />}
 											className="p-button-text"
 										/>
 									</InstapaperShareButton>
 									<EmailShareButton
-										subject={post.title}
-										body={`Check out this post: ${post.title}`}
+										subject={post?.title}
+										body={`Check out this post: ${post?.title}`}
 										url={shareUrl}
 									>
 										<Button

@@ -3,7 +3,6 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const Post = mongoose.model("Post");
 
-
 const commentSchema = new Schema(
 	{
 		author: {
@@ -49,11 +48,9 @@ const commentSchema = new Schema(
 	{ timestamps: true }
 );
 
-
 //? --------- virtual (set / get) methods ----------------
 
 commentSchema.virtual("likedByUser");
-
 
 //? --------- Middlewares ----------------
 
@@ -66,12 +63,10 @@ commentSchema.post("save", async function (doc) {
 	}
 });
 
-
 // Middleware to decrements totalComments in Post  when user add Comment to a Post
 
 commentSchema.post("deleteOne", async function (doc) {
 	await Post.findByIdAndUpdate(doc.post, { $inc: { totalComments: -1 } });
 });
-
 
 module.exports = mongoose.model("Comment", commentSchema);

@@ -1,23 +1,24 @@
+import { Post } from "@components/Post";
 import { isDev } from "@data/constants";
 import { DevTool } from "@hookform/devtools";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Icon } from "@iconify/react";
+import { Comments } from "@jsx/components/Comments";
 import { EmojiPickerOverlay } from "@jsx/components/EmojiPickerOverlay";
-import { useCreateCommentMutation, useGetCommentQuery, useUpdateCommentMutation } from "@jsx/store/api/commentApi";
+import { useCreateCommentMutation, useUpdateCommentMutation } from "@jsx/store/api/commentApi";
+import { useGetPostQuery } from "@jsx/store/api/postApi";
 import { selectCurrentUser } from "@store/slices/authSlice";
 import { useDebounce } from "@uidotdev/usehooks";
 import { commentSchema } from "@validations/postSchema";
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
-import { Divider } from "primereact/divider";
+import { Skeleton } from "primereact/skeleton";
 import { Toast } from "primereact/toast";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { Post } from "@components/Post";
-import {  useGetPostQuery } from "@jsx/store/api/postApi";
-import { Skeleton } from "primereact/skeleton";
+import { PFormMentionTagTextArea } from "./Form/PFormMentionTagTextArea";
 
 export function PostCommentsDialog({ showDialog, setShowDialog }) {
 	const navigate = useNavigate();
@@ -37,20 +38,19 @@ export function PostCommentsDialog({ showDialog, setShowDialog }) {
 	// } = useGetCommentQuery(showDialog?.id, {
 	// 	skip: !showDialog.id,
 	// });
-    	const {
-			data: post,
-			isFetching,
-			isLoading,
-			isSuccess,
-			isError,
-			error,
-		} = useGetPostQuery(showDialog?.id, {
-			skip: !showDialog.id,
-		});
+	const {
+		data: post,
+		isFetching,
+		isLoading,
+		isSuccess,
+		isError,
+		error,
+	} = useGetPostQuery(showDialog?.id, {
+		skip: !showDialog.id,
+	});
 	const isUpdate = Boolean(showDialog?.id);
 	console.log(showDialog);
 	console.log(post);
-
 
 	const {
 		handleSubmit,
@@ -67,10 +67,10 @@ export function PostCommentsDialog({ showDialog, setShowDialog }) {
 	});
 
 	useEffect(() => {
-			reset({
-				description: "",
-				mentions: [],
-			});
+		reset({
+			description: "",
+			mentions: [],
+		});
 	}, [post, reset]);
 	const errorMessage = createCommentResult?.isError ? createCommentResult?.error : errorsForm;
 
@@ -120,9 +120,8 @@ export function PostCommentsDialog({ showDialog, setShowDialog }) {
 		}
 	}
 
-
 	const onSubmit = (data) => {
-			handleCreateComment(data);
+		handleCreateComment(data);
 	};
 
 	const description = watch("description");
@@ -152,21 +151,21 @@ export function PostCommentsDialog({ showDialog, setShowDialog }) {
 	const handleEmojiOpen = (e) => {
 		emojiPicker.current.toggle(e);
 	};
-    
-if (isLoading || isFetching) {
-	return (
-		<div>
-			<div className="flex items-center justify-center">
-				<div className="m-4">
-					<Skeleton shape="rect" width="100%" height="100px" />
-					<Skeleton shape="text" width="100%" />
-					<Skeleton shape="text" width="100%" />
-					<Skeleton shape="text" width="100%" />
+
+	if (isLoading || isFetching) {
+		return (
+			<div>
+				<div className="flex items-center justify-center">
+					<div className="m-4">
+						<Skeleton shape="rect" width="100%" height="100px" />
+						<Skeleton shape="text" width="100%" />
+						<Skeleton shape="text" width="100%" />
+						<Skeleton shape="text" width="100%" />
+					</div>
 				</div>
 			</div>
-		</div>
-	);
-}
+		);
+	}
 	return (
 		<>
 			{/* react hook form dev tool  */}
@@ -175,7 +174,7 @@ if (isLoading || isFetching) {
 			{/* Create New Post Form Dialog */}
 			<Dialog
 				key={`${showDialog?.id}`}
-				header={<h2 className="text-center">{`${user.fullName}'s Post`}</h2>}
+				header={<h2 className="text-center">{`${user.firstName}'s Post`}</h2>}
 				visible={showDialog.open}
 				style={{ width: "40%" }}
 				contentClassName="py-0"
@@ -187,31 +186,47 @@ if (isLoading || isFetching) {
 				dismissableMask={!isSubmitting && !createCommentResult?.isLoading}
 				closeOnEscape={!isSubmitting && !createCommentResult?.isLoading}
 				footer={
-					<form onSubmit={handleSubmit(onSubmit)}>
-						{/* Creat Comment Form */}
-						<div className="flex m-2 gap-2">
-							<Button
-								label="Emoji"
-								icon={<Icon icon="uil:smile" className="pi p-button-icon-left" />}
-								iconPos="left"
-								className="p-button-text"
-								onClick={handleEmojiOpen}
-							/>
-							<EmojiPickerOverlay ref={emojiPicker} handleEmojiClick={handleEmojiClick} />
-						</div>
-						<Divider />
-						<Button
-							type="submit"
-							label={createCommentResult?.isLoading ? "Creatting..." : "Post"}
-							className="w-full"
-							iconPos="right"
-							loading={isSubmitting || createCommentResult?.isLoading}
-							onClick={handleSubmit(onSubmit)}
+					<form
+						onSubmit={handleSubmit(onSubmit)}
+						className="border-1 border-100 border-round surface-ground p-2"
+					>
+						<PFormMentionTagTextArea
+							name="description"
+							control={control}
+							descriptionRef={descriptionCommentRef}
+							setCursorPosition={setCursorPosition}
+							className="flex mb-2"
+							inputClassName="w-full border-none surface-ground shadow-none"
+							placeholder="Write your thought ... @ for mentions"
+							autoResize={true}
+							autoFocus={true}
+							disabled={isSubmitting || createCommentResult?.isLoading || createCommentResult?.isLoading}
+							errorMessage={errorMessage}
 						/>
+						<div className="flex">
+							<div className="flex flex-1">
+								<Button
+									label="Emoji"
+									icon={<Icon icon="uil:smile" className="pi p-button-icon-left" />}
+									iconPos="left"
+									className="p-button-text"
+									onClick={handleEmojiOpen}
+								/>
+								<EmojiPickerOverlay ref={emojiPicker} handleEmojiClick={handleEmojiClick} />
+							</div>
+							<Button
+								type="submit"
+								label={createCommentResult?.isLoading ? "Creatting..." : "Post"}
+								iconPos="right"
+								loading={isSubmitting || createCommentResult?.isLoading}
+								onClick={handleSubmit(onSubmit)}
+							/>
+						</div>
 					</form>
 				}
 			>
 				<Post post={post} />
+				<Comments />
 			</Dialog>
 		</>
 	);

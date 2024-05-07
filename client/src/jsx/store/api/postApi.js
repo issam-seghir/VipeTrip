@@ -78,8 +78,17 @@ export const postApi = api.enhanceEndpoints({ addTagTypes: ["Post"] }).injectEnd
 						}
 					})
 				);
+
+				const patchResultGetPost = dispatch(
+					postApi.util.updateQueryData("getPost", id, (draft) => {
+						if (draft) {
+							draft.bookmarkedByUser = !draft.bookmarkedByUser;
+						}
+					})
+				);
 				queryFulfilled.catch(() => {
 					patchResult.undo();
+					patchResultGetPost.undo();
 				});
 			},
 		}),
@@ -105,14 +114,14 @@ export const postApi = api.enhanceEndpoints({ addTagTypes: ["Post"] }).injectEnd
 						}
 					})
 				);
-				// const patchResultGetPost = dispatch(
-				// 	postApi.util.updateQueryData("getPost", id, (draft) => {
-				// 		if (draft) {
-				// 			draft.likedByUser = !draft.likedByUser;
-				// 			draft.totalLikes += draft.likedByUser ? 1 : -1;
-				// 		}
-				// 	})
-				// );
+				const patchResultGetPost = dispatch(
+					postApi.util.updateQueryData("getPost", id, (draft) => {
+						if (draft) {
+							draft.likedByUser = !draft.likedByUser;
+							draft.totalLikes += draft.likedByUser ? 1 : -1;
+						}
+					})
+				);
 
 				queryFulfilled.catch(() => {
 					/**
@@ -121,7 +130,7 @@ export const postApi = api.enhanceEndpoints({ addTagTypes: ["Post"] }).injectEnd
 					 * dispatch(api.util.invalidateTags(['Post']))
 					 */
 					patchResult.undo();
-					// patchResultGetPost.undo();
+					patchResultGetPost.undo();
 				});
 			},
 		}),

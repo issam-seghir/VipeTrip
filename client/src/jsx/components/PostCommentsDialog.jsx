@@ -66,12 +66,7 @@ export function PostCommentsDialog({ showDialog, setShowDialog }) {
 		resolver: zodResolver(commentSchema),
 	});
 
-	useEffect(() => {
-		reset({
-			description: "",
-			mentions: [],
-		});
-	}, [post, reset]);
+
 	const errorMessage = createCommentResult?.isError ? createCommentResult?.error : errorsForm;
 
 	const getFormErrorMessage = (name) => {
@@ -98,10 +93,10 @@ export function PostCommentsDialog({ showDialog, setShowDialog }) {
 	async function handleCreateComment(data) {
 		try {
 			// Convert data to FormData
-			const res = await createComment(data).unwrap();
+			const res = await createComment({ postId: showDialog.id, data }).unwrap();
 			if (res) {
 				reset();
-				setShowDialog({ open: false, id: showDialog?.id });
+				// setShowDialog({ open: false, id: showDialog?.id });
 				toast.current.show({
 					severity: "success",
 					summary: "Comment Created 🎉",
@@ -126,7 +121,7 @@ export function PostCommentsDialog({ showDialog, setShowDialog }) {
 
 	const description = watch("description");
 	const debouncedDescription = useDebounce(description, 500); // Debounce the email input by 500ms
-
+console.log(description);
 	// Set mentions and tags from description input
 	useEffect(() => {
 		const mentions = debouncedDescription?.match(/@\w+/g) || [];
@@ -226,6 +221,7 @@ export function PostCommentsDialog({ showDialog, setShowDialog }) {
 								icon={"pi pi-send"}
 								className="p-button-text p-2"
 								iconPos="right"
+								disabled={!description}
 								loading={isSubmitting || createCommentResult?.isLoading}
 								onClick={handleSubmit(onSubmit)}
 							/>
@@ -234,7 +230,7 @@ export function PostCommentsDialog({ showDialog, setShowDialog }) {
 				}
 			>
 				<Post post={post} />
-				<Comments />
+				<Comments postId={post?.id} />
 			</Dialog>
 		</>
 	);

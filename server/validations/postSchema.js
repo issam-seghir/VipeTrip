@@ -2,7 +2,6 @@ const { z } = require("zod");
 const zu = require("zod_utilz");
 const { stringNonEmpty, ObjectIdSchema } = require("@/utils/zodUtils");
 
-
 //? -------- REGEX ---------
 const tagRegex = /^#?[\w-]+$/;
 
@@ -16,12 +15,9 @@ const createPostSchema = {
 		mentions: z.array(z.string()).max(50).default([]),
 		tags: z
 			.array(
-				z
-					.string()
-					.max(20)
-					.regex(tagRegex, {
-						message: "Tags can only contain letters, numbers, dashes (-), or underscores (_)",
-					})
+				z.string().max(20).regex(tagRegex, {
+					message: "Tags can only contain letters, numbers, dashes (-), or underscores (_)",
+				})
 			)
 			.max(10)
 			.default([]), // Limit the length of each tag to 20 characters and the number of tags to 10

@@ -1,30 +1,49 @@
 const Comment = require("@model/Comment");
 const User = require("@model/User");
 const Post = require("@model/Post");
+const Like = require("@model/Like");
 
-// Create Comment
-const createComment = async (req, res) => {
-	try {
-		const { userId, postId, description, mentions } = req.body;
-		const user = await User.findById(userId);
-		const post = await Post.findById(postId);
-		if (!user || !post) {
-			return res.status(404).json({ message: "User or Post not found" });
-		}
+const { asyncWrapper } = require("@middleware/asyncWrapper");
 
-		const newComment = new Comment({
-			userId,
-			postId,
-			description,
-			mentions,
-		});
-		await newComment.save();
+/**
+ * @typedef {import('@validations/commentSchema').commentSchemaBody} commentSchemaBody
+ */
 
-		res.status(201).json(newComment);
-	} catch (error) {
-		res.status(500).json({ message: error.message });
+const createComment = asyncWrapper(async (req, res) => {
+	/** @type {commentSchemaBody} */
+	const { description, mentions } = req.body;
+	const { postId } = req.params;
+
+	// Check if the user exists
+	const user = await User.findById(req.user.id);
+	if (!user) {
+		return res.status(404).json({ message: "User not found" });
 	}
-};
+	const post = await Post.findById(postId);
+	if (!post) {
+		return res.status(404).json({ message: "Post not found" });
+	}
+	post.totalComments += 1;
+	await post.save();
+
+	// Remove the '@' from each mention
+	const mentionNames = mentions.map((mention) => mention.replace("@", ""));
+	// Find all mentioned users by their firstName or lastName
+	const mentionedUsers = await User.find({ fullName: { $in: mentionNames } });
+	const mentionIds = mentionedUsers.map((user) => user.id);
+
+	const comment = new Comment({
+		author: req.user.id,
+		post: postId,
+		description,
+		replies: [],
+		mentions: mentionIds, // Store ObjectId of mentioned users
+	});
+
+	await comment.save();
+
+	res.status(201).json({ message: "Post Created  successfully", data: comment });
+});
 
 // Add Reply to Comment
 const addReplyToComment = async (req, res) => {
@@ -46,16 +65,28 @@ const addReplyToComment = async (req, res) => {
 };
 
 // Get All Comments for a Post
-const getAllComments = async (req, res) => {
-	try {
-		const { postId } = req.params;
-		const comments = await Comment.find({ postId }).populate("userId").populate("replies");
+const getAllComments = asyncWrapper(async (req, res) => {
+	const { postId } = req.params;
 
-		res.json(comments);
-	} catch (error) {
-		res.status(500).json({ message: error.message });
-	}
-};
+	const user = await User.findById(req.user.id);
+
+	// Get the IDs of the posts that the user has liked
+	const userLikes = await Like.find({ liker: user.id, type: "Comment" });
+	const likedCommentsIds = new Set(userLikes.map((like) => like.likedComment._id.toString()));
+
+	let comments = await Comment.find({ post: postId }).populate("author").populate("replies");
+
+  comments = await Promise.all(
+		comments.map(async (comment) => {
+			comment.likedByUser = likedCommentsIds.has(comment._id.toString()); // Set the likedByUser virtual property
+			return comment;
+		})
+  );
+
+
+	res.status(201).json({ message: "get All comments", data: comments });
+
+});
 
 // Update Comment
 const updateComment = async (req, res) => {
@@ -94,9 +125,9 @@ const deleteComment = async (req, res) => {
 };
 
 module.exports = {
-    createComment,
-    addReplyToComment,
-    getAllComments,
-    updateComment,
+	createComment,
+	addReplyToComment,
+	getAllComments,
+	updateComment,
 	deleteComment,
 };

@@ -5,8 +5,8 @@ import { Toast } from "primereact/toast";
 import { useRef } from "react";
 import { Comment } from "./Comment";
 
-export function Comments() {
-	const { data: comments, error, isLoading, isFetching, isError } = useGetAllCommentsQuery();
+export function Comments({postId}) {
+	const { data: comments, error, isLoading, isFetching, isError } = useGetAllCommentsQuery(postId );
     const toast = useRef(null);
 	if (isLoading) {
 		return (
@@ -76,14 +76,10 @@ export function Comments() {
 	}
 
 	return (
-		<div className={classNames("bg-red", isFetching)}>
+		<div className={(classNames("bg-red", isFetching), "p-3 my-4   ")}>
 			<Toast ref={toast} />
 			{comments.map((comment) => (
-				<Comment
-					id={comment?.id}
-					key={comment?.id}
-					comment={comment}
-				/>
+				<Comment id={comment?.id} key={comment?.id} comment={comment} />
 			))}
 			<div id="scroll-anchor" />
 			{/* {isFetchingNextPage && "Loading more..."} */}

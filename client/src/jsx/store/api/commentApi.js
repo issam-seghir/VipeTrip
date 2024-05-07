@@ -4,7 +4,7 @@ import { current } from "immer";
 export const commentApi = api.enhanceEndpoints({ addTagTypes: ["Comment"] }).injectEndpoints({
 	endpoints: (builder) => ({
 		getAllComments: builder.query({
-			query: () => "comments",
+			query: (postId) => `posts/${postId}/comments`,
 			transformResponse: (response) => response.data,
 			providesTags: (result) =>
 				result
@@ -12,57 +12,57 @@ export const commentApi = api.enhanceEndpoints({ addTagTypes: ["Comment"] }).inj
 					: [{ type: "Comment", id: "LIST" }],
 		}),
 		getComment: builder.query({
-			query: (id) => ({
-				url: `comments/${id}`,
+			query: ({ postId, commentId }) => ({
+				url: `posts/${postId}/comments/${commentId}`,
 				method: "GET",
 			}),
 			transformResponse: (response) => response.data,
 			providesTags: (result, error, id) => [{ type: "Comment", id }],
 		}),
 		getCommentLikers: builder.query({
-			query: (id) => ({
-				url: `comments/${id}/likers`,
+			query: ({ postId, commentId }) => ({
+				url: `posts/${postId}/comments/${commentId}/likers`,
 				method: "GET",
 			}),
 			transformResponse: (response) => response.data,
 			providesTags: (result, error, id) => [{ type: "Comment", id }],
 		}),
 		createComment: builder.mutation({
-			query: (body) => ({
-				url: `comments`,
+			query: ({ postId, data }) => ({
+				url: `posts/${postId}/comments`,
 				method: "POST",
-				body,
+				body :data,
 			}),
 			invalidatesTags: [{ type: "Comment", id: "LIST" }],
 		}),
 		updateComment: builder.mutation({
 			query: ({ id, data }) => ({
-				url: `comments/${id}`,
+				url: `posts/${id}/comments/${id}`,
 				method: "PUT",
 				body: data,
 			}),
 			invalidatesTags: (result, error, { id }) => [{ type: "Comment", id }],
 		}),
 		deleteComment: builder.mutation({
-			query: (id) => ({
-				url: `comments/${id}`,
+			query: ({ postId, commentId }) => ({
+				url: `posts/${postId}/comments/${commentId}`,
 				method: "DELETE",
 			}),
 			invalidatesTags: (result, error, id) => [{ type: "Comment", id }],
 		}),
 		likeDislikeComment: builder.mutation({
-			query: (id) => ({
-				url: `comments/${id}/likeDislike`,
+			query: ({ postId, commentId }) => ({
+				url: `posts/${postId}/comments/${commentId}/likeDislike`,
 				method: "Comment",
 			}),
 			// Optimistique update like button state
-			onQueryStarted: (id, { dispatch, queryFulfilled }) => {
+			onQueryStarted: ({ postId, commentId }, { dispatch, queryFulfilled }) => {
 				console.log("Mutation started : Optimistique update for like button");
 				const patchResult = dispatch(
-					commentApi.util.updateQueryData("getAllComments", undefined, (draft) => {
+					commentApi.util.updateQueryData("getAllComments", postId, (draft) => {
 						console.log(current(draft));
 						try {
-							const comment = draft.find((comment) => comment.id === id);
+							const comment = draft.find((comment) => comment.id === commentId);
 							if (comment) {
 								comment.likedByUser = !comment.likedByUser;
 								comment.totalLikes += comment.likedByUser ? 1 : -1;

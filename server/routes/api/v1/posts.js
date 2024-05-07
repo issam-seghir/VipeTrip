@@ -1,6 +1,8 @@
 const express = require("express");
-
 const router = express.Router();
+const commentsRouter = require("./comments");
+
+
 const {
 	getAllPosts,
 	getUserPosts,
@@ -17,6 +19,7 @@ const multerErrorHandler = require("@/middleware/multer/multerErrorHandler");
 const { uploadPost } = require("@/middleware/multer/multerUploader");
 const validate = require("express-zod-safe");
 const { createPostSchema } = require("@validations/postSchema");
+const { createComment, getAllComments, deleteComment, updateComment } = require("@/controllers/commentController");
 
 router
 	.route("/")
@@ -32,5 +35,8 @@ router.route("/:postId/repost").post(repostPost);
 router.route("/:postId/likeDislike").post(likeDislikePost);
 router.route("/:postId/likers").get(getPostLikers);
 router.route("/:postId/bookmark").post(bookmarkPost);
+
+// comments
+router.use('/:postId/comments', commentsRouter); // Use the comments router as middleware
 
 module.exports = router;

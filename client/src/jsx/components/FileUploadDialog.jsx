@@ -14,6 +14,7 @@ import { Controller } from "react-hook-form";
 export function FileUploadDialog({
 	control,
 	images,
+	existingImages =[],
 	resetField,
 	onPhotoRemove,
 	showFileUploadDialog,
@@ -21,6 +22,7 @@ export function FileUploadDialog({
 }) {
 	const toast = useRef(null);
 
+	const NEW_MAX_FILES = MAX_FILES - existingImages.length;
 	const onTemplateRemove = (file, callback) => {
 		onPhotoRemove(file);
 		callback();
@@ -43,7 +45,7 @@ export function FileUploadDialog({
 				{cancelButton}
 				<div className="flex align-items-center gap-3 ml-auto">
 					<span>
-						{images?.length || 0} / {MAX_FILES}
+						{images?.length || 0} / {NEW_MAX_FILES}
 					</span>
 				</div>
 			</div>
@@ -160,16 +162,16 @@ export function FileUploadDialog({
 								(file) => !value.some((selectedFile) => selectedFile.name === file.name)
 							);
 
-							if (value.length + newFiles.length > MAX_FILES) {
-								// Select only the first MAX_FILES - value.length files
-								const filesToSelect = newFiles.slice(0, MAX_FILES - value.length);
+							if (value.length + newFiles.length > NEW_MAX_FILES) {
+								// Select only the first NEW_MAX_FILES - value.length files
+								const filesToSelect = newFiles.slice(0, NEW_MAX_FILES - value.length);
 								onChange([...value, ...filesToSelect]);
 
 								toast.current.show({
 									severity: "error",
 									sticky: true,
 									summary: "Validation Error",
-									detail: `Maximum number of Photos exceeded. Limit is ${MAX_FILES}.`,
+									detail: `Maximum number of Photos exceeded. Limit is ${NEW_MAX_FILES}.`,
 								});
 							} else {
 								onChange([...value, ...newFiles]);

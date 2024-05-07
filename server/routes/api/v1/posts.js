@@ -14,15 +14,19 @@ const {
 	updatePost,
 } = require("@controllers/postsController");
 const multerErrorHandler = require("@/middleware/multer/multerErrorHandler");
-const { upload, uploadPost } = require("@/middleware/multer/multerUploader");
+const { uploadPost } = require("@/middleware/multer/multerUploader");
 const validate = require("express-zod-safe");
 const { createPostSchema } = require("@validations/postSchema");
 
 router
 	.route("/")
-	.post(uploadPost.array("images", 5), multerErrorHandler(upload), validate(createPostSchema), createPost);
+	.post(uploadPost.array("images", 5), multerErrorHandler(uploadPost), validate(createPostSchema), createPost);
 router.route("/").get(getAllPosts);
-router.route("/:postId").get(getSinglePost).delete(deletePost).put(updatePost);
+router
+	.route("/:postId")
+	.get(getSinglePost)
+	.delete(deletePost)
+	.put(uploadPost.array("images", 5), multerErrorHandler(uploadPost), updatePost);
 
 router.route("/:postId/repost").post(repostPost);
 router.route("/:postId/likeDislike").post(likeDislikePost);

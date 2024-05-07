@@ -36,7 +36,7 @@ export const postApi = api.enhanceEndpoints({ addTagTypes: ["Post"] }).injectEnd
 			invalidatesTags: [{ type: "Post", id: "LIST" }],
 		}),
 		updatePost: builder.mutation({
-			query: ({ id, ...data }) => ({
+			query: ({ id, data }) => ({
 				url: `posts/${id}`,
 				method: "PUT",
 				body: data,

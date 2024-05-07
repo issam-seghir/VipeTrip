@@ -46,7 +46,6 @@ const createPost = asyncWrapper(async (req, res) => {
 const deletePost = asyncWrapper(async (req, res, next) => {
 	const { postId } = req.params;
 	const userId = req?.user?.id;
-	console.log(process.cwd());
 	// Find the post by ID
 	const post = await Post.findById(postId);
 	const user = await User.findById(userId);
@@ -88,9 +87,11 @@ const deletePost = asyncWrapper(async (req, res, next) => {
 const updatePost = asyncWrapper(async (req, res, next) => {
 	const { postId } = req.params;
 	const userId = req.user.id;
-	const { description, mentions, tags, privacy } = req.body;
+	const { description, mentions, tags, privacy, existingImages = [] } = req.body;
 	const images = req?.files?.map((file) => file.path.replace("public\\", "")) || [];
 
+	console.log(images);
+	console.log(req.body);
 	// Check if the user exists
 	const user = await User.findById(req.user.id);
 	if (!user) {
@@ -107,17 +108,33 @@ const updatePost = asyncWrapper(async (req, res, next) => {
 		return next(new Error("You are not authorized to edit this post"));
 	}
 
-	// Define the update data
+	// Filter out images that will be  deleted from server
+	const deletedImages = post?.images.filter((img) => !existingImages.includes(img));
+	const keepedImages = post?.images.filter((img) => existingImages.includes(img));
+	const newImages = [...keepedImages, ...images];
+	// Delete the images
+	deletedImages.forEach((image) => {
+		const imagePath = path.join(process.cwd(), "public", image);
+		// eslint-disable-next-line security/detect-non-literal-fs-filename
+		fs.unlink(imagePath, (err) => {
+			if (err) {
+				console.error(`Failed to delete image ${image}:`, err);
+			}
+		});
+	});
+
+	// // Define the update data
 	const updateData = {
 		description: description || post.description,
+		edited: true,
 		mentions: mentions || post.mentions,
 		tags: tags || post.tags,
 		privacy: privacy || post.privacy,
-		images: images.length > 0 ? images : post.images,
+		images: newImages || post.images,
 	};
 	const updatedPost = await Post.findByIdAndUpdate(postId, updateData, { new: true });
 
-	res.status(200).json(updatedPost);
+	res.status(200).json({ message: "Post updated successfully", data: updatedPost });
 });
 
 const getAllPosts = asyncWrapper(async (req, res) => {
@@ -239,7 +256,6 @@ const getSinglePost = asyncWrapper(async (req, res) => {
 	}
 
 	res.status(201).json({ message: "Get SIngle Post successfully", data: post });
-
 });
 
 const repostPost = asyncWrapper(async (req, res) => {

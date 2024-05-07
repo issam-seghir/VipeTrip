@@ -1,11 +1,12 @@
-import React from 'react'
 import { Button } from "primereact/button";
+
 const serverUrl = import.meta.env.VITE_SERVER_URL;
 
-export  function PhotosPreview({ photos, onPhotoRemove }) {
+export function PhotosPreview({ photos = [], existingImages = [], onPhotoRemove, disabled = false }) {
+	const newPhotos = [...existingImages, ...photos];
 	return (
 		<div className="flex gap-2">
-			{photos.map((photo, index) => (
+			{newPhotos.map((photo, index) => (
 				<div key={index} className="relative cover w-8rem h-10rem">
 					<img
 						src={photo?.objectURL || `${serverUrl}/${photo}`}
@@ -13,6 +14,7 @@ export  function PhotosPreview({ photos, onPhotoRemove }) {
 						className=" border-round-md"
 					/>
 					<Button
+						disabled={disabled}
 						type="button"
 						icon="pi pi-times"
 						style={{ width: "1.75rem", height: "1.75rem" }}

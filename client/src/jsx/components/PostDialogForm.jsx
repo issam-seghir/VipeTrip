@@ -46,6 +46,7 @@ export function PostDialogForm({ showDialog, setShowDialog }) {
 		skip: !showDialog.id,
 	});
 	const isUpdate = Boolean(showDialog?.id);
+	const [existingImages, setExistingImages] = useState([]);
 
 	const {
 		handleSubmit,
@@ -62,24 +63,25 @@ export function PostDialogForm({ showDialog, setShowDialog }) {
 	});
 
 	useEffect(() => {
-		isUpdate && postToEdit
-			? reset(postToEdit)
-			: reset({
-					description: "",
-					privacy: "public",
-					mentions: [],
-					tags: [],
-					images: [],
-			  });
+		console.log(postToEdit);
+		if (isUpdate && postToEdit) {
+			const { images, ...postToEditWithoutImages } = postToEdit;
+			reset(postToEditWithoutImages);
+			setExistingImages(images);
+		} else {
+			reset({
+				description: "",
+				privacy: "public",
+				mentions: [],
+				tags: [],
+				images: [],
+			});
+			setExistingImages([]);
+		}
 	}, [isUpdate, postToEdit, reset]);
 	const errorUpdateMessage = updatePostResult?.isError ? updatePostResult?.error : errorsForm;
 	const errorCreateMessage = createPostResult?.isError ? createPostResult?.error : errorsForm;
 	const errorMessage = isUpdate ? errorUpdateMessage : errorCreateMessage;
-
-
-
-
-
 
 	const getFormErrorMessage = (name) => {
 		if (errorMessage[name]) {
@@ -129,10 +131,17 @@ export function PostDialogForm({ showDialog, setShowDialog }) {
 	}
 	async function handleUpdatePost(data) {
 		try {
+			const newData = { ...data, existingImages: existingImages };
+			console.log(newData);
 
 			// Convert data to FormData
-			const formData = convertModelToFormData(data);
-			const res = await updatePost( {id:postToEdit?.id, data : formData}).unwrap();
+			const formData = convertModelToFormData(newData);
+			// Log FormData
+			for (let pair of formData.entries()) {
+				console.log(pair[0] + ", " + pair[1]);
+			}
+
+			const res = await updatePost({ id: postToEdit?.id, data: formData }).unwrap();
 			if (res) {
 				reset();
 				setShowDialog({ open: false, id: postToEdit.id });
@@ -155,6 +164,7 @@ export function PostDialogForm({ showDialog, setShowDialog }) {
 	}
 
 	const onSubmit = (data) => {
+
 		if (isUpdate) {
 			handleUpdatePost(data);
 		} else {
@@ -166,7 +176,6 @@ export function PostDialogForm({ showDialog, setShowDialog }) {
 	const debouncedDescription = useDebounce(description, 500); // Debounce the email input by 500ms
 
 	const images = watch("images");
-
 	// Set mentions and tags from description input
 	useEffect(() => {
 		const mentions = debouncedDescription?.match(/@\w+/g) || [];
@@ -200,8 +209,15 @@ export function PostDialogForm({ showDialog, setShowDialog }) {
 	};
 
 	const onPhotoRemove = (photo) => {
-		const updatedPhotos = images.filter((image) => image.name !== photo.name);
-		setValue("images", updatedPhotos, { shouldValidate: true });
+		if (existingImages.length > 0 && existingImages.includes(photo)) {
+			// Remove image from existing images (server image path)
+			const updatedExistingImages = existingImages.filter((image) => image !== photo);
+			setExistingImages(updatedExistingImages);
+		} else {
+			// Remove image from images (client image object)
+			const updatedPhotos = images.filter((image) => image.name !== photo.name);
+			setValue("images", updatedPhotos, { shouldValidate: true });
+		}
 	};
 
 	const [showFileUploadDialog, setShowFileUploadDialog] = useState(false);
@@ -228,7 +244,10 @@ export function PostDialogForm({ showDialog, setShowDialog }) {
 				breakpoints={{ "960px": "75vw", "640px": "90vw" }}
 				onHide={() => {
 					setShowDialog({ open: false, id: isUpdate ? postToEdit?.id : null });
-					isUpdate && reset(); // Reset the form state
+					if (isUpdate) {
+						reset();
+						setExistingImages(postToEdit?.images);
+					} // Reset the form state
 				}}
 				draggable={false}
 				dismissableMask={!isSubmitting && !createPostResult?.isLoading && !updatePostResult?.isLoading}
@@ -247,6 +266,7 @@ export function PostDialogForm({ showDialog, setShowDialog }) {
 							<FileUploadDialog
 								control={control}
 								images={images}
+								existingImages={existingImages}
 								resetField={resetField}
 								onPhotoRemove={onPhotoRemove}
 								showFileUploadDialog={showFileUploadDialog}
@@ -335,7 +355,14 @@ export function PostDialogForm({ showDialog, setShowDialog }) {
 						{/* Photos Preview */}
 						{/* error label */}
 						{getFormErrorMessage("images")}
-						{images?.length > 0 && <PhotosPreview photos={images} onPhotoRemove={onPhotoRemove} />}
+						{(images?.length > 0 || existingImages?.length > 0) && (
+							<PhotosPreview
+								photos={images}
+								existingImages={existingImages}
+								onPhotoRemove={onPhotoRemove}
+								disabled={isSubmitting || createPostResult?.isLoading || updatePostResult?.isLoading}
+							/>
+						)}
 					</div>
 				</form>
 			</Dialog>

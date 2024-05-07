@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { format, formatDistanceToNow } from "date-fns";
 import { Tooltip } from "primereact/tooltip";
+import numeral from "numeral";
 
 export function Comment({ comment }) {
 	const navigate = useNavigate();
@@ -17,7 +18,7 @@ export function Comment({ comment }) {
 	const dispatch = useDispatch();
 
 	const user = useSelector(selectCurrentUser);
-	const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(true);
+	const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
 	const [likersDialog, setLikersDialog] = useState(false);
 	const shareOverlay = useRef(null);
 	const [likeDislikeComment, likeDislikeCommentResult] = useLikeDislikeCommentMutation();
@@ -28,13 +29,13 @@ export function Comment({ comment }) {
 			<Avatar
 				size="small"
 				icon="pi pi-user"
-				className="p-overlay"
+				className="p-overlay flex-shrink-0"
 				onClick={() => navigate(`/profile/${comment?.author?.id}`)}
 				image={comment?.author?.picturePath}
 				alt={comment?.author?.fullName}
 				shape="circle"
 			/>
-			<div className="flex flex-column gap-2">
+			<div className="flex flex-column gap-1 ">
 				<div className="flex flex-column p-2  border-1 border-round border-200  align-items-start">
 					<div className="flex align-items-center gap-2">
 						<div
@@ -72,8 +73,8 @@ export function Comment({ comment }) {
 						)}
 					</div>
 				</div>
-				<div className="flex align-items-start ">
-					<div className={`text-xs text-400 flex gap-2`}>
+				<div className="flex align-items-center ">
+					<div className={` flex-1  text-xs text-400 flex gap-2`}>
 						<div className={`createData-tooltip-${comment?.id} `}>
 							{formatDistanceToNow(new Date(comment?.createdAt), { addSuffix: true })}
 							<Tooltip
@@ -84,16 +85,27 @@ export function Comment({ comment }) {
 							/>
 						</div>
 					</div>
-					<div className="flex flex-1 ">
+
+					<div className="flex">
+						{comment?.totalLikes > 0 && (
+							<div className="text-sm " id={`likes-state-tooltip-${comment.id}`}>
+								{numeral(comment?.totalLikes).format("0a")} likes
+								<Tooltip
+									key={comment.id}
+									target={`#likes-state-tooltip-${comment.id}`}
+									content={`${comment?.totalLikes}`}
+									position="bottom"
+								/>
+							</div>
+						)}
 						<Button
 							// onClick={handleLikeButton}
 							icon={comment?.likedByUser ? "pi pi-thumbs-up-fill " : "pi pi-thumbs-up"}
-							className="likeButton relative  p-button-text shadow-none border-none"
-						>
-						</Button>
+							className="p-1 relative  p-button-text shadow-none border-none"
+						></Button>
 						<Button
 							icon="pi pi-comment"
-							className="p-button-text shadow-none border-none"
+							className="p-button-text p-0 shadow-none border-none"
 							onClick={() => {
 								// setShowCommentDialog({ open: true, id: post?.id });
 							}}

@@ -91,7 +91,7 @@ export const PostStatus = ({ post }) => {
 						shape="circle"
 					/>
 				))}
-				{post?.totalLikes > -1 && (
+				{post?.totalLikes > 0 && (
 					<div className="text-sm " id={`likes-state-tooltip-${post.id}`}>
 						{numeral(post?.totalLikes).format("0a")} likes
 						<Tooltip
@@ -103,7 +103,7 @@ export const PostStatus = ({ post }) => {
 					</div>
 				)}
 			</AvatarGroup>
-			{post?.totalComments > -1 && (
+			{post?.totalComments > 0 && (
 				<div className="text-sm " id={`comments-state-tooltip-${post.id}`}>
 					{numeral(post?.totalComments).format("0a")} comments
 					<Tooltip
@@ -114,7 +114,7 @@ export const PostStatus = ({ post }) => {
 					/>
 				</div>
 			)}
-			{post?.totalShares > -1 && (
+			{post?.totalShares > 0 && (
 				<div className="text-sm " id={`shares-state-tooltip-${post.id}`}>
 					{numeral(post?.totalShares).format("0a")} shares
 					<Tooltip

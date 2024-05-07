@@ -76,7 +76,7 @@ export function Comments({postId}) {
 	}
 
 	return (
-		<div className={(classNames("bg-red", isFetching), "p-3 my-4   ")}>
+		<div className={(classNames("bg-red", isFetching), "p-3 my-4  flex flex-column gap-2")}>
 			<Toast ref={toast} />
 			{comments.map((comment) => (
 				<Comment id={comment?.id} key={comment?.id} comment={comment} />

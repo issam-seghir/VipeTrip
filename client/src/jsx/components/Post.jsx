@@ -49,7 +49,7 @@ export function Post({ post, setShowDialog, setShowCommentDialog }) {
 
 	const user = useSelector(selectCurrentUser);
 	const [scope, animate] = useAnimate();
-	const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(true);
+	const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
 	const [likersDialog, setLikersDialog] = useState(false);
 	const shareOverlay = useRef(null);
 	const clientUrl = import.meta.env.VITE_CLIENT_URL;

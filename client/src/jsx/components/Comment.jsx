@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 import { format, formatDistanceToNow } from "date-fns";
 import { Tooltip } from "primereact/tooltip";
 import numeral from "numeral";
+import { Menu } from "primereact/menu";
 
 export function Comment({ comment }) {
 	const navigate = useNavigate();
@@ -60,6 +61,22 @@ export function Comment({ comment }) {
 								/>
 							</>
 						)}
+						<Menu
+							// model={items}
+							popup
+							popupAlignment="right"
+							className="surface-card"
+							closeOnEscape
+							ref={optionsMenu}
+							id="popup_menu_right"
+						/>
+						<Button
+							icon="pi pi-ellipsis-h"
+							className="p-button-text w-fit h-fit p-2"
+							aria-controls="popup_menu_right"
+							aria-haspopup
+							onClick={(event) => optionsMenu.current.toggle(event)}
+						/>
 					</div>
 					<div className="flex-inline p-1">
 						{isDescriptionExpanded ? comment?.description : comment?.description.slice(0, 100)}
@@ -101,11 +118,11 @@ export function Comment({ comment }) {
 						<Button
 							// onClick={handleLikeButton}
 							icon={comment?.likedByUser ? "pi pi-thumbs-up-fill " : "pi pi-thumbs-up"}
-							className="p-1 relative  p-button-text shadow-none border-none"
+							className="p-1 w-2rem relative  p-button-text shadow-none border-none"
 						></Button>
 						<Button
 							icon="pi pi-comment"
-							className="p-button-text p-0 shadow-none border-none"
+							className="p-button-text w-2rem p-0 shadow-none border-none"
 							onClick={() => {
 								// setShowCommentDialog({ open: true, id: post?.id });
 							}}
@@ -113,23 +130,6 @@ export function Comment({ comment }) {
 					</div>
 				</div>
 			</div>
-
-			{/* <Menu
-						model={items}
-						popup
-						popupAlignment="right"
-						className="surface-card"
-						closeOnEscape
-						ref={optionsMenu}
-						id="popup_menu_right"
-					/>
-					<Button
-						icon="pi pi-ellipsis-h"
-						className="p-button-text w-fit h-fit p-2"
-						aria-controls="popup_menu_right"
-						aria-haspopup
-						onClick={(event) => optionsMenu.current.toggle(event)}
-					/> */}
 		</div>
 	);
 }

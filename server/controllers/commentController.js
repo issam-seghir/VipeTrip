@@ -42,8 +42,52 @@ const createComment = asyncWrapper(async (req, res) => {
 
 	await comment.save();
 
-	res.status(201).json({ message: "Post Created  successfully", data: comment });
+	res.status(201).json({ message: "Comment Created  successfully", data: comment });
 });
+
+
+
+/**
+ * @typedef {import('@validations/commentSchema').commentSchemaBody} commentSchemaBody
+ */
+
+const updateComment = asyncWrapper(async (req, res) => {
+	/** @type {commentSchemaBody} */
+	const { description, mentions } = req.body;
+	const { postId, commentId } = req.params;
+
+	// Check if the user exists
+	const user = await User.findById(req.user.id);
+	if (!user) {
+		return res.status(404).json({ message: "User not found" });
+	}
+	const post = await Post.findById(postId);
+	if (!post) {
+		return res.status(404).json({ message: "Post not found" });
+	}
+
+	const comment = await Comment.findById(commentId);
+	if (!comment) {
+		return res.status(404).json({ message: "Comment not found" });
+	}
+
+	// Remove the '@' from each mention
+	const mentionNames = mentions.map((mention) => mention.replace("@", ""));
+	// Find all mentioned users by their firstName or lastName
+	const mentionedUsers = await User.find({ fullName: { $in: mentionNames } });
+	const mentionIds = mentionedUsers.map((user) => user.id);
+
+	comment.description = description;
+	comment.mentions = mentionIds;
+	comment.edited = true;
+
+	await comment.save();
+
+	res.status(201).json({ message: "Comment updated  successfully", data: comment });
+});
+
+
+
 
 // Add Reply to Comment
 const addReplyToComment = async (req, res) => {
@@ -88,41 +132,7 @@ const getAllComments = asyncWrapper(async (req, res) => {
 
 });
 
-// Update Comment
-const updateComment = async (req, res) => {
-	try {
-		const { commentId, description } = req.body;
-		const comment = await Comment.findById(commentId);
-		if (!comment) {
-			return res.status(404).json({ message: "Comment not found" });
-		}
 
-		comment.description = description;
-		comment.edited = true;
-		await comment.save();
-
-		res.json(comment);
-	} catch (error) {
-		res.status(500).json({ message: error.message });
-	}
-};
-
-// Delete Comment
-const deleteComment = async (req, res) => {
-	try {
-		const { commentId } = req.params;
-		const comment = await Comment.findById(commentId);
-		if (!comment) {
-			return res.status(404).json({ message: "Comment not found" });
-		}
-
-		await comment.remove();
-
-		res.json({ message: "Comment deleted successfully" });
-	} catch (error) {
-		res.status(500).json({ message: error.message });
-	}
-};
 
 module.exports = {
 	createComment,

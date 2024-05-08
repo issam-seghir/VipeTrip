@@ -36,6 +36,7 @@ export function Comment({ key, comment }) {
 	const [scope, animate] = useAnimate();
 	const [isEditing, setIsEditing] = useState(false);
 	const [isReplying, setIsReplying] = useState(false);
+	const [showReplies, setShowReplies] = useState(false);
 
 	const descriptionCommentRef = useRef(null);
 	const [cursorPosition, setCursorPosition] = useState(null);
@@ -45,7 +46,7 @@ export function Comment({ key, comment }) {
 	const [deleteComment, deleteCommentResult] = useDeleteCommentMutation();
 	const [updateComment, updateCommentResult] = useUpdateCommentMutation();
 	const [createReply, createReplyResult] = useCreateReplyMutation();
-console.log(comment?.likedByUser);
+	console.log(comment?.likedByUser);
 	const {
 		handleSubmit,
 		watch,
@@ -398,6 +399,16 @@ console.log(comment?.likedByUser);
 							</div>
 						</div>
 						<div className="flex align-items-center">
+							{!comment?.parentComment &&
+								comment?.totalReplies >0 && (
+									<Button
+										link
+										label={showReplies ? "Hide Replies" : "Show Replies"}
+										onClick={() => setShowReplies(!showReplies)}
+										disabled={deleteComment?.isLoading || updateComment?.isLoading}
+										className={`p-1 mr-3 font-light text-sm shadow-none border-none`}
+									/>
+								)}
 							{comment?.totalLikes > 0 && (
 								<div className="text-sm " id={`likes-state-tooltip-${comment.id}`}>
 									{numeral(comment?.totalLikes).format("0a")}
@@ -418,21 +429,25 @@ console.log(comment?.likedByUser);
 							{!comment?.parentComment && (
 								<div className="flex">
 									{comment?.totalReplies > 0 && (
-									<div className="text-sm " id={`likes-state-tooltip-${comment.id}`}>
-										{numeral(comment?.totalReplies).format("0a")}
-										<Tooltip
-											key={comment.id}
-											target={`#likes-state-tooltip-${comment.id}`}
-											content={`${comment?.totalReplies}`}
-											position="bottom"
-										/>
-									</div>
-																)}
+										<div className="text-sm " id={`likes-state-tooltip-${comment.id}`}>
+											{numeral(comment?.totalReplies).format("0a")}
+											<Tooltip
+												key={comment.id}
+												target={`#likes-state-tooltip-${comment.id}`}
+												content={`${comment?.totalReplies}`}
+												position="bottom"
+											/>
+										</div>
+									)}
+
 									<Button
 										disabled={deleteComment?.isLoading || updateComment?.isLoading}
 										icon="pi pi-comment"
 										className="p-button-text w-2rem p-0 shadow-none border-none"
-										onClick={() => setIsReplying(true)}
+										onClick={() => {
+											setIsReplying(!isReplying);
+											setShowReplies(true);
+										}}
 									/>
 								</div>
 							)}
@@ -495,6 +510,7 @@ console.log(comment?.likedByUser);
 					</div>
 				)}
 				{comment?.replies?.length > 0 &&
+					showReplies &&
 					comment?.replies?.map((reply) => <Comment key={reply?.id} comment={reply} />)}
 			</div>
 		</div>

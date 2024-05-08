@@ -86,6 +86,7 @@ const createReply = asyncWrapper(async (req, res) => {
 
 	const reply = new Comment({
 		author: req.user.id,
+		parentComment:commentId,
 		post: postId,
 		description: NewDescription,
 		mentions: mentionIds,
@@ -232,7 +233,9 @@ const getAllComments = asyncWrapper(async (req, res) => {
 	const userLikes = await Like.find({ liker: user.id, type: "Comment" });
 	const likedCommentsIds = new Set(userLikes.map((like) => like.likedComment._id.toString()));
 
-	let comments = await Comment.find({ post: postId })
+
+
+	let comments = await Comment.find({ post: postId ,parentComment: null})
 		.sort({ createdAt: -1 }) // Sort by creation date in descending order
 		.populate("author")
 		.populate("replies");

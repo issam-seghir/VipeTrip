@@ -106,7 +106,7 @@ export function LoginForm() {
 				<div className="flex flex-column gap-2 align-items-center">
 					<PFormTextField
 						control={control}
-						defaultValue={""}
+						defaultValue={"lorando@gmail.com"}
 						name={"email"}
 						label="Email"
 						type="email"
@@ -117,7 +117,7 @@ export function LoginForm() {
 					/>
 					<PFormTextField
 						control={control}
-						defaultValue={""}
+						defaultValue={"LoranDo@99"}
 						name={"password"}
 						label="Password"
 						type="password"

@@ -40,6 +40,7 @@ import { Toast } from "primereact/toast";
 import { classNames } from "primereact/utils";
 import { useDispatch, useSelector } from "react-redux";
 import { Dialog } from "primereact/dialog";
+
 export function Post({ post, setShowDialog, setShowCommentDialog }) {
 	const navigate = useNavigate();
 	const toast = useRef(null);
@@ -126,7 +127,7 @@ export function Post({ post, setShowDialog, setShowCommentDialog }) {
 					{
 						label: "Delete Post",
 						className: "border-round-md m-1",
-						style: { backgroundColor: "rgb(247 53 53 / 76%)" },
+						style: { backgroundColor: "rgb(247 53 53 / 47%)" },
 						icon: "pi pi-trash",
 						command: () => {
 							confirmDialog({

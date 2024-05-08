@@ -6,7 +6,7 @@ import { Icon } from "@iconify/react";
 import { Comments } from "@jsx/components/Comments";
 import { EmojiPickerOverlay } from "@jsx/components/EmojiPickerOverlay";
 import { useCreateCommentMutation, useUpdateCommentMutation } from "@jsx/store/api/commentApi";
-import { useGetPostQuery } from "@jsx/store/api/postApi";
+import { postApi } from "@jsx/store/api/postApi";
 import { selectCurrentUser } from "@store/slices/authSlice";
 import { useDebounce } from "@uidotdev/usehooks";
 import { commentSchema } from "@validations/postSchema";
@@ -28,29 +28,26 @@ export function PostCommentsDialog({ showDialog, setShowDialog }) {
 	const [cursorPosition, setCursorPosition] = useState(null);
 	const [createComment, createCommentResult] = useCreateCommentMutation();
 	const [updateComment, updateCommentResult] = useUpdateCommentMutation();
+
 	// const {
-	// 	data: comment,
+	// 	data: post,
 	// 	isFetching,
 	// 	isLoading,
 	// 	isSuccess,
 	// 	isError,
 	// 	error,
-	// } = useGetCommentQuery(showDialog?.id, {
+	// } = useGetPostQuery(showDialog?.id, {
 	// 	skip: !showDialog.id,
 	// });
-	const {
-		data: post,
-		isFetching,
-		isLoading,
-		isSuccess,
-		isError,
-		error,
-	} = useGetPostQuery(showDialog?.id, {
+	const { post, isFetching, isLoading, isSuccess, isError, error } = postApi.useGetAllPostsQuery(undefined, {
+		selectFromResult: ({ data }) => {
+			// console.log(data); // Log all posts data
+			const selectedPost = data?.find((post) => post.id === showDialog?.id);
+			// console.log(selectedPost); // Log selected post
+			return { post: selectedPost };
+		},
 		skip: !showDialog.id,
 	});
-	const isUpdate = Boolean(showDialog?.id);
-	console.log(showDialog);
-	console.log(post);
 
 	const {
 		handleSubmit,
@@ -65,7 +62,6 @@ export function PostCommentsDialog({ showDialog, setShowDialog }) {
 		mode: "onChange",
 		resolver: zodResolver(commentSchema),
 	});
-
 
 	const errorMessage = createCommentResult?.isError ? createCommentResult?.error : errorsForm;
 
@@ -121,7 +117,6 @@ export function PostCommentsDialog({ showDialog, setShowDialog }) {
 
 	const description = watch("description");
 	const debouncedDescription = useDebounce(description, 500); // Debounce the email input by 500ms
-console.log(description);
 	// Set mentions and tags from description input
 	useEffect(() => {
 		const mentions = debouncedDescription?.match(/@\w+/g) || [];

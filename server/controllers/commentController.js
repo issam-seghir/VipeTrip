@@ -130,6 +130,7 @@ const deleteComment = asyncWrapper(async (req, res) => {
 	if (!user) {
 		return res.status(404).json({ message: "User not found" });
 	}
+
 	const post = await Post.findById(postId);
 	if (!post) {
 		return res.status(404).json({ message: "Post not found" });
@@ -145,6 +146,10 @@ const deleteComment = asyncWrapper(async (req, res) => {
 		return res.status(403).json({ message: "User is not authorized to delete this comment" });
 	}
 
+	// Decrement the comment count of the post
+	post.totalComments -= 1;
+	await post.save();
+
 	// If the comment is a reply, decrement the totalReplies count of the parent comment and remove it from parent comment's replies
 	const parentComment = await Comment.findOne({ replies: commentId });
 	if (parentComment) {
@@ -159,9 +164,6 @@ const deleteComment = asyncWrapper(async (req, res) => {
 	// Delete all likes associated with the post
 	await Like.deleteMany({ likedComment: commentId, type: "Comment" });
 
-	// Decrement the comment count of the post
-	await Post.updateOne({ _id: postId }, { $inc: { totalComments: -1 } });
-
 	//TODO Delete or update any notifications related to the deleted comment
 	// await Notification.deleteMany({ relatedComment: commentId });
 
@@ -170,7 +172,6 @@ const deleteComment = asyncWrapper(async (req, res) => {
 
 	res.status(200).json({ message: "Comment Deleted  successfully" });
 });
-
 
 // Add Reply to Comment
 const addReplyToComment = async (req, res) => {
@@ -209,7 +210,10 @@ const getAllComments = asyncWrapper(async (req, res) => {
 	const userLikes = await Like.find({ liker: user.id, type: "Comment" });
 	const likedCommentsIds = new Set(userLikes.map((like) => like.likedComment._id.toString()));
 
-	let comments = await Comment.find({ post: postId }).populate("author").populate("replies");
+	let comments = await Comment.find({ post: postId })
+		.sort({ createdAt: -1 }) // Sort by creation date in descending order
+		.populate("author")
+		.populate("replies");
 
 	comments = await Promise.all(
 		comments.map(async (comment) => {

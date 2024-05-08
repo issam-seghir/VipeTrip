@@ -25,7 +25,10 @@ export const commentApi = api.enhanceEndpoints({ addTagTypes: ["Comment"] }).inj
 				method: "POST",
 				body: data,
 			}),
-			invalidatesTags: [{ type: "Comment", id: "LIST" }],
+			invalidatesTags: (result, error, { postId }) => [
+				{ type: "Post", id: "LIST" },
+				{ type: "Comment", id: "LIST" },
+			],
 		}),
 		updateComment: builder.mutation({
 			query: ({ postId, commentId, data }) => ({
@@ -33,14 +36,17 @@ export const commentApi = api.enhanceEndpoints({ addTagTypes: ["Comment"] }).inj
 				method: "PUT",
 				body: data,
 			}),
-			invalidatesTags: (result, error, { id }) => [{ type: "Comment", id }],
+			invalidatesTags: (result, error, { commentId }) => [{ type: "Comment", commentId }],
 		}),
 		deleteComment: builder.mutation({
 			query: ({ postId, commentId }) => ({
 				url: `posts/${postId}/comments/${commentId}`,
 				method: "DELETE",
 			}),
-			invalidatesTags: (result, error, { postId, commentId }) => [{ type: "Comment", commentId }],
+			invalidatesTags: (result, error, { postId, commentId }) => [
+				{ type: "Post", id: "LIST" },
+				{ type: "Comment", id: "LIST" },
+			],
 		}),
 		likeDislikeComment: builder.mutation({
 			query: ({ postId, commentId }) => ({

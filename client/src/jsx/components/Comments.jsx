@@ -1,14 +1,12 @@
 import { useGetAllCommentsQuery } from "@jsx/store/api/commentApi";
 import { Skeleton } from "primereact/skeleton";
 import { classNames } from "primereact/utils";
-import { Toast } from "primereact/toast";
 import { useRef } from "react";
 import { Comment } from "./Comment";
 
 export function Comments({postId}) {
 	const { data: comments, error, isLoading, isFetching, isError } = useGetAllCommentsQuery(postId );
-    const toast = useRef(null);
-	if (isLoading) {
+	if (isLoading ) {
 		return (
 			<div>
 				<h5>Rectangle</h5>
@@ -76,8 +74,12 @@ export function Comments({postId}) {
 	}
 
 	return (
-		<div className={(classNames("bg-red", isFetching), "p-3 my-4  flex flex-column gap-2")}>
-			<Toast ref={toast} />
+		<div
+			className={classNames(
+				{ "bg-black-alpha-10 text-300": isFetching },
+				"p-3 my-4  flex flex-column gap-2 border-round-md"
+			)}
+		>
 			{comments.map((comment) => (
 				<Comment id={comment?.id} key={comment?.id} comment={comment} />
 			))}

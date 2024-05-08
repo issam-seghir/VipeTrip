@@ -16,6 +16,7 @@ import { useRef, useState } from "react";
 import "react-lazy-load-image-component/src/effects/blur.css";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { Toast } from "primereact/toast";
 
 export function Comment({ comment }) {
 	const navigate = useNavigate();
@@ -34,12 +35,6 @@ export function Comment({ comment }) {
 	const handleUpdateComment = async (data) => {
 		try {
 			await updateComment({ postId: comment?.post, commentId: comment?.id, data }).unwrap();
-			toast.current.show({
-				severity: "success",
-				summary: "Comment Deleted 🎉",
-				detail: "Your Comment has been deleted successfully",
-				life: 3000,
-			});
 		} catch (error) {
 			console.log(error);
 			toast.current.show({
@@ -53,12 +48,6 @@ export function Comment({ comment }) {
 	const handleDeleteComment = async () => {
 		try {
 			await deleteComment({ postId: comment?.post, commentId: comment?.id }).unwrap();
-			toast.current.show({
-				severity: "success",
-				summary: "Comment Deleted 🎉",
-				detail: "Your Comment has been deleted successfully",
-				life: 3000,
-			});
 		} catch (error) {
 			console.log(error);
 			toast.current.show({
@@ -85,7 +74,7 @@ export function Comment({ comment }) {
 					{
 						label: "Delete Post",
 						className: "border-round-md m-1",
-						style: { backgroundColor: "rgb(247 53 53 / 76%)" },
+						style: { backgroundColor: "rgb(247 53 53 / 47%)" },
 						icon: "pi pi-trash",
 						command: () => {
 							confirmDialog({
@@ -107,6 +96,8 @@ export function Comment({ comment }) {
 
 	return (
 		<div className="flex gap-2">
+			<Toast ref={toast} />
+
 			<Avatar
 				size="small"
 				icon="pi pi-user"
@@ -152,7 +143,11 @@ export function Comment({ comment }) {
 									model={items}
 									popup
 									popupAlignment="right"
-									className="surface-card "
+									className="surface-card w-fit"
+									pt={{
+										menuitem: "text-sm",
+
+									}}
 									closeOnEscape
 									ref={optionsMenu}
 									id="popup_menu_right"
@@ -193,7 +188,7 @@ export function Comment({ comment }) {
 						</div>
 					</div>
 
-					<div className="flex">
+					<div className="flex align-items-center">
 						{comment?.totalLikes > 0 && (
 							<div className="text-sm " id={`likes-state-tooltip-${comment.id}`}>
 								{numeral(comment?.totalLikes).format("0a")} likes
@@ -207,10 +202,12 @@ export function Comment({ comment }) {
 						)}
 						<Button
 							// onClick={handleLikeButton}
+							diabled={deleteComment?.isLoading || updateComment?.isLoading}
 							icon={comment?.likedByUser ? "pi pi-thumbs-up-fill " : "pi pi-thumbs-up"}
 							className="p-1 w-2rem relative  p-button-text shadow-none border-none"
 						></Button>
 						<Button
+							diabled={deleteComment?.isLoading || updateComment?.isLoading}
 							icon="pi pi-comment"
 							className="p-button-text w-2rem p-0 shadow-none border-none"
 							onClick={() => {

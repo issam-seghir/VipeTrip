@@ -17,12 +17,15 @@ import "react-lazy-load-image-component/src/effects/blur.css";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Toast } from "primereact/toast";
+import { useAnimate } from "framer-motion";
+
 
 export function Comment({ comment }) {
 	const navigate = useNavigate();
 	const toast = useRef(null);
 	const optionsMenu = useRef(null);
 	const dispatch = useDispatch();
+	const [scope, animate] = useAnimate();
 
 	const user = useSelector(selectCurrentUser);
 	const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
@@ -93,9 +96,19 @@ export function Comment({ comment }) {
 			: []),
 	];
 
+		const handleLikeButton = () => {
+			likeDislikeComment({ postId: comment?.post, commentId: comment?.id });
+			if (scope?.current) {
+			animate([
+				[".likeCommentButton", { scale: 0.8 }, { duration: 0.1, at: "<" }],
+				[".likeCommentButton", { scale: 1.2 }, { duration: 0.2 }],
+				[".likeCommentButton", { scale: 1 }, { duration: 0.1 }],
+			]);
+		}
+		};
 
 	return (
-		<div className="flex gap-2">
+		<div ref={scope} className="flex gap-2">
 			<Toast ref={toast} />
 
 			<Avatar
@@ -146,7 +159,6 @@ export function Comment({ comment }) {
 									className="surface-card w-fit"
 									pt={{
 										menuitem: "text-sm",
-
 									}}
 									closeOnEscape
 									ref={optionsMenu}
@@ -175,7 +187,7 @@ export function Comment({ comment }) {
 						)}
 					</div>
 				</div>
-				<div className="flex align-items-center ">
+				<div className="flex align-items-center gap-3 ">
 					<div className={` flex-1  text-xs text-400 flex gap-2`}>
 						<div className={`createData-tooltip-${comment?.id} `}>
 							{formatDistanceToNow(new Date(comment?.createdAt), { addSuffix: true })}
@@ -201,10 +213,10 @@ export function Comment({ comment }) {
 							</div>
 						)}
 						<Button
-							// onClick={handleLikeButton}
+							onClick={handleLikeButton}
 							diabled={deleteComment?.isLoading || updateComment?.isLoading}
 							icon={comment?.likedByUser ? "pi pi-thumbs-up-fill " : "pi pi-thumbs-up"}
-							className="p-1 w-2rem relative  p-button-text shadow-none border-none"
+							className="likeCommentButton p-1 w-2rem relative  p-button-text shadow-none border-none"
 						></Button>
 						<Button
 							diabled={deleteComment?.isLoading || updateComment?.isLoading}

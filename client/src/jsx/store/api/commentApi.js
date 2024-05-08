@@ -51,7 +51,7 @@ export const commentApi = api.enhanceEndpoints({ addTagTypes: ["Comment"] }).inj
 		likeDislikeComment: builder.mutation({
 			query: ({ postId, commentId }) => ({
 				url: `posts/${postId}/comments/${commentId}/likeDislike`,
-				method: "Comment",
+				method: "POST",
 			}),
 			// Optimistique update like button state
 			onQueryStarted: ({ postId, commentId }, { dispatch, queryFulfilled }) => {

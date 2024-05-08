@@ -225,10 +225,50 @@ const getAllComments = asyncWrapper(async (req, res) => {
 	res.status(201).json({ message: "get All comments", data: comments });
 });
 
+/**
+ * @typedef {import('@validations/commentSchema').commentSchemaBody} commentSchemaBody
+ */
+const likeDislikeComment = asyncWrapper(async (req, res, next) => {
+	/** @type {commentSchemaBody} */
+	const { postId, commentId } = req.params;
+	const userId = req?.user?.id;
+
+	// Check if the user exists
+	const user = await User.findById(req.user.id);
+	if (!user) {
+		return res.status(404).json({ message: "User not found" });
+	}
+
+	const post = await Post.findById(postId);
+	if (!post) {
+		return res.status(404).json({ message: "Post not found" });
+	}
+
+	const comment = await Comment.findById(commentId);
+	if (!comment) {
+		return res.status(200).json({ message: "Comment already deleted or not found" });
+	}
+
+	// Check if the user has already liked the post
+	const existingLike = await Like.findOne({ likedComment: commentId, liker: userId, type: "Comment" });
+	if (existingLike) {
+		// If the user has already liked the post, delete the document
+		await Like.findOneAndDelete({ _id: existingLike._id });
+		return res.status(200).json({ message: "Comment unliked successfully" });
+	}
+
+	// If the user has not liked the post, create a new Like document
+	const like = new Like({ likedComment: commentId, liker: userId, type: "Comment" });
+	await like.save();
+
+	res.status(200).json({ message: "Comment liked successfully" });
+});
+
 module.exports = {
 	createComment,
 	addReplyToComment,
 	getAllComments,
 	updateComment,
 	deleteComment,
+	likeDislikeComment,
 };

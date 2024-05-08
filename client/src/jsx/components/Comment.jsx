@@ -240,7 +240,7 @@ console.log(comment?.likedByUser);
 
 	return (
 		<div key={key} ref={scope}>
-			<div className="flex gap-2">
+			<div className="flex gap-2 mb-2">
 				{/* react hook form dev tool  */}
 				<Toast ref={toast} />
 				<Avatar
@@ -252,7 +252,7 @@ console.log(comment?.likedByUser);
 					alt={comment?.author?.fullName}
 					shape="circle"
 				/>
-				<div className="flex flex-column gap-1 ">
+				<div className="flex flex-column gap-1 w-full ">
 					<div className="flex flex-column p-2  border-1 border-round border-200  align-items-start">
 						<div className="flex w-full  align-items-center gap-2">
 							<div
@@ -400,7 +400,7 @@ console.log(comment?.likedByUser);
 						<div className="flex align-items-center">
 							{comment?.totalLikes > 0 && (
 								<div className="text-sm " id={`likes-state-tooltip-${comment.id}`}>
-									{numeral(comment?.totalLikes).format("0a")} likes
+									{numeral(comment?.totalLikes).format("0a")}
 									<Tooltip
 										key={comment.id}
 										target={`#likes-state-tooltip-${comment.id}`}
@@ -411,17 +411,30 @@ console.log(comment?.likedByUser);
 							)}
 							<Button
 								onClick={handleLikeButton}
-								diabled={deleteComment?.isLoading || updateComment?.isLoading}
+								disabled={deleteComment?.isLoading || updateComment?.isLoading}
 								icon={comment?.likedByUser ? "pi pi-thumbs-up-fill " : "pi pi-thumbs-up"}
 								className={`likeCommentButton-${comment?.id} p-1 w-2rem relative p-button-text shadow-none border-none`}
 							/>
 							{!comment?.parentComment && (
-								<Button
-									diabled={deleteComment?.isLoading || updateComment?.isLoading}
-									icon="pi pi-comment"
-									className="p-button-text w-2rem p-0 shadow-none border-none"
-									onClick={() => setIsReplying(true)}
-								/>
+								<div className="flex">
+									{comment?.totalReplies > 0 && (
+									<div className="text-sm " id={`likes-state-tooltip-${comment.id}`}>
+										{numeral(comment?.totalReplies).format("0a")}
+										<Tooltip
+											key={comment.id}
+											target={`#likes-state-tooltip-${comment.id}`}
+											content={`${comment?.totalReplies}`}
+											position="bottom"
+										/>
+									</div>
+																)}
+									<Button
+										disabled={deleteComment?.isLoading || updateComment?.isLoading}
+										icon="pi pi-comment"
+										className="p-button-text w-2rem p-0 shadow-none border-none"
+										onClick={() => setIsReplying(true)}
+									/>
+								</div>
 							)}
 						</div>
 					</div>

@@ -28,16 +28,6 @@ export function PostCommentsDialog({ showDialog, setShowDialog }) {
 	const [cursorPosition, setCursorPosition] = useState(null);
 	const [createComment, createCommentResult] = useCreateCommentMutation();
 
-	// const {
-	// 	data: post,
-	// 	isFetching,
-	// 	isLoading,
-	// 	isSuccess,
-	// 	isError,
-	// 	error,
-	// } = useGetPostQuery(showDialog?.id, {
-	// 	skip: !showDialog.id,
-	// });
 	const { post, isFetching, isLoading, isSuccess, isError, error } = postApi.useGetAllPostsQuery(undefined, {
 		selectFromResult: ({ data }) => {
 			// console.log(data); // Log all posts data

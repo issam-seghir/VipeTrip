@@ -60,6 +60,45 @@ const createComment = asyncWrapper(async (req, res) => {
 	res.status(201).json({ message: "Comment Created  successfully", data: comment });
 });
 
+const createReply = asyncWrapper(async (req, res) => {
+	const { description, mentions } = req.body;
+	const { postId, commentId } = req.params;
+
+	// Check if the user exists
+	const user = await User.findById(req.user.id);
+	if (!user) {
+		return res.status(404).json({ message: "User not found" });
+	}
+	const post = await Post.findById(postId);
+	if (!post) {
+		return res.status(404).json({ message: "Post not found" });
+	}
+	const parentComment = await Comment.findById(commentId);
+	if (!parentComment) {
+		return res.status(404).json({ message: "parent Comment not found" });
+	}
+
+	const mentionNames = mentions.map((mention) => mention.replace("@", ""));
+	const mentionedUsers = await User.find({ fullName: { $in: mentionNames } });
+	const mentionIds = mentionedUsers.map((user) => user.id);
+
+	const NewDescription = description.replaceAll("\n", "\\n");
+
+	const reply = new Comment({
+		author: req.user.id,
+		post: postId,
+		description: NewDescription,
+		mentions: mentionIds,
+	});
+
+	await reply.save();
+
+	parentComment.replies.push(reply);
+	await parentComment.save();
+
+	res.status(201).json({ message: "Reply added successfully", data: reply });
+});
+
 /**
  * @typedef {import('@validations/commentSchema').commentSchemaBody} commentSchemaBody
  */
@@ -85,7 +124,7 @@ const updateComment = asyncWrapper(async (req, res) => {
 	}
 
 	// Check if the user is the author of the comment
-	if (comment.author.toString() !== user.id) {
+	if (comment.author.id.toString() !== user.id) {
 		return res.status(403).json({ message: "User is not authorized to update this comment" });
 	}
 
@@ -143,9 +182,8 @@ const deleteComment = asyncWrapper(async (req, res) => {
 	if (!comment) {
 		return res.status(200).json({ message: "Comment already deleted or not found" });
 	}
-
 	// Check if the user is the author of the comment
-	if (comment.author.toString() !== user.id) {
+	if (comment.author.id.toString() !== user.id) {
 		return res.status(403).json({ message: "User is not authorized to delete this comment" });
 	}
 
@@ -175,25 +213,6 @@ const deleteComment = asyncWrapper(async (req, res) => {
 
 	res.status(200).json({ message: "Comment Deleted  successfully" });
 });
-
-// Add Reply to Comment
-const addReplyToComment = async (req, res) => {
-	try {
-		const { commentId, replyId } = req.body;
-		const comment = await Comment.findById(commentId);
-		const reply = await Comment.findById(replyId);
-		if (!comment || !reply) {
-			return res.status(404).json({ message: "Comment or Reply not found" });
-		}
-
-		comment.replies.push(replyId);
-		await comment.save();
-
-		res.json(comment);
-	} catch (error) {
-		res.status(500).json({ message: error.message });
-	}
-};
 
 // Get All Comments for a Post
 const getAllComments = asyncWrapper(async (req, res) => {
@@ -271,7 +290,7 @@ const likeDislikeComment = asyncWrapper(async (req, res, next) => {
 
 module.exports = {
 	createComment,
-	addReplyToComment,
+	createReply,
 	getAllComments,
 	updateComment,
 	deleteComment,

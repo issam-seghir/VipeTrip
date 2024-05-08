@@ -7,6 +7,7 @@ const {
 	deleteComment,
 	updateComment,
 	likeDislikeComment,
+    createReply
 } = require("@/controllers/commentController");
 
 const validate = require("express-zod-safe");
@@ -17,5 +18,6 @@ router.route("/").post(createComment).get(getAllComments);
 router.route("/:commentId").delete(deleteComment).put(updateComment);
 
 router.route("/:commentId/likeDislike").post(likeDislikeComment);
+router.route("/:commentId/reply").post(createReply);
 
 module.exports = router;

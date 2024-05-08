@@ -30,6 +30,17 @@ export const commentApi = api.enhanceEndpoints({ addTagTypes: ["Comment"] }).inj
 				{ type: "Comment", id: "LIST" },
 			],
 		}),
+		createReply: builder.mutation({
+			query: ({ postId, commentId, data }) => ({
+				url: `posts/${postId}/comments/${commentId}/reply`,
+				method: "POST",
+				body: data,
+			}),
+			invalidatesTags: (result, error, { postId }) => [
+				{ type: "Post", id: "LIST" },
+				{ type: "Comment", id: "LIST" },
+			],
+		}),
 		updateComment: builder.mutation({
 			query: ({ postId, commentId, data }) => ({
 				url: `posts/${postId}/comments/${commentId}`,
@@ -80,6 +91,7 @@ export const commentApi = api.enhanceEndpoints({ addTagTypes: ["Comment"] }).inj
 
 export const {
 	useCreateCommentMutation,
+	useCreateReplyMutation,
 	useUpdateCommentMutation,
 	useDeleteCommentMutation,
 	useGetAllCommentsQuery,

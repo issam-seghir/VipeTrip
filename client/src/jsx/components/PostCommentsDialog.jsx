@@ -28,14 +28,14 @@ export function PostCommentsDialog({ showDialog, setShowDialog }) {
 	const [cursorPosition, setCursorPosition] = useState(null);
 	const [createComment, createCommentResult] = useCreateCommentMutation();
 
-	const { post, isFetching, isLoading, isSuccess, isError, error } = postApi.useGetAllPostsQuery(undefined, {
+	const { post, isFetching, isLoading, isSuccess, isError, error } = postApi.useGetAllPostsQuery({page:1,limit:15}, {
 		selectFromResult: ({ data }) => {
 			// console.log(data); // Log all posts data
 			const selectedPost = data?.find((post) => post.id === showDialog?.id);
 			// console.log(selectedPost); // Log selected post
 			return { post: selectedPost };
 		},
-		skip: !showDialog.id,
+		skip: !showDialog.id  ,
 	});
 
 	const {

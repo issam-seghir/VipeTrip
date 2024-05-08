@@ -12,7 +12,7 @@ import { Avatar } from "primereact/avatar";
 import { Button } from "primereact/button";
 import { Menu } from "primereact/menu";
 import { Tooltip } from "primereact/tooltip";
-import { useRef, useState } from "react";
+import { useRef, useState, forwardRef } from "react";
 import "react-lazy-load-image-component/src/effects/blur.css";
 import { useNavigate } from "react-router-dom";
 import {
@@ -41,7 +41,7 @@ import { classNames } from "primereact/utils";
 import { useDispatch, useSelector } from "react-redux";
 import { Dialog } from "primereact/dialog";
 
-export function Post({ post, setShowDialog, setShowCommentDialog }) {
+export const  Post = forwardRef(({ post, setShowDialog, setShowCommentDialog },ref) =>  {
 	const navigate = useNavigate();
 	const toast = useRef(null);
 	const optionsMenu = useRef(null);
@@ -242,9 +242,9 @@ export function Post({ post, setShowDialog, setShowCommentDialog }) {
 	return (
 		<>
 			<div
-				ref={scope}
+				ref={ref}
 				className={classNames(
-					"flex flex-column justify-content-between gap-3 p-3 w-full border-1 surface-border border-round",
+					"flex flex-column justify-content-between gap-3 p-3 mb-5 w-full border-1 surface-border border-round",
 					{ "pointer-events-none ": deletePostResult.isLoading },
 					{ "opacity-50 ": deletePostResult.isLoading }
 				)}
@@ -268,7 +268,6 @@ export function Post({ post, setShowDialog, setShowCommentDialog }) {
 						<Divider className="m-0" />
 					</>
 				)}
-
 				<Toast ref={toast} />
 				<ConfirmDialog
 					tagKey={`delete-post-dialog-${post?.id}`}
@@ -387,10 +386,10 @@ export function Post({ post, setShowDialog, setShowCommentDialog }) {
 				</div>
 				<Gallery images={post?.images} />
 				<PostStatus post={post} />
-				<Divider className="m-0"/>
+				<Divider className="m-0" />
 				{/* Post Footer */}
 
-				<div className="flex gap-1">
+				<div ref={scope} className="flex gap-1">
 					<div className="flex flex-1">
 						<Button
 							onClick={handleLikeButton}
@@ -516,5 +515,6 @@ export function Post({ post, setShowDialog, setShowCommentDialog }) {
 				</div>
 			</div>
 		</>
-	);
-}
+	)
+});
+Post.displayName = "Post";

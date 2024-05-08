@@ -4,7 +4,7 @@ import { current } from "immer";
 export const postApi = api.enhanceEndpoints({ addTagTypes: ["Post"] }).injectEndpoints({
 	endpoints: (builder) => ({
 		getAllPosts: builder.query({
-			query: () => "posts",
+			query: ({ page = 1, limit = 15 }) => `posts?page=${page}&limit=${limit}`,
 			transformResponse: (response) => response.data,
 			providesTags: (result) =>
 				result

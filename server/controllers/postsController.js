@@ -151,7 +151,7 @@ const updatePost = asyncWrapper(async (req, res, next) => {
 
 const getAllPosts = asyncWrapper(async (req, res) => {
 	const page = Number.parseInt(req.query.page) || 1; // Get the page number from the query parameters, default to 1
-	const limit = Number.parseInt(req.query.limit) || 10; // Get the limit from the query parameters, default to 10
+	const limit = Number.parseInt(req.query.limit) || 15; // Get the limit from the query parameters, default to 10
 	const skip = (page - 1) * limit;
 
 	const user = await User.findById(req.user.id);

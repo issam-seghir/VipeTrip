@@ -1,5 +1,5 @@
 import { Post } from "@components/Post";
-import { useGetAllPostsQuery } from "@jsx/store/api/postApi";
+import useInfiniteScroll from "@hooks/useInfiniteScroll";
 import {
 	selectPostDeleteSuccuss,
 	selectPostRespostedSuccuss,
@@ -53,7 +53,8 @@ export function FeedPostsSection({ setShowDialog, setShowCommentDialog }) {
 		}
 	}, [isPostRepostedSuccuss, dispatch]);
 
-	const { data: posts, isFetching, isLoading, isError, error } = useGetAllPostsQuery();
+	// const { data: posts, isFetching, isLoading, isError, error } = useGetAllPostsQuery();
+	const { combinedData: posts, itemRef, isFetching, isLoading, isError, error } = useInfiniteScroll("getAllPosts");
 
 	if (isLoading) {
 		return (
@@ -478,14 +479,15 @@ export function FeedPostsSection({ setShowDialog, setShowCommentDialog }) {
 		</div>;
 		// toast.error("échec de la requet des user");
 	}
-
+	console.log(posts);
 	return (
 		<div className={classNames("bg-red", isFetching)}>
 			<Toast ref={toast} />
-			{posts.map((post) => (
+			{posts.map((post, index) => (
 				<Post
 					id={post?.id}
 					key={post?.id}
+					ref={index === posts.length - 1 ? itemRef : null} // If the last item in the viewport, the next page is requested
 					post={post}
 					setShowDialog={setShowDialog}
 					setShowCommentDialog={setShowCommentDialog}

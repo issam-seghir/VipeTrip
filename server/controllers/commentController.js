@@ -40,6 +40,20 @@ const createComment = asyncWrapper(async (req, res) => {
 		mentions: mentionIds, // Store ObjectId of mentioned users
 	});
 
+	//TODO If your app supports notifications, send a notification to users who are mentioned in the updated comment
+	// This will depend on how you've implemented notifications. Here's a general idea:
+	// mentionedUsers.forEach((user) => {
+	// 	Notification.create({
+	// 		user: user.id,
+	// 		message: `${req.user.name} mentioned you in a comment`,
+	// 		link: `/posts/${postId}/comments/${commentId}`,
+	// 	});
+	// });
+
+	//TODO If your app supports real-time updates, send a message to all connected clients to inform them of the update
+	// This will depend on how you've implemented real-time updates. If you're using Socket.IO, it might look something like this:
+	// io.emit("commentUpdated", { commentId, postId, description, mentions: mentionIds });
+
 	await comment.save();
 
 	res.status(201).json({ message: "Comment Created  successfully", data: comment });
@@ -80,6 +94,20 @@ const updateComment = asyncWrapper(async (req, res) => {
 	const mentionedUsers = await User.find({ fullName: { $in: mentionNames } });
 	const mentionIds = mentionedUsers.map((user) => user.id);
 
+	//TODO If your app supports notifications, send a notification to users who are mentioned in the updated comment
+	// This will depend on how you've implemented notifications. Here's a general idea:
+	// mentionedUsers.forEach((user) => {
+	// 	Notification.create({
+	// 		user: user.id,
+	// 		message: `${req.user.name} mentioned you in a comment`,
+	// 		link: `/posts/${postId}/comments/${commentId}`,
+	// 	});
+	// });
+
+	//TODO If your app supports real-time updates, send a message to all connected clients to inform them of the update
+	// This will depend on how you've implemented real-time updates. If you're using Socket.IO, it might look something like this:
+	// io.emit("commentUpdated", { commentId, postId, description, mentions: mentionIds });
+
 	comment.description = description;
 	comment.mentions = mentionIds;
 	comment.edited = true;
@@ -109,7 +137,7 @@ const deleteComment = asyncWrapper(async (req, res) => {
 
 	const comment = await Comment.findById(commentId);
 	if (!comment) {
-		return res.status(404).json({ message: "Comment not found" });
+		return res.status(200).json({ message: "Comment already deleted or not found" });
 	}
 
 	// Check if the user is the author of the comment
@@ -117,11 +145,32 @@ const deleteComment = asyncWrapper(async (req, res) => {
 		return res.status(403).json({ message: "User is not authorized to delete this comment" });
 	}
 
+	// If the comment is a reply, decrement the totalReplies count of the parent comment and remove it from parent comment's replies
+	const parentComment = await Comment.findOne({ replies: commentId });
+	if (parentComment) {
+		await Comment.updateOne(
+			{ _id: parentComment._id },
+			{ $pull: { replies: commentId }, $inc: { totalReplies: -1 } }
+		);
+	}
+	// Delete all replies associated with the comment
+	await Comment.deleteMany({ _id: { $in: comment.replies } });
+
+	// Delete all likes associated with the post
+	await Like.deleteMany({ likedComment: commentId, type: "Comment" });
+
+	// Decrement the comment count of the post
+	await Post.updateOne({ _id: postId }, { $inc: { totalComments: -1 } });
+
+	//TODO Delete or update any notifications related to the deleted comment
+	// await Notification.deleteMany({ relatedComment: commentId });
+
 	// Find the post by ID and delete it
 	await Comment.findByIdAndDelete(commentId);
 
 	res.status(200).json({ message: "Comment Deleted  successfully" });
 });
+
 
 // Add Reply to Comment
 const addReplyToComment = async (req, res) => {
@@ -146,7 +195,15 @@ const addReplyToComment = async (req, res) => {
 const getAllComments = asyncWrapper(async (req, res) => {
 	const { postId } = req.params;
 
+	// Check if the user exists
 	const user = await User.findById(req.user.id);
+	if (!user) {
+		return res.status(404).json({ message: "User not found" });
+	}
+	const post = await Post.findById(postId);
+	if (!post) {
+		return res.status(404).json({ message: "Post not found" });
+	}
 
 	// Get the IDs of the posts that the user has liked
 	const userLikes = await Like.find({ liker: user.id, type: "Comment" });

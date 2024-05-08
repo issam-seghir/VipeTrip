@@ -1,6 +1,7 @@
 const Post = require("@model/Post");
 const User = require("@model/User");
 const Like = require("@model/Like");
+const Comment = require("@model/Comment");
 const mongoose = require("mongoose");
 const { asyncWrapper } = require("@middleware/asyncWrapper");
 const createError = require("http-errors");
@@ -69,13 +70,18 @@ const deletePost = asyncWrapper(async (req, res, next) => {
 		});
 	});
 
-	// // Delete all comments associated with the post
-	// await Comment.deleteMany({ post: postId });
+	// Delete all comments associated with the post
+	await Comment.deleteMany({ post: postId });
 
 	// Delete all likes associated with the post
 	await Like.deleteMany({ likedPost: postId, type: "Post" });
 	// Delete All bookmarks associated with the post
 	await User.updateMany({}, { $pull: { bookmarkedPosts: postId } });
+
+	// If the post is a shared post, decrement the totalShares count of the original post
+	if (post.sharedFrom) {
+		await Post.updateOne({ _id: post.sharedFrom }, { $inc: { totalShares: -1 } });
+	}
 	// Delete All shared post associated with the post
 	await Post.deleteMany({ sharedFrom: postId });
 
@@ -335,14 +341,14 @@ const repostPost = asyncWrapper(async (req, res) => {
 	originalPost?.images.forEach((image) => {
 		const originalImagePath = path.join(process.cwd(), "public", image);
 		const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-		 const newImageName = `shared-${uniqueSuffix}${path.extname(image)}`;;
+		const newImageName = `shared-${uniqueSuffix}${path.extname(image)}`;
 		const newImagePath = path.join(process.cwd(), "public/posts", newImageName);
-		 try {
-				fs.copyFileSync(originalImagePath, newImagePath);
-				sharedPost.images.push(path.join("posts", newImageName));
-			} catch (err) {
-				console.error(`Failed to copy image ${originalImagePath}: `, err);
-			}
+		try {
+			fs.copyFileSync(originalImagePath, newImagePath);
+			sharedPost.images.push(path.join("posts", newImageName));
+		} catch (error) {
+			console.error(`Failed to copy image ${originalImagePath}:`, error);
+		}
 	});
 
 	await sharedPost.save();

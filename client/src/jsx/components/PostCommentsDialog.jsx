@@ -27,7 +27,6 @@ export function PostCommentsDialog({ showDialog, setShowDialog }) {
 	const descriptionCommentRef = useRef(null);
 	const [cursorPosition, setCursorPosition] = useState(null);
 	const [createComment, createCommentResult] = useCreateCommentMutation();
-	const [updateComment, updateCommentResult] = useUpdateCommentMutation();
 
 	// const {
 	// 	data: post,
@@ -91,7 +90,10 @@ export function PostCommentsDialog({ showDialog, setShowDialog }) {
 			// Convert data to FormData
 			const res = await createComment({ postId: showDialog.id, data }).unwrap();
 			if (res) {
-				reset();
+				reset({
+					description: "",
+					mentions: [],
+				});
 				// setShowDialog({ open: false, id: showDialog?.id });
 				toast.current.show({
 					severity: "success",

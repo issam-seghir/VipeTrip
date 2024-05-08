@@ -329,7 +329,12 @@ export function Comment({ comment }) {
 							</form>
 						) : (
 							<>
-								{isDescriptionExpanded ? comment?.description : comment?.description.slice(0, 100)}
+								{isDescriptionExpanded
+									? comment?.description.split("\n").map((line, index) => <p key={index}>{line}</p>)
+									: comment?.description
+											.slice(0, 100)
+											.split("\n")
+											.map((line, index) => <p key={index}>{line}</p>)}
 								{comment?.description.length > 100 && (
 									<Button
 										className="p-button-text w-fit h-fit p-0 ml-1 text-sm vertical-align-baseline  border-none shadow-none"

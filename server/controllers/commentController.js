@@ -31,11 +31,12 @@ const createComment = asyncWrapper(async (req, res) => {
 	// Find all mentioned users by their firstName or lastName
 	const mentionedUsers = await User.find({ fullName: { $in: mentionNames } });
 	const mentionIds = mentionedUsers.map((user) => user.id);
-
+	// fix preserving line break (new lines)
+	const NewDescription = description.replaceAll("\n", "\\n");
 	const comment = new Comment({
 		author: req.user.id,
 		post: postId,
-		description,
+		description: NewDescription,
 		replies: [],
 		mentions: mentionIds, // Store ObjectId of mentioned users
 	});
@@ -108,7 +109,9 @@ const updateComment = asyncWrapper(async (req, res) => {
 	// This will depend on how you've implemented real-time updates. If you're using Socket.IO, it might look something like this:
 	// io.emit("commentUpdated", { commentId, postId, description, mentions: mentionIds });
 
-	comment.description = description;
+	// fix preserving line break (new lines)
+	comment.description = description.replaceAll("\n", "\\n");
+
 	comment.mentions = mentionIds;
 	comment.edited = true;
 
@@ -218,6 +221,8 @@ const getAllComments = asyncWrapper(async (req, res) => {
 	comments = await Promise.all(
 		comments.map(async (comment) => {
 			comment.likedByUser = likedCommentsIds.has(comment._id.toString()); // Set the likedByUser virtual property
+			// fix preserving line break (new lines)
+			comment.description = comment.description.replaceAll("\\n", "\n");
 			return comment;
 		})
 	);

@@ -64,6 +64,7 @@ export const commentApi = api.enhanceEndpoints({ addTagTypes: ["Comment"] }).inj
 				url: `posts/${postId}/comments/${commentId}/likeDislike`,
 				method: "POST",
 			}),
+			// invalidatesTags: (result, error, { postId, commentId }) => [{ type: "Comment", id: "LIST" }],
 			// Optimistique update like button state
 			onQueryStarted: ({ postId, commentId }, { dispatch, queryFulfilled }) => {
 				console.log("Mutation started : Optimistique update for like button");
@@ -71,10 +72,23 @@ export const commentApi = api.enhanceEndpoints({ addTagTypes: ["Comment"] }).inj
 					commentApi.util.updateQueryData("getAllComments", postId, (draft) => {
 						console.log(current(draft));
 						try {
-							const comment = draft.find((comment) => comment.id === commentId);
-							if (comment) {
-								comment.likedByUser = !comment.likedByUser;
-								comment.totalLikes += comment.likedByUser ? 1 : -1;
+							// Search through the comments
+							for (const comment of draft) {
+								// If the comment is the one being liked/disliked, update it
+								if (comment.id === commentId) {
+									comment.likedByUser = !comment.likedByUser;
+									comment.totalLikes += comment.likedByUser ? 1 : -1;
+									return;
+								}
+
+								// If the comment is not the one being liked/disliked, search its replies
+								for (const reply of comment.replies) {
+									if (reply.id === commentId) {
+										reply.likedByUser = !reply.likedByUser;
+										reply.totalLikes += reply.likedByUser ? 1 : -1;
+										return;
+									}
+								}
 							}
 						} catch (error) {
 							console.error(error);

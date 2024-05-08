@@ -387,6 +387,7 @@ export function Post({ post, setShowDialog, setShowCommentDialog }) {
 				</div>
 				<Gallery images={post?.images} />
 				<PostStatus post={post} />
+				<Divider className="m-0"/>
 				{/* Post Footer */}
 
 				<div className="flex gap-1">

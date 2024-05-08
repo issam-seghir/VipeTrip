@@ -129,11 +129,17 @@ const updatePost = asyncWrapper(async (req, res, next) => {
 		});
 	});
 
+	// Remove the '@' from each mention
+	const mentionNames = mentions.map((mention) => mention.replace("@", ""));
+	// Find all mentioned users by their firstName or lastName
+	const mentionedUsers = await User.find({ fullName: { $in: mentionNames } });
+	const mentionIds = mentionedUsers.map((user) => user.id);
+
 	// // Define the update data
 	const updateData = {
 		description: description || post.description,
 		edited: true,
-		mentions: mentions || post.mentions,
+		mentions: mentionIds || post.mentions,
 		tags: tags || post.tags,
 		privacy: privacy || post.privacy,
 		images: newImages || post.images,

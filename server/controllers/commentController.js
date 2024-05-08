@@ -23,6 +23,7 @@ const createComment = asyncWrapper(async (req, res) => {
 	if (!post) {
 		return res.status(404).json({ message: "Post not found" });
 	}
+
 	post.totalComments += 1;
 	await post.save();
 
@@ -86,7 +87,7 @@ const createReply = asyncWrapper(async (req, res) => {
 
 	const reply = new Comment({
 		author: req.user.id,
-		parentComment:commentId,
+		parentComment: commentId,
 		post: postId,
 		description: NewDescription,
 		mentions: mentionIds,
@@ -95,6 +96,7 @@ const createReply = asyncWrapper(async (req, res) => {
 	await reply.save();
 
 	parentComment.replies.push(reply);
+	parentComment.totalReplies += 1; // Increment the totalReplies count of the parent comment
 	await parentComment.save();
 
 	res.status(201).json({ message: "Reply added successfully", data: reply });
@@ -188,17 +190,20 @@ const deleteComment = asyncWrapper(async (req, res) => {
 		return res.status(403).json({ message: "User is not authorized to delete this comment" });
 	}
 
-	// Decrement the comment count of the post
-	post.totalComments -= 1;
-	await post.save();
+	// If the comment is a top-level comment, decrement the totalComments count of the post
+	if (comment.parentComment === null) {
+		post.totalComments -= 1;
+		await post.save();
+	}
 
-	// If the comment is a reply, decrement the totalReplies count of the parent comment and remove it from parent comment's replies
-	const parentComment = await Comment.findOne({ replies: commentId });
-	if (parentComment) {
-		await Comment.updateOne(
-			{ _id: parentComment._id },
-			{ $pull: { replies: commentId }, $inc: { totalReplies: -1 } }
-		);
+	// Check if the comment is a reply
+	if (comment.parentComment !== null) {
+		// Find the parent comment and decrement its totalReplies count
+		const parentComment = await Comment.findById(comment.parentComment);
+		if (parentComment) {
+			parentComment.totalReplies -= 1;
+			await parentComment.save();
+		}
 	}
 	// Delete all replies associated with the comment
 	await Comment.deleteMany({ _id: { $in: comment.replies } });
@@ -229,13 +234,11 @@ const getAllComments = asyncWrapper(async (req, res) => {
 		return res.status(404).json({ message: "Post not found" });
 	}
 
-	// Get the IDs of the posts that the user has liked
+	// Get the IDs of the comments that the user has liked
 	const userLikes = await Like.find({ liker: user.id, type: "Comment" });
 	const likedCommentsIds = new Set(userLikes.map((like) => like.likedComment._id.toString()));
 
-
-
-	let comments = await Comment.find({ post: postId ,parentComment: null})
+	let comments = await Comment.find({ post: postId, parentComment: null })
 		.sort({ createdAt: -1 }) // Sort by creation date in descending order
 		.populate("author")
 		.populate("replies");
@@ -245,6 +248,17 @@ const getAllComments = asyncWrapper(async (req, res) => {
 			comment.likedByUser = likedCommentsIds.has(comment._id.toString()); // Set the likedByUser virtual property
 			// fix preserving line break (new lines)
 			comment.description = comment.description.replaceAll("\\n", "\n");
+
+			if (comment?.replies) {
+				// Check if the user has liked the replies
+				comment.replies = comment.replies.map((reply) => {
+					reply.likedByUser = likedCommentsIds.has(reply._id.toString());
+					// fix preserving line break (new lines)
+					reply.description = reply.description.replaceAll("\\n", "\n");
+					return reply;
+				});
+			}
+
 			return comment;
 		})
 	);

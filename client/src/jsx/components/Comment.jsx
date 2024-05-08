@@ -28,7 +28,7 @@ import { commentSchema } from "@validations/postSchema";
 import { useForm } from "react-hook-form";
 import { PFormMentionTagTextArea } from "./Form/PFormMentionTagTextArea";
 
-export function Comment({key, comment }) {
+export function Comment({ key, comment }) {
 	const navigate = useNavigate();
 	const toast = useRef(null);
 	const optionsMenu = useRef(null);
@@ -45,7 +45,7 @@ export function Comment({key, comment }) {
 	const [deleteComment, deleteCommentResult] = useDeleteCommentMutation();
 	const [updateComment, updateCommentResult] = useUpdateCommentMutation();
 	const [createReply, createReplyResult] = useCreateReplyMutation();
-
+console.log(comment?.likedByUser);
 	const {
 		handleSubmit,
 		watch,
@@ -231,9 +231,9 @@ export function Comment({key, comment }) {
 		likeDislikeComment({ postId: comment?.post, commentId: comment?.id });
 		if (scope?.current) {
 			animate([
-				[".likeCommentButton", { scale: 0.8 }, { duration: 0.1, at: "<" }],
-				[".likeCommentButton", { scale: 1.2 }, { duration: 0.2 }],
-				[".likeCommentButton", { scale: 1 }, { duration: 0.1 }],
+				[`.likeCommentButton-${comment?.id}`, { scale: 0.8 }, { duration: 0.1, at: "<" }],
+				[`.likeCommentButton-${comment?.id}`, { scale: 1.2 }, { duration: 0.2 }],
+				[`.likeCommentButton-${comment?.id}`, { scale: 1 }, { duration: 0.1 }],
 			]);
 		}
 	};
@@ -413,14 +413,16 @@ export function Comment({key, comment }) {
 								onClick={handleLikeButton}
 								diabled={deleteComment?.isLoading || updateComment?.isLoading}
 								icon={comment?.likedByUser ? "pi pi-thumbs-up-fill " : "pi pi-thumbs-up"}
-								className="likeCommentButton p-1 w-2rem relative  p-button-text shadow-none border-none"
-							></Button>
-							<Button
-								diabled={deleteComment?.isLoading || updateComment?.isLoading}
-								icon="pi pi-comment"
-								className="p-button-text w-2rem p-0 shadow-none border-none"
-								onClick={() => setIsReplying(true)}
+								className={`likeCommentButton-${comment?.id} p-1 w-2rem relative p-button-text shadow-none border-none`}
 							/>
+							{!comment?.parentComment && (
+								<Button
+									diabled={deleteComment?.isLoading || updateComment?.isLoading}
+									icon="pi pi-comment"
+									className="p-button-text w-2rem p-0 shadow-none border-none"
+									onClick={() => setIsReplying(true)}
+								/>
+							)}
 						</div>
 					</div>
 				</div>
@@ -479,9 +481,6 @@ export function Comment({key, comment }) {
 						</div>
 					</div>
 				)}
-				{/* {comment?.replies.map((replies) => (
-					<Comment id={replies?.id} key={replies?.id} comment={replies} />
-				))} */}
 				{comment?.replies?.length > 0 &&
 					comment?.replies?.map((reply) => <Comment key={reply?.id} comment={reply} />)}
 			</div>

@@ -28,7 +28,7 @@ import { commentSchema } from "@validations/postSchema";
 import { useForm } from "react-hook-form";
 import { PFormMentionTagTextArea } from "./Form/PFormMentionTagTextArea";
 
-export function Comment({ key, comment }) {
+export function Comment({ comment }) {
 	const navigate = useNavigate();
 	const toast = useRef(null);
 	const optionsMenu = useRef(null);
@@ -240,7 +240,7 @@ export function Comment({ key, comment }) {
 	};
 
 	return (
-		<div key={key} ref={scope}>
+		<div  ref={scope}>
 			<div className="flex gap-2 mb-2">
 				{/* react hook form dev tool  */}
 				<Toast ref={toast} />

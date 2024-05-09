@@ -5,10 +5,10 @@ export const postApi = api.enhanceEndpoints({ addTagTypes: ["Post"] }).injectEnd
 	endpoints: (builder) => ({
 		getAllPosts: builder.query({
 			query: ({ page = 1, limit = 15 }) => `posts?page=${page}&limit=${limit}`,
-			transformResponse: (response) => response.data,
+			// transformResponse: (response) => response.data,
 			providesTags: (result) =>
 				result
-					? [...result.map(({ id }) => ({ type: "Post", id })), { type: "Post", id: "LIST" }]
+					? [...result.data.map(({ id }) => ({ type: "Post", id })), { type: "Post", id: "LIST" }]
 					: [{ type: "Post", id: "LIST" }],
 		}),
 		getPost: builder.query({
@@ -63,13 +63,13 @@ export const postApi = api.enhanceEndpoints({ addTagTypes: ["Post"] }).injectEnd
 				method: "POST",
 			}),
 			// Optimistique update like button state
-			onQueryStarted: (id, { dispatch, queryFulfilled }) => {
+			onQueryStarted: (id,page,limit, { dispatch, queryFulfilled }) => {
 				console.log("Mutation started : Optimistique update for Bookmark button");
 				const patchResult = dispatch(
-					postApi.util.updateQueryData("getAllPosts", undefined, (draft) => {
-						console.log(current(draft));
+					postApi.util.updateQueryData("getAllPosts", {page,limit}, (draft) => {
+						console.log(current(draft.data));
 						try {
-							const post = draft.find((post) => post.id === id);
+							const post = draft.data.find((post) => post.id === id);
 							if (post) {
 								post.bookmarkedByUser = !post.bookmarkedByUser;
 							}
@@ -98,13 +98,13 @@ export const postApi = api.enhanceEndpoints({ addTagTypes: ["Post"] }).injectEnd
 				method: "POST",
 			}),
 			// Optimistique update like button state
-			onQueryStarted: (id, { dispatch, queryFulfilled }) => {
+			onQueryStarted: (id,{ dispatch, queryFulfilled }) => {
 				console.log("Mutation started : Optimistique update for like button");
 				const patchResult = dispatch(
-					postApi.util.updateQueryData("getAllPosts", undefined, (draft) => {
+					postApi.util.updateQueryData("getAllPosts", {page:1,limit:5}, (draft) => {
 						console.log(current(draft));
 						try {
-							const post = draft.find((post) => post.id === id);
+							const post = draft.data.find((post) => post.id === id);
 							if (post) {
 								post.likedByUser = !post.likedByUser;
 								post.totalLikes += post.likedByUser ? 1 : -1;

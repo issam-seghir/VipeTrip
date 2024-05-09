@@ -151,8 +151,9 @@ const updatePost = asyncWrapper(async (req, res, next) => {
 
 const getAllPosts = asyncWrapper(async (req, res) => {
 	const page = Number.parseInt(req.query.page) || 1; // Get the page number from the query parameters, default to 1
-	const limit = Number.parseInt(req.query.limit) || 15; // Get the limit from the query parameters, default to 10
-	const skip = (page - 1) * limit;
+	const limit = Number.parseInt(req.query.limit) || 5; // Get the limit from the query parameters, default to 10
+	const startIndex = (page - 1) * limit;
+	const endIndex = page * limit;
 
 	const user = await User.findById(req.user.id);
 
@@ -164,8 +165,10 @@ const getAllPosts = asyncWrapper(async (req, res) => {
 	const bookmarkedPostIds = new Set(user.bookmarkedPosts.map((post) => post._id.toString()));
 	let posts = await Post.find()
 		.sort({ createdAt: -1 }) // Sort by creation date in descending order
-		.skip(skip) // Skip the posts before the current page
+		.skip(startIndex) // Skip the posts before the current page
 		.limit(limit); // Limit the number of posts
+	const total = await Post.countDocuments();
+	const hasNextPage = endIndex < total;
 
 	const viewedPosts = new Set();
 	let postImpressions = 0;
@@ -240,7 +243,13 @@ const getAllPosts = asyncWrapper(async (req, res) => {
 	// }
 
 	// console.log(posts);
-	res.status(201).json({ message: "Get all Posts successfully", data: posts });
+	res.status(201).json({
+		message: "Get all Posts successfully",
+		data: posts,
+		page: page,
+		limit: limit,
+		hasNextPage: hasNextPage,
+	});
 });
 
 const getUserPosts = asyncWrapper(async (req, res) => {

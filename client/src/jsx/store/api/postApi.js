@@ -5,7 +5,7 @@ import { current } from "immer";
 export const postApi = api.enhanceEndpoints({ addTagTypes: ["Post"] }).injectEndpoints({
 	endpoints: (builder) => ({
 		getAllPosts: builder.query({
-			query: ({ page = 1, limit = 15 }) => `posts?page=${page}&limit=${limit}`,
+			query: ({ page = 1, limit = 5 }) => `posts?page=${page}&limit=${limit}`,
 			// transformResponse: (response) => response.data,
 			providesTags: (result) =>
 				result
@@ -109,8 +109,8 @@ export const postApi = api.enhanceEndpoints({ addTagTypes: ["Post"] }).injectEnd
 				const limit = state.store.infiniteScroll.limit;
 
 				console.log("Mutation started : Optimistique update for like button");
-				const patchResult = dispatch(
-					postApi.util.updateQueryData("getAllPosts", { page, limit}, (draft) => {
+				const patchResultPrevPage = dispatch(
+					postApi.util.updateQueryData("getAllPosts", { page: page - 1, limit }, (draft) => {
 						console.log(current(draft));
 						try {
 							const post = draft.data.find((post) => post.id === id);
@@ -123,6 +123,35 @@ export const postApi = api.enhanceEndpoints({ addTagTypes: ["Post"] }).injectEnd
 						}
 					})
 				);
+				const patchResult = dispatch(
+					postApi.util.updateQueryData("getAllPosts", { page, limit }, (draft) => {
+						console.log(current(draft));
+						try {
+							const post = draft.data.find((post) => post.id === id);
+							if (post) {
+								post.likedByUser = !post.likedByUser;
+								post.totalLikes += post.likedByUser ? 1 : -1;
+							}
+						} catch (error) {
+							console.error(error);
+						}
+					})
+				);
+				const patchResultNextPage = dispatch(
+					postApi.util.updateQueryData("getAllPosts", { page: page + 1, limit }, (draft) => {
+						console.log(current(draft));
+						try {
+							const post = draft.data.find((post) => post.id === id);
+							if (post) {
+								post.likedByUser = !post.likedByUser;
+								post.totalLikes += post.likedByUser ? 1 : -1;
+							}
+						} catch (error) {
+							console.error(error);
+						}
+					})
+				);
+
 				const patchResultGetPost = dispatch(
 					postApi.util.updateQueryData("getPost", id, (draft) => {
 						if (draft) {
@@ -138,7 +167,9 @@ export const postApi = api.enhanceEndpoints({ addTagTypes: ["Post"] }).injectEnd
 					 * to trigger a re-fetch:
 					 * dispatch(api.util.invalidateTags(['Post']))
 					 */
+					patchResultPrevPage.undo();
 					patchResult.undo();
+					patchResultNextPage.undo();
 					patchResultGetPost.undo();
 				});
 			},

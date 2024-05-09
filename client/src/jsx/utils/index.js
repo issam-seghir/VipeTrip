@@ -1,8 +1,6 @@
 /* eslint-disable unicorn/no-useless-undefined */
-import { safeRegex } from "safe-regex";
 import uFuzzy from "@leeoniya/ufuzzy";
-
-
+import { safeRegex } from "safe-regex";
 
 /**
  ** Converts megabytes to bytes.
@@ -36,8 +34,6 @@ export const byteToMb = (sizeInBytes, decimalsNum = 2) => {
 	const fixedResult = result.toFixed(decimalsNum);
 	return +Number.parseFloat(fixedResult).toString();
 };
-
-
 
 /**
  * Generates a UUID.
@@ -88,7 +84,6 @@ export function isRegexSave(...regexes) {
 	};
 }
 
-
 /**
  * *Retrieves the value of a specified cookie from the document's cookie string.
  *
@@ -108,12 +103,11 @@ export function isRegexSave(...regexes) {
  * console.log(nonExistent); // null
  */
 export function getCookie(name) {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop().split(";").shift();
-    return null;
+	const value = `; ${document.cookie}`;
+	const parts = value.split(`; ${name}=`);
+	if (parts.length === 2) return parts.pop().split(";").shift();
+	return null;
 }
-
 
 /**
  * Debounces a function, delaying its execution until after a specified delay.
@@ -125,15 +119,15 @@ export function getCookie(name) {
  * debouncedFunc(); // 'Hello' will be logged to the console after 500ms.
  */
 export function debounce(func, delay) {
-		let debounceTimer;
-		return function () {
-			const args = arguments;
-			clearTimeout(debounceTimer);
-			debounceTimer = setTimeout(() => func.apply(this, args), delay);
-		};
-	}
+	let debounceTimer;
+	return function () {
+		const args = arguments;
+		clearTimeout(debounceTimer);
+		debounceTimer = setTimeout(() => func.apply(this, args), delay);
+	};
+}
 
-	/**
+/**
  * Performs a fuzzy search on an array of data.
  * @param {string} query - The search query.
  * @param {Array} data - The data to search through.
@@ -152,7 +146,6 @@ export function fuzzySearch(query, data) {
 	}
 	return [];
 }
-
 
 /**
  * Converts a JavaScript object into a FormData instance.
@@ -188,21 +181,31 @@ export function convertModelToFormData(val, formData = new FormData(), namespace
 		if (val instanceof Date) {
 			formData.append(namespace, val.toISOString());
 		} else if (Array.isArray(val)) {
-			val.forEach((element, i) => {
-				if (element instanceof File) {
-					formData.append(`${namespace}`, element);
-				} else {
-					convertModelToFormData(element, formData, `${namespace}[${i}]`);
-				}
-			});
+			if (val.length === 0) {
+				// Handle empty array
+				formData.append(namespace, JSON.stringify([]));
+			} else {
+				val.forEach((element, i) => {
+					if (element instanceof File) {
+						formData.append(`${namespace}`, element);
+					} else {
+						convertModelToFormData(element, formData, `${namespace}[${i}]`);
+					}
+				});
+			}
 		} else if (typeof val === "object" && !(val instanceof File)) {
-			Object.keys(val).forEach((propertyName) => {
-				convertModelToFormData(
-					val[propertyName],
-					formData,
-					namespace ? `${namespace}[${propertyName}]` : propertyName
-				);
-			});
+			if (Object.keys(val).length === 0) {
+				// Handle empty object
+				formData.append(namespace, JSON.stringify({}));
+			} else {
+				Object.keys(val).forEach((propertyName) => {
+					convertModelToFormData(
+						val[propertyName],
+						formData,
+						namespace ? `${namespace}[${propertyName}]` : propertyName
+					);
+				});
+			}
 		} else if (val instanceof File) {
 			formData.append(namespace, val);
 		} else {
@@ -242,10 +245,8 @@ export function toTitleCase(string) {
  * randomNumberBetween(100, 200);
  */
 export const randomNumberBetween = (min, max) => {
-  return Math.floor(Math.random() * (max - min + 1) + min);
+	return Math.floor(Math.random() * (max - min + 1) + min);
 };
-
-
 
 /**
  * Waits for the specified number of milliseconds.

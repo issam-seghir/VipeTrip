@@ -203,7 +203,8 @@ export function PostDialogForm({ showDialog, setShowDialog }) {
 				start + emojiObject?.emoji.length;
 		}, 0);
 	};
-
+const values = getValues(); // You can get all input values
+console.log(values);
 	const handlePollOpen = () => {
 		// handle poll click
 	};

@@ -17,34 +17,34 @@ export function useInfiniteScroll(useGetQuery) {
 		limit,
 	});
 
-	console.log("lastQueryResponse");
-	console.log(lastQueryResponse);
+	// console.log("lastQueryResponse");
+	// console.log(lastQueryResponse);
 	const currentQueryResponse = useGetQuery({
 		page,
 		limit,
 	});
 
-	console.log("currentQueryResponse");
-	console.log(currentQueryResponse);
+	// console.log("currentQueryResponse");
+	// console.log(currentQueryResponse);
 	const nextQueryResponse = useGetQuery({
 		page: page + 1,
 		limit,
 	});
 
-	console.log("nextQueryResponse");
-	console.log(nextQueryResponse);
+	// console.log("nextQueryResponse");
+	// console.log(nextQueryResponse);
 	const combinedData = useMemo(() => {
 		const arr = Array.from({ length: limit * (page + 1) });
 
-		console.log("Fetching data for pages:", {
-			lastPage: lastQueryResponse.data?.page,
-			currentPage: currentQueryResponse.data?.page,
-			nextPage: nextQueryResponse.data?.page,
-		});
+		// console.log("Fetching data for pages:", {
+		// 	lastPage: lastQueryResponse.data?.page,
+		// 	currentPage: currentQueryResponse.data?.page,
+		// 	nextPage: nextQueryResponse.data?.page,
+		// });
 		for (const data of [lastQueryResponse.data, currentQueryResponse.data, nextQueryResponse.data]) {
 			if (data) {
-				console.log("data");
-				console.log(data);
+				// console.log("data");
+				// console.log(data);
 				const offset = (data.page - 1) * data.limit;
 				arr.splice(offset, data.data.length, ...data.data);
 			}
@@ -63,6 +63,14 @@ export function useInfiniteScroll(useGetQuery) {
 		() => lastQueryResponse?.isLoading || currentQueryResponse?.isLoading || nextQueryResponse?.isLoading,
 		[currentQueryResponse?.isLoading, lastQueryResponse?.isLoading, nextQueryResponse?.isLoading]
 	);
+	const isError = useMemo(
+		() => lastQueryResponse?.isError || currentQueryResponse?.isError || nextQueryResponse?.isError,
+		[currentQueryResponse?.isError, lastQueryResponse?.isError, nextQueryResponse?.isError]
+	);
+const error = useMemo(
+	() => lastQueryResponse?.error || currentQueryResponse?.error || nextQueryResponse?.error,
+	[lastQueryResponse?.error, currentQueryResponse?.error, nextQueryResponse?.error]
+);
 
 	// this part of the code is managing the scroll up and down event.
 	// make sure you are using an intersection observer and not the scroll event.
@@ -105,5 +113,7 @@ export function useInfiniteScroll(useGetQuery) {
 		firstRowRef,
 		isFetching,
 		isLoading,
+    isError,
+    error
 	};
 }

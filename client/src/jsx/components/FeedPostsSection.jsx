@@ -10,7 +10,6 @@ import {
 } from "@store/slices/postSlice";
 import { Skeleton } from "primereact/skeleton";
 import { Toast } from "primereact/toast";
-import { classNames } from "primereact/utils";
 import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -55,13 +54,14 @@ export function FeedPostsSection({ setShowDialog, setShowCommentDialog }) {
 		}
 	}, [isPostRepostedSuccuss, dispatch]);
 
-	// const { data: posts, isFetching, isLoading, isError, error } = useGetAllPostsQuery();
 	const {
 		combinedData: posts,
 		lastRowRef,
 		firstRowRef,
 		isFetching,
 		isLoading,
+		isError,
+		error,
 	} = useInfiniteScroll(useGetAllPostsQuery);
 
 	if (isLoading) {
@@ -480,16 +480,15 @@ export function FeedPostsSection({ setShowDialog, setShowCommentDialog }) {
 		);
 	}
 
-	// if (isError) {
-	// 	console.log(error);
-	// 	<div>
-	// 		{error.status} {JSON.stringify(error.data)}
-	// 	</div>;
-	// 	// toast.error("échec de la requet des user");
-	// }
-	console.log(posts);
+	if (isError) {
+		console.log(error);
+		<div>
+			{error.status} {JSON.stringify(error.data)}
+		</div>;
+		// toast.error("échec de la requet des user");
+	}
 	return (
-		<div className={classNames("bg-red", isFetching)}>
+		<div>
 			<Toast ref={toast} />
 			{posts?.filter(Boolean).map((post, index, arr) => (
 				<Post
@@ -501,7 +500,16 @@ export function FeedPostsSection({ setShowDialog, setShowCommentDialog }) {
 					setShowCommentDialog={setShowCommentDialog}
 				/>
 			))}
-			{isFetching && "Loading more..."}
+			{isFetching && (
+				<div>
+					<h5>Rectangle</h5>
+					<Skeleton className="mb-2"></Skeleton>
+					<Skeleton width="10rem" className="mb-2"></Skeleton>
+					<Skeleton width="5rem" className="mb-2"></Skeleton>
+					<Skeleton height="2rem" className="mb-2"></Skeleton>
+					<Skeleton width="10rem" height="4rem"></Skeleton>
+				</div>
+			)}
 		</div>
 	);
 }

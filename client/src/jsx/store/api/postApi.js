@@ -63,13 +63,26 @@ export const postApi = api.enhanceEndpoints({ addTagTypes: ["Post"] }).injectEnd
 				url: `posts/${id}/bookmark`,
 				method: "POST",
 			}),
-			// Optimistique update like button state
+			// Optimistic update like button state
 			onQueryStarted: (id, { dispatch, queryFulfilled }) => {
 				const state = store.getState();
 				const page = state.store.infiniteScroll.page;
 				const limit = state.store.infiniteScroll.limit;
 
 				console.log("Mutation started : Optimistique update for Bookmark button");
+				const patchResultPrevPage = dispatch(
+					postApi.util.updateQueryData("getAllPosts", { page: page - 1, limit }, (draft) => {
+						console.log(current(draft.data));
+						try {
+							const post = draft.data.find((post) => post.id === id);
+							if (post) {
+								post.bookmarkedByUser = !post.bookmarkedByUser;
+							}
+						} catch (error) {
+							console.error(error);
+						}
+					})
+				);
 				const patchResult = dispatch(
 					postApi.util.updateQueryData("getAllPosts", { page, limit }, (draft) => {
 						console.log(current(draft.data));
@@ -83,7 +96,19 @@ export const postApi = api.enhanceEndpoints({ addTagTypes: ["Post"] }).injectEnd
 						}
 					})
 				);
-
+				const patchResultNextPage = dispatch(
+					postApi.util.updateQueryData("getAllPosts", { page: page + 1, limit }, (draft) => {
+						console.log(current(draft.data));
+						try {
+							const post = draft.data.find((post) => post.id === id);
+							if (post) {
+								post.bookmarkedByUser = !post.bookmarkedByUser;
+							}
+						} catch (error) {
+							console.error(error);
+						}
+					})
+				);
 				const patchResultGetPost = dispatch(
 					postApi.util.updateQueryData("getPost", id, (draft) => {
 						if (draft) {
@@ -92,7 +117,9 @@ export const postApi = api.enhanceEndpoints({ addTagTypes: ["Post"] }).injectEnd
 					})
 				);
 				queryFulfilled.catch(() => {
+					patchResultPrevPage.undo();
 					patchResult.undo();
+					patchResultNextPage.undo();
 					patchResultGetPost.undo();
 				});
 			},

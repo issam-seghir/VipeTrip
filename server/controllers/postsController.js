@@ -93,7 +93,7 @@ const deletePost = asyncWrapper(async (req, res, next) => {
 const updatePost = asyncWrapper(async (req, res, next) => {
 	const { postId } = req.params;
 	const userId = req.user.id;
-	const { description, mentions, tags, privacy, existingImages = [] } = req.body;
+	const { description, mentions =[], tags =[], privacy, existingImages = [] } = req.body;
 	const images = req?.files?.map((file) => file.path.replace("public\\", "")) || [];
 
 	console.log(images);

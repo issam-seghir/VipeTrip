@@ -104,9 +104,13 @@ export const postApi = api.enhanceEndpoints({ addTagTypes: ["Post"] }).injectEnd
 			}),
 			// Optimistique update like button state
 			onQueryStarted: (id, { dispatch, queryFulfilled }) => {
+				const state = store.getState();
+				const page = state.store.infiniteScroll.page;
+				const limit = state.store.infiniteScroll.limit;
+
 				console.log("Mutation started : Optimistique update for like button");
 				const patchResult = dispatch(
-					postApi.util.updateQueryData("getAllPosts", { page: 1, limit: 5 }, (draft) => {
+					postApi.util.updateQueryData("getAllPosts", { page, limit}, (draft) => {
 						console.log(current(draft));
 						try {
 							const post = draft.data.find((post) => post.id === id);

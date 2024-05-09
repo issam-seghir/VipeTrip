@@ -5,9 +5,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Icon } from "@iconify/react";
 import { Comments } from "@jsx/components/Comments";
 import { EmojiPickerOverlay } from "@jsx/components/EmojiPickerOverlay";
-import { useCreateCommentMutation, useUpdateCommentMutation } from "@jsx/store/api/commentApi";
+import { useCreateCommentMutation } from "@jsx/store/api/commentApi";
 import { postApi } from "@jsx/store/api/postApi";
 import { selectCurrentUser } from "@store/slices/authSlice";
+import { selectLimit, selectPage } from "@store/slices/infiniteScrollSlice";
 import { useDebounce } from "@uidotdev/usehooks";
 import { commentSchema } from "@validations/postSchema";
 import { Button } from "primereact/button";
@@ -28,15 +29,70 @@ export function PostCommentsDialog({ showDialog, setShowDialog }) {
 	const [cursorPosition, setCursorPosition] = useState(null);
 	const [createComment, createCommentResult] = useCreateCommentMutation();
 
-	const { post, isFetching, isLoading, isSuccess, isError, error } = postApi.useGetAllPostsQuery({page:1,limit:15}, {
-		selectFromResult: ({ data }) => {
-			// console.log(data); // Log all posts data
-			const selectedPost = data?.find((post) => post.id === showDialog?.id);
-			// console.log(selectedPost); // Log selected post
-			return { post: selectedPost };
-		},
-		skip: !showDialog.id  ,
-	});
+	const page = useSelector(selectPage);
+	const limit = useSelector(selectLimit);
+	console.log("page", page);
+	const {
+		postPrev,
+		isFetching: isPrevFetching,
+		isLoading: isPrevLoading,
+		isSuccess: isPrevSuccess,
+		isError: isPrevError,
+		error: prevError,
+	} = postApi.useGetAllPostsQuery(
+		{ page: page - 1, limit },
+		{
+			selectFromResult: ({ data }) => {
+				console.log("selectFromResult postPrev"); // Log all posts data
+				console.log(data); // Log all posts data
+				const selectedPost = data?.data?.find((post) => post?.id === showDialog?.id);
+				// console.log(selectedPost); // Log selected post
+				return { postPrev: selectedPost };
+			},
+			skip: !showDialog.id || page === 1, // Skip if showDialog.id is not defined or if we're on the first page
+		}
+	);
+	const {
+		postOriginal,
+		isFetching: isOriginalFetching,
+		isLoading: isOriginalLoading,
+		isSuccess: isOriginalSuccess,
+		isError: isOriginalError,
+		error: originalError,
+	} = postApi.useGetAllPostsQuery(
+		{ page, limit },
+		{
+			selectFromResult: ({ data }) => {
+				console.log("selectFromResult postOriginal"); // Log all posts data
+				console.log(data); // Log all posts data
+				const selectedPost = data?.data?.find((post) => post?.id === showDialog?.id);
+				// console.log(selectedPost); // Log selected post
+				return { postOriginal: selectedPost };
+			},
+			skip: !showDialog.id,
+		}
+	);
+	const {
+		postNext,
+		isFetching: isNextFetching,
+		isLoading: isNextLoading,
+		isSuccess: isNextSuccess,
+		isError: isNextError,
+		error: nextError,
+	} = postApi.useGetAllPostsQuery(
+		{ page: page + 1, limit },
+		{
+			selectFromResult: ({ data }) => {
+				console.log("selectFromResult postNext"); // Log all posts data
+				console.log(data); // Log all posts data
+				const selectedPost = data?.data?.find((post) => post?.id === showDialog?.id);
+				// console.log(selectedPost); // Log selected post
+				return { postNext: selectedPost };
+			},
+			skip: !showDialog.id,
+		}
+	);
+	const post = postPrev || postOriginal || postNext;
 
 	const {
 		handleSubmit,
@@ -134,7 +190,7 @@ export function PostCommentsDialog({ showDialog, setShowDialog }) {
 		emojiPicker.current.toggle(e);
 	};
 
-	if (isLoading || isFetching) {
+	if (isNextLoading || isOriginalLoading || isNextFetching || isOriginalFetching || isPrevLoading || isPrevFetching) {
 		return (
 			<div>
 				<div className="flex items-center justify-center">

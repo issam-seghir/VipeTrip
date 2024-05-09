@@ -72,19 +72,22 @@ export function Comments({postId}) {
 		</div>;
 		// toast.error("échec de la requet des user");
 	}
-
+console.log(comments);
 	return (
 		<div
 			className={classNames(
-				{ "bg-black-alpha-10 text-300": isFetching },
+				// { "bg-black-alpha-10 text-300": isFetching },
 				"p-3 my-4  flex flex-column gap-2 border-round-md"
 			)}
 		>
+			{isFetching && (
+				<div>
+					<Skeleton width="95%" className="ml-5  mb-2" height="4rem"></Skeleton>
+				</div>
+			)}
 			{comments.map((comment) => (
 				<Comment id={comment?.id} key={comment?.id} comment={comment} />
 			))}
-			<div id="scroll-anchor" />
-			{/* {isFetchingNextPage && "Loading more..."} */}
 		</div>
 	);
 }

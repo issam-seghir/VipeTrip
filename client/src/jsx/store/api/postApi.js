@@ -1,4 +1,5 @@
 import { api } from "@jsx/store/api/api";
+import { store } from "@jsx/store/store";
 import { current } from "immer";
 
 export const postApi = api.enhanceEndpoints({ addTagTypes: ["Post"] }).injectEndpoints({
@@ -63,10 +64,14 @@ export const postApi = api.enhanceEndpoints({ addTagTypes: ["Post"] }).injectEnd
 				method: "POST",
 			}),
 			// Optimistique update like button state
-			onQueryStarted: (id,page,limit, { dispatch, queryFulfilled }) => {
+			onQueryStarted: (id, { dispatch, queryFulfilled }) => {
+				const state = store.getState();
+				const page = state.store.infiniteScroll.page;
+				const limit = state.store.infiniteScroll.limit;
+
 				console.log("Mutation started : Optimistique update for Bookmark button");
 				const patchResult = dispatch(
-					postApi.util.updateQueryData("getAllPosts", {page,limit}, (draft) => {
+					postApi.util.updateQueryData("getAllPosts", { page, limit }, (draft) => {
 						console.log(current(draft.data));
 						try {
 							const post = draft.data.find((post) => post.id === id);
@@ -98,10 +103,10 @@ export const postApi = api.enhanceEndpoints({ addTagTypes: ["Post"] }).injectEnd
 				method: "POST",
 			}),
 			// Optimistique update like button state
-			onQueryStarted: (id,{ dispatch, queryFulfilled }) => {
+			onQueryStarted: (id, { dispatch, queryFulfilled }) => {
 				console.log("Mutation started : Optimistique update for like button");
 				const patchResult = dispatch(
-					postApi.util.updateQueryData("getAllPosts", {page:1,limit:5}, (draft) => {
+					postApi.util.updateQueryData("getAllPosts", { page: 1, limit: 5 }, (draft) => {
 						console.log(current(draft));
 						try {
 							const post = draft.data.find((post) => post.id === id);

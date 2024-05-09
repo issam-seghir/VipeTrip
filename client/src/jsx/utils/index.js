@@ -181,31 +181,21 @@ export function convertModelToFormData(val, formData = new FormData(), namespace
 		if (val instanceof Date) {
 			formData.append(namespace, val.toISOString());
 		} else if (Array.isArray(val)) {
-			if (val.length === 0) {
-				// Handle empty array
-				formData.append(namespace, JSON.stringify([]));
-			} else {
-				val.forEach((element, i) => {
-					if (element instanceof File) {
-						formData.append(`${namespace}`, element);
-					} else {
-						convertModelToFormData(element, formData, `${namespace}[${i}]`);
-					}
-				});
-			}
+			val.forEach((element, i) => {
+				if (element instanceof File) {
+					formData.append(`${namespace}`, element);
+				} else {
+					convertModelToFormData(element, formData, `${namespace}[${i}]`);
+				}
+			});
 		} else if (typeof val === "object" && !(val instanceof File)) {
-			if (Object.keys(val).length === 0) {
-				// Handle empty object
-				formData.append(namespace, JSON.stringify({}));
-			} else {
-				Object.keys(val).forEach((propertyName) => {
-					convertModelToFormData(
-						val[propertyName],
-						formData,
-						namespace ? `${namespace}[${propertyName}]` : propertyName
-					);
-				});
-			}
+			Object.keys(val).forEach((propertyName) => {
+				convertModelToFormData(
+					val[propertyName],
+					formData,
+					namespace ? `${namespace}[${propertyName}]` : propertyName
+				);
+			});
 		} else if (val instanceof File) {
 			formData.append(namespace, val);
 		} else {

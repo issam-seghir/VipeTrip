@@ -17,11 +17,20 @@ export const authSlice = createSlice({
 			state.user = null;
 			state.token = null;
 		},
+		 bookmarkPost: (state, action) => {
+                 if (state.user) {
+                state.user.bookmarkedPosts = [...(state.user.bookmarkedPosts || []), action.payload];
+            }
+        },
+        unbookmarkPost: (state, action) => {
+            if (state.user) {
+                state.user.bookmarkedPosts = (state.user.bookmarkedPosts || []).filter(post => post !== action.payload);
+            }
+        },
 	},
 });
 
-
 export const selectCurrentUser = (state) => state.store.auth.user;
 export const selectCurrentToken = (state) => state.store.auth.token;
-export const { setCredentials,clearCredentials } = authSlice.actions;
+export const { setCredentials, clearCredentials, bookmarkPost, unbookmarkPost } = authSlice.actions;
 export default authSlice.reducer;

@@ -1,4 +1,5 @@
 import { api } from "@jsx/store/api/api";
+import { bookmarkPost, unbookmarkPost } from "@jsx/store/slices/authSlice";
 import { store } from "@jsx/store/store";
 import { current } from "immer";
 
@@ -63,13 +64,18 @@ export const postApi = api.enhanceEndpoints({ addTagTypes: ["Post"] }).injectEnd
 				url: `posts/${id}/bookmark`,
 				method: "POST",
 			}),
-			// Optimistic update like button state
+			// Optimistic update when bookmark button is clicked
 			onQueryStarted: (id, { dispatch, queryFulfilled }) => {
 				const state = store.getState();
 				const page = state.store.infiniteScroll.page;
 				const limit = state.store.infiniteScroll.limit;
 
 				console.log("Mutation started : Optimistique update for Bookmark button");
+
+				// Optimistically update the user's bookmarked posts
+				store.dispatch(bookmarkPost(id));
+
+				// Optimistically update the posts
 				const patchResultPrevPage = dispatch(
 					postApi.util.updateQueryData("getAllPosts", { page: page - 1, limit }, (draft) => {
 						console.log(current(draft.data));
@@ -117,6 +123,7 @@ export const postApi = api.enhanceEndpoints({ addTagTypes: ["Post"] }).injectEnd
 					})
 				);
 				queryFulfilled.catch(() => {
+					store.dispatch(unbookmarkPost(id));
 					patchResultPrevPage.undo();
 					patchResult.undo();
 					patchResultNextPage.undo();

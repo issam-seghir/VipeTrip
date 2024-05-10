@@ -1,4 +1,5 @@
 const User = require("@model/User");
+const Post = require("@model/Post");
 const { asyncWrapper } = require("@middleware/asyncWrapper");
 const { ObjectIdSchema } = require("@utils/zodUtils");
 const createError = require("http-errors");
@@ -26,6 +27,8 @@ const getUser = asyncWrapper(async (req, res, next) => {
 	 await user.incrementViewedProfile();
 	res.json({ success: "get user success", user });
 });
+
+
 
 const updateUser = asyncWrapper(async (req, res, next) => {
 	const user = await User.findByIdAndUpdate(req.user.id, req.body, { new: true, runValidators: true });

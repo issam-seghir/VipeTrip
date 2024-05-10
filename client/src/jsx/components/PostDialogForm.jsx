@@ -16,21 +16,27 @@ import { Divider } from "primereact/divider";
 import { Toast } from "primereact/toast";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { convertModelToFormData } from "../utils/index";
 import { PFormDropdown } from "./Form/PFormDropdown";
 import { PFormMentionTagTextArea } from "./Form/PFormMentionTagTextArea";
+import {
+	selectPostDialogForm,
+	setPostDialogForm,
+} from "@store/slices/postSlice";
 
 const privacies = [
 	{ label: "onlyMe", value: "onlyMe" },
 	{ label: "friends", value: "friends" },
 	{ label: "public", value: "public" },
 ];
-export function PostDialogForm({ showDialog, setShowDialog }) {
+export function PostDialogForm() {
 	const navigate = useNavigate();
 	const user = useSelector(selectCurrentUser);
 	const toast = useRef(null);
+	const showDialog = useSelector(selectPostDialogForm);
+	const dispatch = useDispatch();
 	const descriptionRef = useRef(null);
 	const [cursorPosition, setCursorPosition] = useState(null);
 	const [createPost, createPostResult] = useCreatePostMutation();
@@ -63,7 +69,6 @@ export function PostDialogForm({ showDialog, setShowDialog }) {
 	});
 
 	useEffect(() => {
-		console.log(postToEdit);
 		if (isUpdate && postToEdit) {
 			const { images, ...postToEditWithoutImages } = postToEdit;
 			reset(postToEditWithoutImages);
@@ -111,7 +116,9 @@ export function PostDialogForm({ showDialog, setShowDialog }) {
 			const res = await createPost(formData).unwrap();
 			if (res) {
 				reset();
-				setShowDialog({ open: false, id: null });
+				dispatch(setPostDialogForm({ open: false, id: null }));
+
+				// setShowDialog({ open: false, id: null });
 				toast.current.show({
 					severity: "success",
 					summary: "Post Created 🎉",
@@ -144,7 +151,9 @@ export function PostDialogForm({ showDialog, setShowDialog }) {
 			const res = await updatePost({ id: postToEdit?.id, data: formData }).unwrap();
 			if (res) {
 				reset();
-				setShowDialog({ open: false, id: postToEdit.id });
+				dispatch(setPostDialogForm({ open: false, id: postToEdit?.id }));
+
+				// setShowDialog({ open: false, id: postToEdit.id });
 				toast.current.show({
 					severity: "success",
 					summary: "Post Updated 🎉",
@@ -244,7 +253,9 @@ console.log(values);
 				contentClassName="py-0"
 				breakpoints={{ "960px": "75vw", "640px": "90vw" }}
 				onHide={() => {
-					setShowDialog({ open: false, id: isUpdate ? postToEdit?.id : null });
+									dispatch(setPostDialogForm({ open: false, id: isUpdate ? postToEdit?.id : null }));
+
+					// setShowDialog({ open: false, id: isUpdate ? postToEdit?.id : null });
 					if (isUpdate) {
 						reset();
 						setExistingImages(postToEdit?.images);
@@ -348,6 +359,7 @@ console.log(values);
 							inputClassName="w-full  surface-card border-transparent shadow-none"
 							placeholder="Enter @ to mention people, # to mention tag"
 							autoResize={true}
+							// eslint-disable-next-line jsx-a11y/no-autofocus
 							autoFocus={true}
 							disabled={isSubmitting || createPostResult?.isLoading || updatePostResult?.isLoading}
 							errorMessage={errorMessage}

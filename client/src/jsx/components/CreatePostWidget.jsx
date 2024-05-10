@@ -1,21 +1,24 @@
 import { Icon } from "@iconify/react";
 
 import { selectCurrentUser } from "@store/slices/authSlice";
+import { setPostDialogForm } from "@store/slices/postSlice";
 
 import { Avatar } from "primereact/avatar";
 import { Button } from "primereact/button";
 
-import { useSelector } from "react-redux";
+import { useSelector ,useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
-export function CreatePostWidget({ onClick }) {
+export function CreatePostWidget() {
 	const navigate = useNavigate();
+	const dispatch = useDispatch();
+
 	const user = useSelector(selectCurrentUser);
 
 	return (
 		<div
 			className="cursor-pointer flex flex-column justify-content-between gap-3 p-3 w-full border-1 surface-border border-round"
-			onClick={onClick}
+			onClick={() => dispatch(setPostDialogForm({ open: true, id: null }))}
 			onKeyDown={() => {}}
 			tabIndex={0}
 			role="button"

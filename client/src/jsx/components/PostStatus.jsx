@@ -11,7 +11,8 @@ import { Button } from "primereact/button";
 
 export const PostStatus = ({ post }) => {
 	const navigate = useNavigate();
-
+console.log("post status");
+console.log(post);
 	const [likersDialog, setLikersDialog] = useState(false);
 	// const [trigger, { data: likers, isFetching, isLoading, isError, error }] = useLazyGetPostLikersQuery();
 	const {

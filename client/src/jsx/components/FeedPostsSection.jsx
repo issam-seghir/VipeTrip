@@ -6,7 +6,7 @@ import { useGetAllPostsQuery } from "@jsx/store/api/postApi";
 import { Skeleton } from "primereact/skeleton";
 
 
-export function FeedPostsSection({ setShowDialog, setShowCommentDialog }) {
+export function FeedPostsSection() {
 
 	const {
 		combinedData: posts,
@@ -449,8 +449,6 @@ export function FeedPostsSection({ setShowDialog, setShowCommentDialog }) {
 					key={post.id}
 					ref={index === 0 ? firstRowRef : index === arr.length - 1 ? lastRowRef : null}
 					post={post}
-					setShowDialog={setShowDialog}
-					setShowCommentDialog={setShowCommentDialog}
 				/>
 			))}
 			{isFetching && (

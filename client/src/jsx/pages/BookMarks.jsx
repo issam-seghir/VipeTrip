@@ -10,6 +10,7 @@ export function BookMarks() {
 	const toast = useRef(null);
 
 	const { data: user, isFetching, isLoading, isError, error } = useGetCurrentUserQuery();
+	console.log(user?.bookmarkedPosts);
 	if (isLoading) {
 		return (
 			<div>
@@ -23,9 +24,9 @@ export function BookMarks() {
 		);
 	}
 
-if (!user || (user?.bookmarkedPosts && user?.bookmarkedPosts.length === 0)) {
-	return <div>No bookmark to show!</div>;
-}
+	if (!user || (user?.bookmarkedPosts && user?.bookmarkedPosts.length === 0)) {
+		return <div>No bookmark to show!</div>;
+	}
 
 	if (isError) {
 		console.log(error);
@@ -38,13 +39,7 @@ if (!user || (user?.bookmarkedPosts && user?.bookmarkedPosts.length === 0)) {
 		<div>
 			<Toast ref={toast} />
 			{user?.bookmarkedPosts?.map((post, index, arr) => (
-				<Post
-					id={post.id}
-					key={post.id}
-					post={post}
-					// setShowDialog={setShowDialog}
-					// setShowCommentDialog={setShowCommentDialog}
-				/>
+				<Post id={post.id} key={post.id} post={post} />
 			))}
 		</div>
 	);

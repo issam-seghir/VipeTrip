@@ -28,6 +28,7 @@ export const commentApi = api.enhanceEndpoints({ addTagTypes: ["Comment"] }).inj
 			invalidatesTags: (result, error, { postId }) => [
 				{ type: "Post", id: "LIST" },
 				{ type: "Comment", id: "LIST" },
+				{ type: "User", id: "LIST" },
 			],
 		}),
 		createReply: builder.mutation({
@@ -57,6 +58,7 @@ export const commentApi = api.enhanceEndpoints({ addTagTypes: ["Comment"] }).inj
 			invalidatesTags: (result, error, { postId, commentId }) => [
 				{ type: "Post", id: "LIST" },
 				{ type: "Comment", id: "LIST" },
+				{ type: "User", id: "LIST" },
 			],
 		}),
 		likeDislikeComment: builder.mutation({

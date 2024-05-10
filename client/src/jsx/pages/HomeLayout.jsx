@@ -13,6 +13,8 @@ import {
 import { useEffect, useRef, Suspense } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Toast } from "primereact/toast";
+import { PostDialogForm } from "@jsx/components/PostDialogForm";
+import { PostCommentsDialog } from "@jsx/components/PostCommentsDialog";
 
 export const HomeLayout = () => {
 	const isNonMobileScreens = useMediaQuery("(min-width:1000px)");
@@ -148,6 +150,8 @@ export const HomeLayout = () => {
 				</div>
 				<div className="grid-container-right">test</div>
 			</main>
+			<PostDialogForm />
+			<PostCommentsDialog />
 		</>
 	);
 };

@@ -12,7 +12,7 @@ import { Avatar } from "primereact/avatar";
 import { Button } from "primereact/button";
 import { Menu } from "primereact/menu";
 import { Tooltip } from "primereact/tooltip";
-import { useRef, useState, forwardRef } from "react";
+import { forwardRef, useRef, useState } from "react";
 import "react-lazy-load-image-component/src/effects/blur.css";
 import { useNavigate } from "react-router-dom";
 import {
@@ -31,7 +31,12 @@ import { useCopyToClipboard } from "usehooks-ts";
 import { Gallery } from "./Gallery";
 import { PostStatus } from "./PostStatus";
 
-import { setPostIsDeletedSuccuss, setPostIsRepostedSuccuss } from "@jsx/store/slices/postSlice";
+import {
+	setPostCommentsDialog,
+	setPostDialogForm,
+	setPostIsDeletedSuccuss,
+	setPostIsRepostedSuccuss,
+} from "@jsx/store/slices/postSlice";
 import { selectCurrentUser } from "@store/slices/authSlice";
 import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
 import { Divider } from "primereact/divider";
@@ -39,9 +44,8 @@ import { OverlayPanel } from "primereact/overlaypanel";
 import { Toast } from "primereact/toast";
 import { classNames } from "primereact/utils";
 import { useDispatch, useSelector } from "react-redux";
-import { Dialog } from "primereact/dialog";
 
-export const  Post = forwardRef(({ post, setShowDialog, setShowCommentDialog },ref) =>  {
+export const Post = forwardRef(({ post }, ref) => {
 	const navigate = useNavigate();
 	const toast = useRef(null);
 	const optionsMenu = useRef(null);
@@ -70,7 +74,8 @@ export const  Post = forwardRef(({ post, setShowDialog, setShowCommentDialog },r
 						className: "border-round-md m-1",
 						icon: "pi pi-file-edit",
 						command: () => {
-							setShowDialog({ open: true, id: post.id });
+							dispatch(setPostDialogForm({ open: true, id: post?.id }));
+							// setShowDialog({ open: true, id: post.id });
 						},
 					},
 			  ]
@@ -421,7 +426,8 @@ export const  Post = forwardRef(({ post, setShowDialog, setShowCommentDialog },r
 							icon="pi pi-comment"
 							className="p-button-text shadow-none border-none"
 							onClick={() => {
-								setShowCommentDialog({ open: true, id: post?.id });
+								dispatch(setPostCommentsDialog({ open: true, id: post?.id }));
+								// setShowCommentDialog({ open: true, id: post?.id });
 							}}
 						/>
 						<Button
@@ -515,6 +521,6 @@ export const  Post = forwardRef(({ post, setShowDialog, setShowCommentDialog },r
 				</div>
 			</div>
 		</>
-	)
+	);
 });
 Post.displayName = "Post";

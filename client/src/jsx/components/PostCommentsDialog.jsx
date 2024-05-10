@@ -7,7 +7,6 @@ import { Comments } from "@jsx/components/Comments";
 import { EmojiPickerOverlay } from "@jsx/components/EmojiPickerOverlay";
 import { useCreateCommentMutation } from "@jsx/store/api/commentApi";
 import { postApi } from "@jsx/store/api/postApi";
-import { selectCurrentUser } from "@store/slices/authSlice";
 import { selectLimit, selectPage } from "@store/slices/infiniteScrollSlice";
 import { useDebounce } from "@uidotdev/usehooks";
 import { commentSchema } from "@validations/postSchema";
@@ -17,21 +16,25 @@ import { Skeleton } from "primereact/skeleton";
 import { Toast } from "primereact/toast";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useSelector } from "react-redux";
+import { useSelector ,useDispatch} from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { PFormMentionTagTextArea } from "./Form/PFormMentionTagTextArea";
+import { setPostCommentsDialog ,selectPostCommentsDialog } from "@store/slices/postSlice";
+import { userApi } from "@jsx/store/api/userApi";
+import { selectCurrentUser } from "@store/slices/authSlice";
 
-export function PostCommentsDialog({ showDialog, setShowDialog }) {
+export function PostCommentsDialog() {
 	const navigate = useNavigate();
-	const user = useSelector(selectCurrentUser);
 	const toast = useRef(null);
 	const descriptionCommentRef = useRef(null);
 	const [cursorPosition, setCursorPosition] = useState(null);
 	const [createComment, createCommentResult] = useCreateCommentMutation();
+	const showDialog = useSelector(selectPostCommentsDialog);
+	const dispatch = useDispatch();
+	const user = useSelector(selectCurrentUser);
 
 	const page = useSelector(selectPage);
 	const limit = useSelector(selectLimit);
-	console.log("page", page);
 	const {
 		postPrev,
 		isFetching: isPrevFetching,
@@ -43,8 +46,8 @@ export function PostCommentsDialog({ showDialog, setShowDialog }) {
 		{ page: page - 1, limit },
 		{
 			selectFromResult: ({ data }) => {
-				console.log("selectFromResult postPrev"); // Log all posts data
-				console.log(data); // Log all posts data
+				// console.log("selectFromResult postPrev"); // Log all posts data
+				// console.log(data); // Log all posts data
 				const selectedPost = data?.data?.find((post) => post?.id === showDialog?.id);
 				// console.log(selectedPost); // Log selected post
 				return { postPrev: selectedPost };
@@ -63,8 +66,8 @@ export function PostCommentsDialog({ showDialog, setShowDialog }) {
 		{ page, limit },
 		{
 			selectFromResult: ({ data }) => {
-				console.log("selectFromResult postOriginal"); // Log all posts data
-				console.log(data); // Log all posts data
+				// console.log("selectFromResult postOriginal"); // Log all posts data
+				// console.log(data); // Log all posts data
 				const selectedPost = data?.data?.find((post) => post?.id === showDialog?.id);
 				// console.log(selectedPost); // Log selected post
 				return { postOriginal: selectedPost };
@@ -83,8 +86,8 @@ export function PostCommentsDialog({ showDialog, setShowDialog }) {
 		{ page: page + 1, limit },
 		{
 			selectFromResult: ({ data }) => {
-				console.log("selectFromResult postNext"); // Log all posts data
-				console.log(data); // Log all posts data
+				// console.log("selectFromResult postNext"); // Log all posts data
+				// console.log(data); // Log all posts data
 				const selectedPost = data?.data?.find((post) => post?.id === showDialog?.id);
 				// console.log(selectedPost); // Log selected post
 				return { postNext: selectedPost };
@@ -92,7 +95,23 @@ export function PostCommentsDialog({ showDialog, setShowDialog }) {
 			skip: !showDialog.id,
 		}
 	);
-	const post = postPrev || postOriginal || postNext;
+	const {
+		bookmarkedPost,
+		isFetching: isUserFetching,
+		isLoading: isUserLoading,
+		isError: isUserError,
+		error: userError,
+	} = userApi.useGetCurrentUserQuery(undefined, {
+		selectFromResult: ({ data }) => {
+			// console.log("selectFromResult uszer"); // Log all posts data
+			// console.log(data); // Log all posts data
+			const selectedPost = data?.bookmarkedPosts.find((post) => post?.id === showDialog?.id);
+			// console.log(selectedPost); // Log selected post
+			return { bookmarkedPost: selectedPost };
+		},
+		skip: !showDialog.id,
+	});
+	const post = postPrev || postOriginal || postNext || bookmarkedPost;
 
 	const {
 		handleSubmit,
@@ -140,7 +159,6 @@ export function PostCommentsDialog({ showDialog, setShowDialog }) {
 					description: "",
 					mentions: [],
 				});
-				// setShowDialog({ open: false, id: showDialog?.id });
 				toast.current.show({
 					severity: "success",
 					summary: "Comment Created 🎉",
@@ -190,7 +208,16 @@ export function PostCommentsDialog({ showDialog, setShowDialog }) {
 		emojiPicker.current.toggle(e);
 	};
 
-	if (isNextLoading || isOriginalLoading || isNextFetching || isOriginalFetching || isPrevLoading || isPrevFetching) {
+	if (
+		isNextLoading ||
+		isOriginalLoading ||
+		isNextFetching ||
+		isOriginalFetching ||
+		isPrevLoading ||
+		isPrevFetching ||
+		isUserLoading ||
+		isUserFetching
+	) {
 		return (
 			<div>
 				<div className="flex items-center justify-center">
@@ -212,14 +239,14 @@ export function PostCommentsDialog({ showDialog, setShowDialog }) {
 			{/* Create New Post Form Dialog */}
 			<Dialog
 				key={`${showDialog?.id}`}
-				header={<h2 className="text-center">{`${user.firstName}'s Post`}</h2>}
+				header={<h2 className="text-center">{`${user?.firstName}'s Post`}</h2>}
 				visible={showDialog.open}
 				style={{ width: "40%" }}
 				contentClassName="py-0"
 				breakpoints={{ "960px": "75vw", "640px": "90vw" }}
-				onHide={() => {
-					setShowDialog({ open: false, id: showDialog?.id });
-				}}
+				onHide={() =>
+					dispatch(setPostCommentsDialog({ open: false, id: showDialog?.id }))
+				}
 				draggable={false}
 				dismissableMask={!isSubmitting && !createCommentResult?.isLoading}
 				closeOnEscape={!isSubmitting && !createCommentResult?.isLoading}
@@ -237,6 +264,7 @@ export function PostCommentsDialog({ showDialog, setShowDialog }) {
 							inputClassName="w-full border-none surface-ground shadow-none"
 							placeholder="Write your thought ... @ for mentions"
 							autoResize={true}
+							// eslint-disable-next-line jsx-a11y/no-autofocus
 							autoFocus={true}
 							disabled={isSubmitting || createCommentResult?.isLoading || createCommentResult?.isLoading}
 							errorMessage={errorMessage}

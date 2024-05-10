@@ -46,7 +46,6 @@ export function Comment({ comment }) {
 	const [deleteComment, deleteCommentResult] = useDeleteCommentMutation();
 	const [updateComment, updateCommentResult] = useUpdateCommentMutation();
 	const [createReply, createReplyResult] = useCreateReplyMutation();
-	console.log(comment?.likedByUser);
 	const {
 		handleSubmit,
 		watch,

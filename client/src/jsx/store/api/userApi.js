@@ -1,6 +1,6 @@
 import { api } from "@jsx/store/api/api";
 
-export const userApi = api.api.enhanceEndpoints({ addTagTypes: ["User"] }).injectEndpoints({
+export const userApi = api.enhanceEndpoints({ addTagTypes: ["User"] }).injectEndpoints({
 	// get user by id query
 	endpoints: (builder) => ({
 		getUserById: builder.query({
@@ -9,12 +9,12 @@ export const userApi = api.api.enhanceEndpoints({ addTagTypes: ["User"] }).injec
 				method: "GET",
 			}),
 		}),
-		getBookmarkedPosts: builder.query({
-			query: () => `users/bookmarkedPosts`,
+		getCurrentUser: builder.query({
+			query: () => `users/me`,
 			transformResponse: (response) => response.data,
 			providesTags: (result, error) => [{ type: "User", id: "LIST" }],
 		}),
 	}),
 });
 
-export const { useGetUserByIdQuery, useGetBookmarkedPostsQuery } = userApi;
+export const { useGetUserByIdQuery, useGetCurrentUserQuery } = userApi;

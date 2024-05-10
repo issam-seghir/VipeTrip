@@ -42,14 +42,20 @@ export const postApi = api.enhanceEndpoints({ addTagTypes: ["Post"] }).injectEnd
 				method: "PUT",
 				body: data,
 			}),
-			invalidatesTags: (result, error, { id }) => [{ type: "Post", id }],
+			invalidatesTags: (result, error, { id }) => [
+				{ type: "Post", id },
+				{ type: "User", id: "LIST" },
+			],
 		}),
 		deletePost: builder.mutation({
 			query: (id) => ({
 				url: `posts/${id}`,
 				method: "DELETE",
 			}),
-			invalidatesTags: (result, error, id) => [{ type: "Post", id }],
+			invalidatesTags: (result, error, id) => [
+				{ type: "Post", id },
+				{ type: "User", id: "LIST" },
+			],
 		}),
 		repostPost: builder.mutation({
 			query: (id) => ({
@@ -63,7 +69,7 @@ export const postApi = api.enhanceEndpoints({ addTagTypes: ["Post"] }).injectEnd
 				url: `posts/${id}/bookmark`,
 				method: "POST",
 			}),
-			invalidatesTags: (result, error, id) => [{ type: "User", id:"LIST" }],
+			invalidatesTags: (result, error, id) => [{ type: "User", id: "LIST" }],
 
 			// Optimistic update when bookmark button is clicked
 			onQueryStarted: (id, { dispatch, queryFulfilled }) => {
@@ -191,14 +197,22 @@ export const postApi = api.enhanceEndpoints({ addTagTypes: ["Post"] }).injectEnd
 						}
 					})
 				);
-				// const patchResultCurrentUserPosts = dispatch(
-				// 	userApi.util.updateQueryData("getCurrentUser", undefined, (draft) => {
-				// 		if (draft) {
-				// 			draft.bookmarkedPosts.likedByUser = !draft.likedByUser;
-				// 			draft.bookmarkedPosts.totalLikes += draft.likedByUser ? 1 : -1;
-				// 		}
-				// 	})
-				// );
+				const patchResultCurrentUserPosts = dispatch(
+					userApi.util.updateQueryData("getCurrentUser", undefined, (draft) => {
+						console.log(current(draft));
+						try {
+							const bookmarkedPost = draft.bookmarkedPosts.find((post) => post.id === id);
+							console.log(id);
+							console.log(current(bookmarkedPost));
+							if (bookmarkedPost) {
+								bookmarkedPost.likedByUser = !bookmarkedPost.likedByUser;
+								bookmarkedPost.totalLikes += bookmarkedPost.likedByUser ? 1 : -1;
+							}
+						} catch (error) {
+							console.error(error);
+						}
+					})
+				);
 
 				queryFulfilled.catch(() => {
 					/**
@@ -210,6 +224,7 @@ export const postApi = api.enhanceEndpoints({ addTagTypes: ["Post"] }).injectEnd
 					patchResult.undo();
 					patchResultNextPage.undo();
 					patchResultGetPost.undo();
+					patchResultCurrentUserPosts.undo();
 				});
 			},
 		}),

@@ -2,57 +2,11 @@ import { Post } from "@components/Post";
 import { useInfiniteScroll } from "@hooks/useInfiniteScroll";
 
 import { useGetAllPostsQuery } from "@jsx/store/api/postApi";
-import {
-	selectPostDeleteSuccuss,
-	selectPostRespostedSuccuss,
-	setPostIsDeletedSuccuss,
-	setPostIsRepostedSuccuss,
-} from "@store/slices/postSlice";
+
 import { Skeleton } from "primereact/skeleton";
-import { Toast } from "primereact/toast";
-import { useEffect, useRef } from "react";
-import { useDispatch, useSelector } from "react-redux";
+
 
 export function FeedPostsSection({ setShowDialog, setShowCommentDialog }) {
-	// Get the current values of isPostDeletedSuccuss and isPostDeletedFails
-	const toast = useRef(null);
-	const toastShown = useRef(false); // Add a new ref to track whether the toast has been shown
-	const isPostDeletedSuccuss = useSelector(selectPostDeleteSuccuss);
-	const isPostRepostedSuccuss = useSelector(selectPostRespostedSuccuss);
-	const dispatch = useDispatch();
-
-	// show success message when deleting a post
-	useEffect(() => {
-		if (isPostDeletedSuccuss && !toastShown.current) {
-			toast.current.show({
-				severity: "success",
-				summary: "Post Deleted 🎉",
-				detail: "Your post has been deleted successfully",
-				life: 3000,
-			});
-			toastShown.current = true; // Set toastShown.current to true after showing the toast
-			dispatch(setPostIsDeletedSuccuss(false));
-		} else if (!isPostDeletedSuccuss) {
-			toastShown.current = false; // Reset toastShown.current to false when isPostDeletedSuccuss is false
-		}
-	}, [isPostDeletedSuccuss, dispatch]);
-
-	// show success message when Reposting a post
-
-	useEffect(() => {
-		if (isPostRepostedSuccuss && !toastShown.current) {
-			toast.current.show({
-				severity: "success",
-				summary: "Post Reposted to your feed  🎉",
-				detail: "Your post has been reposted successfully",
-				life: 3000,
-			});
-			toastShown.current = true; // Set toastShown.current to true after showing the toast
-			dispatch(setPostIsRepostedSuccuss(false));
-		} else if (!isPostRepostedSuccuss) {
-			toastShown.current = false; // Reset toastShown.current to false when isPostRepostedSuccuss is false
-		}
-	}, [isPostRepostedSuccuss, dispatch]);
 
 	const {
 		combinedData: posts,
@@ -489,7 +443,6 @@ export function FeedPostsSection({ setShowDialog, setShowCommentDialog }) {
 	}
 	return (
 		<div>
-			<Toast ref={toast} />
 			{posts?.filter(Boolean).map((post, index, arr) => (
 				<Post
 					id={post.id}

@@ -2,13 +2,63 @@ import Navbar from "@components/NavBar";
 import { useMediaQuery } from "@mui/material";
 import { Badge } from "primereact/badge";
 import { Menu } from "primereact/menu";
-import { Suspense } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { Loader } from "./../components/Loader";
+import {
+	selectPostDeleteSuccuss,
+	selectPostRespostedSuccuss,
+	setPostIsDeletedSuccuss,
+	setPostIsRepostedSuccuss,
+} from "@store/slices/postSlice";
+import { useEffect, useRef, Suspense } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Toast } from "primereact/toast";
 
 export const HomeLayout = () => {
 	const isNonMobileScreens = useMediaQuery("(min-width:1000px)");
 	const navigate = useNavigate();
+	// Get the current values of isPostDeletedSuccuss and isPostDeletedFails
+	const toast = useRef(null);
+	const toastShown = useRef(false); // Add a new ref to track whether the toast has been shown
+	const isPostDeletedSuccuss = useSelector(selectPostDeleteSuccuss);
+	const isPostRepostedSuccuss = useSelector(selectPostRespostedSuccuss);
+	const dispatch = useDispatch();
+
+	// show success message when deleting a post
+	useEffect(() => {
+		if (isPostDeletedSuccuss && !toastShown.current) {
+			toast.current.show({
+				severity: "success",
+				summary: "Post Deleted 🎉",
+				detail: "Your post has been deleted successfully",
+				life: 3000,
+			});
+			toastShown.current = true; // Set toastShown.current to true after showing the toast
+			dispatch(setPostIsDeletedSuccuss(false));
+		} else if (!isPostDeletedSuccuss) {
+			toastShown.current = false; // Reset toastShown.current to false when isPostDeletedSuccuss is false
+		}
+	}, [isPostDeletedSuccuss, dispatch]);
+
+	// show success message when Reposting a post
+
+	useEffect(() => {
+		if (isPostRepostedSuccuss && !toastShown.current) {
+			toast.current.show({
+				severity: "success",
+				summary: "Post Reposted to your feed  🎉",
+				detail: "Your post has been reposted successfully",
+				life: 3000,
+			});
+			toastShown.current = true; // Set toastShown.current to true after showing the toast
+			dispatch(setPostIsRepostedSuccuss(false));
+		} else if (!isPostRepostedSuccuss) {
+			toastShown.current = false; // Reset toastShown.current to false when isPostRepostedSuccuss is false
+		}
+	}, [isPostRepostedSuccuss, dispatch]);
+
+
+
 	const itemRenderer = (item) => (
 		<div className="p-menuitem-content border-round-xl w-full mb-2">
 			<NavLink
@@ -85,6 +135,7 @@ export const HomeLayout = () => {
 	// const { id, picturePath, fullName } = useSelector((state) => state.store.auth.user);
 	return (
 		<>
+			<Toast ref={toast} />
 			<Navbar />
 			<main className="grid-container">
 				<div className="grid-container-left">

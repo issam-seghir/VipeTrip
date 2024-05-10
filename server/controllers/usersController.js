@@ -12,7 +12,6 @@ const getAllUsers = asyncWrapper(async (req, res, next) => {
 	res.json({ success: "get all users success", users });
 });
 
-
 const getUser = asyncWrapper(async (req, res, next) => {
 	try {
 		ObjectIdSchema.parse(req.params.id); //pass the validation
@@ -81,10 +80,12 @@ const getUser = asyncWrapper(async (req, res, next) => {
 });
 
 const getCurrentUser = asyncWrapper(async (req, res, next) => {
-
 	if (!req?.user?.id) return next(new createError.BadRequest("User ID required"));
 
-	const user = await User.findById(req.user.id).populate("bookmarkedPosts");
+	const user = await User.findById(req.user.id).populate({
+		path: "bookmarkedPosts",
+		options: { sort: { createdAt: -1 } }, // Sort in descending order of creation time
+	});
 
 	// Get the IDs of the posts that the user has bookmarked
 	if (!user) {
@@ -141,8 +142,6 @@ const getCurrentUser = asyncWrapper(async (req, res, next) => {
 
 	res.json({ success: "get user success", data: user });
 });
-
-
 
 const updateUser = asyncWrapper(async (req, res, next) => {
 	const user = await User.findByIdAndUpdate(req.user.id, req.body, { new: true, runValidators: true });

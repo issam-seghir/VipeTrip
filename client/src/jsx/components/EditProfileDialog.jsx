@@ -25,6 +25,7 @@ import { selectPostDialogForm, setPostDialogForm } from "@store/slices/postSlice
 import { PFormTextField } from "@components/Form/PFormTextField";
 import { PFormAutoCompleteContries } from "@jsx/components/Form/PFormAutoCompleteContries";
 import { userProfileSchema } from "@validations/userSchema";
+import { PFormTextAreaField } from "./Form/PFormTextAreaField";
 
 export function EditProfileDialog({ showDialog ,setShowDialog}) {
 	const navigate = useNavigate();
@@ -172,7 +173,8 @@ export function EditProfileDialog({ showDialog ,setShowDialog}) {
 				header={<h2 className="text-center">{"Update Profile"}</h2>}
 				visible={showDialog.open}
 				style={{ width: "40%" }}
-				contentClassName="py-0"
+				contentStyle={{ overflowY: "auto", maxHeight: "40%" }}
+				contentClassName="pt-5"
 				breakpoints={{ "960px": "75vw", "640px": "90vw" }}
 				onHide={() => {
 					setShowDialog({ open: false, data: showDialog.data });
@@ -206,58 +208,68 @@ export function EditProfileDialog({ showDialog ,setShowDialog}) {
 						<Divider />
 						<Button
 							type="submit"
-							label={
-								updateProfileResult?.isLoading
-									? "Updatting ..."
-									: "Update Profile"
-							}
+							label={updateProfileResult?.isLoading ? "Updatting ..." : "Update Profile"}
 							className="w-full"
 							iconPos="right"
-							loading={isSubmitting  || updateProfileResult?.isLoading}
+							loading={isSubmitting || updateProfileResult?.isLoading}
 							onClick={handleSubmit(onSubmit)}
 						/>
 					</>
 				}
 			>
 				<form onSubmit={handleSubmit(onSubmit)}>
-					<div className="flex flex-column gap-2 align-items-center">
-						<PFormTextField
-							control={control}
-							defaultValue={""}
-							name={"firstName"}
-							label="First Name"
-							size={"lg"}
-							iconStart={"pi-user"}
-							errorMessage={errorMessage}
-						/>
-						<PFormTextField
-							control={control}
-							defaultValue={""}
-							name={"lastName"}
-							label="Last Name"
-							size={"lg"}
-							iconStart={"pi-user"}
-							errorMessage={errorMessage}
-						/>
-						<PFormTextField
-							control={control}
-							defaultValue={""}
-							name={"job"}
-							label="Job"
-							size={"lg"}
-							iconStart={"pi-briefcase"}
-							errorMessage={errorMessage}
-						/>
-						<PFormAutoCompleteContries
-							control={control}
-							getValues={getValues}
-							defaultValue={""}
-							name={"location"}
-							iconStart={"pi-map-marker"}
-							label="Location"
-							size={"lg"}
-							errorMessage={errorMessage}
-						/>
+					<div className="formgrid grid">
+						<div className="field col-12 md:col-6">
+							<PFormTextField
+								control={control}
+								name={"firstName"}
+								label="First Name"
+								size={"lg"}
+								iconStart={"pi-user"}
+								errorMessage={errorMessage}
+							/>
+						</div>
+						<div className="field col-12 md:col-6">
+							<PFormTextField
+								control={control}
+								name={"lastName"}
+								label="Last Name"
+								size={"lg"}
+								iconStart={"pi-user"}
+								errorMessage={errorMessage}
+							/>
+						</div>
+						<div className="field col-12">
+							<PFormTextAreaField
+								control={control}
+								name={"bio"}
+								fullWidth
+								placeholder="Your Bio ..."
+								errorMessage={errorMessage}
+							/>
+						</div>
+						<div className="field col-12 md:col-6">
+							<PFormTextField
+								control={control}
+								name={"job"}
+								label="Job"
+								size={"lg"}
+								iconStart={"pi-briefcase"}
+								errorMessage={errorMessage}
+							/>
+						</div>
+						<div className="field col-12 md:col-6">
+							<PFormAutoCompleteContries
+								control={control}
+								getValues={getValues}
+								defaultValue={""}
+								name={"location"}
+								iconStart={"pi-map-marker"}
+								label="Location"
+								size={"lg"}
+								errorMessage={errorMessage}
+							/>
+						</div>
 					</div>
 
 					{/* Photos Preview */}

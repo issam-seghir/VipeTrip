@@ -1,4 +1,5 @@
 import { CreatePostWidget } from "@components/CreatePostWidget";
+import { EditProfileDialog } from "@components/EditProfileDialog";
 import { UserPosts } from "@components/UserPosts";
 import { useGetCurrentUserQuery, useGetUserQuery } from "@jsx/store/api/userApi";
 import { toTitleCase } from "@jsx/utils";
@@ -12,13 +13,12 @@ import { Tooltip } from "primereact/tooltip";
 import { useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import { EditProfileDialog } from "@components/EditProfileDialog";
 
 export function Profile() {
 	const { profileId } = useParams();
 	const { id: currentUserId } = useSelector(selectCurrentUser);
 	const isCurrentUser = currentUserId === profileId;
-	const [showEditProfileDialog,setShowEditProfileDialog]= useState({open:false,data:null});
+	const [showEditProfileDialog, setShowEditProfileDialog] = useState({ open: false, data: null });
 	const imgPrevRef = useRef(null);
 	const {
 		data: currentUser,
@@ -452,7 +452,6 @@ export function Profile() {
 			</svg>
 		);
 	}
-console.log(showEditProfileDialog);
 	if (isUserError || isCurrentUserError) {
 		console.log(userError || currentUserError);
 		<div>
@@ -500,7 +499,7 @@ console.log(showEditProfileDialog);
 					<Button
 						label="Edit profile"
 						className="z-4 p-button-text p-2 border-round-2xl border-primary"
-						onClick={()=>setShowEditProfileDialog({open:true,data:user})}
+						onClick={() => setShowEditProfileDialog({ open: true, data: user })}
 						style={{ minWidth: "8rem" }}
 					/>
 				</div>

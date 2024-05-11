@@ -1,26 +1,25 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import { useMediaQuery } from "@uidotdev/usehooks";
-import { InputText } from "primereact/inputtext";
 import { classNames } from "primereact/utils";
 import { useState } from "react";
 import { Controller } from "react-hook-form";
+import { InputTextarea } from 'primereact/inputtextarea';
 
-export function PFormTextField({
+export function PFormTextAreaField({
 	control,
 	defaultValue = "",
+    placeholder,
+    label,
 	name,
-	label,
-	type = "text",
-	size,
-	iconStart,
-	iconEnd,
-	toogleMask = false,
+    rows = 6,
+    cols = 50,
+    fullWidth=false,
+    minLength,
+    maxLength,
+    autoResize =true,
 	errorMessage,
 	disabled = false,
-	clearIconSpace = false,
 }) {
-	const sizeClass = `p-inputtext-${size}`;
-	const [showPassword, setShowPassword] = useState(false);
 	const isMobile = useMediaQuery("only screen and (max-width : 460px)");
 	const isSmallDevice = useMediaQuery("only screen and (max-width : 768px)");
 	const isMediumDevice = useMediaQuery("only screen and (min-width : 769px) and (max-width : 992px)");
@@ -35,9 +34,6 @@ export function PFormTextField({
 			return <small className="p-error">&nbsp;</small>;
 		}
 	};
-	const togglePassword = () => {
-		setShowPassword(!showPassword);
-	};
 
 	return (
 		<Controller
@@ -46,39 +42,22 @@ export function PFormTextField({
 			control={control}
 			render={({ field, fieldState }) => (
 				<div className="flex flex-column align-items-center ">
-					<span
-						className={classNames(
-							{ "p-float-label": label },
-							{ "p-input-icon-left": iconStart },
-							{ "p-input-icon-right": iconEnd || toogleMask }
-						)}
-					>
-						{iconStart && <i className={classNames("pi", iconStart)} />}
-						<InputText
+					<span className={classNames({ "p-float-label": label }, {"w-full":fullWidth})}>
+						<InputTextarea
 							id={field.name}
 							value={field.value}
-							type={showPassword ? "text" : type}
-							className={classNames(
-								{ "p-invalid": fieldState.error },
-								{ "p-inputtext-sm": isMobile },
-								{ "p-inputtext-md": isSmallDevice },
-								{ [sizeClass]: !isSmallDevice && size },
-							)}
+							placeholder={placeholder}
+							className={classNames({ "p-invalid": fieldState.error },{"w-full":fullWidth})}
+							autoResize={autoResize}
+							rows={rows}
+							cols={cols}
+							minLength={minLength}
+							maxLength={maxLength}
 							disabled={disabled}
 							onChange={(e) => {
 								field.onChange(e.target.value);
 							}}
-							style={{ paddingInlineEnd: clearIconSpace ? "0.9375rem" : "revert-layer" }}
 						/>
-						{toogleMask && type === "password" ? (
-							// eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
-							<i
-								className={classNames("pi", showPassword ? "pi-eye-slash" : "pi-eye", "cursor-pointer")}
-								onClick={togglePassword}
-							/>
-						) : (
-							<i className={classNames("pi", iconEnd)} />
-						)}
 
 						<label htmlFor={field.name}>{label}</label>
 					</span>

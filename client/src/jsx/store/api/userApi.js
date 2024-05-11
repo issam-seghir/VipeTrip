@@ -35,7 +35,7 @@ export const userApi = api.enhanceEndpoints({ addTagTypes: ["User"] }).injectEnd
 				method: "PUT",
 				body: data,
 			}),
-			invalidatesTags: (result, error, { id }) => [{ type: "User", id: "LIST" }],
+			invalidatesTags: (result, error) => [{ type: "User", id: "LIST" }],
 		}),
 	}),
 });

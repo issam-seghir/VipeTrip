@@ -1,30 +1,26 @@
-
 import { FileUploadDialog } from "@components/FileUploadDialog";
+import { PFormTextField } from "@components/Form/PFormTextField";
 import { isDev } from "@data/constants";
 import { DevTool } from "@hookform/devtools";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Icon } from "@iconify/react";
+import { PFormAutoCompleteContries } from "@jsx/components/Form/PFormAutoCompleteContries";
 import { PhotosPreview } from "@jsx/components/PhotosPreview";
-import { useUpdateUserProfileMutation ,useUpdateCurrentUserProfileMutation} from "@jsx/store/api/userApi";
-import { selectCurrentUser } from "@store/slices/authSlice";
-import { useDebounce } from "@uidotdev/usehooks";
+import { useUpdateUserProfileMutation } from "@jsx/store/api/userApi";
+import { userProfileSchema } from "@validations/userSchema";
 import { Avatar } from "primereact/avatar";
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
 import { Divider } from "primereact/divider";
+import { Image } from "primereact/image";
 import { Toast } from "primereact/toast";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { convertModelToFormData } from "../utils/index";
-import { selectPostDialogForm, setPostDialogForm } from "@store/slices/postSlice";
-import { PFormTextField } from "@components/Form/PFormTextField";
-import { PFormAutoCompleteContries } from "@jsx/components/Form/PFormAutoCompleteContries";
-import { userProfileSchema } from "@validations/userSchema";
 import { PFormTextAreaField } from "./Form/PFormTextAreaField";
 
-export function EditProfileDialog({ showDialog ,setShowDialog}) {
+export function EditProfileDialog({ showDialog, setShowDialog }) {
 	const navigate = useNavigate();
 	const toast = useRef(null);
 	// const showDialog = useSelector(selectPostDialogForm);
@@ -46,7 +42,7 @@ export function EditProfileDialog({ showDialog ,setShowDialog}) {
 		mode: "onChange",
 		resolver: zodResolver(userProfileSchema),
 	});
-console.log(showDialog?.data);
+	console.log(showDialog?.data);
 
 	useEffect(() => {
 		if (showDialog?.data) {
@@ -132,7 +128,6 @@ console.log(showDialog?.data);
 	const values = getValues(); // You can get all input values
 	console.log(values);
 
-
 	const onPhotoRemove = (photo) => {
 		if (existingImages.length > 0 && existingImages.includes(photo)) {
 			// Remove image from existing images (server image path)
@@ -171,7 +166,7 @@ console.log(showDialog?.data);
 				closeOnEscape={!isSubmitting && !updateUserProfileResult?.isLoading}
 				footer={
 					<>
-						{/* Creat Post Actions */}
+						{/* Edit Profile Actions */}
 						<div className="flex m-2 gap-2">
 							<Button
 								label="Media"
@@ -204,6 +199,44 @@ console.log(showDialog?.data);
 			>
 				<form onSubmit={handleSubmit(onSubmit)}>
 					<div className="formgrid grid">
+						<div>
+							<Image
+								className="cover h-18rem w-full"
+								imageClassName="border-round-md z-0"
+								src={showDialog?.data?.coverPath}
+								alt="Cover"
+								preview
+							/>
+							<div className="flex flex-column mb-6">
+								<div className="flex align-items-start px-4 justify-content-between pt-3">
+									<div className="z-4">
+										<Avatar
+											size="large"
+											icon="pi pi-user"
+											className="p-overlay border-0 border-circle"
+											style={{
+												minWidth: "48px",
+												width: "35%",
+												height: "auto",
+												marginTop: "-23%",
+												border: "1rem red solid",
+											}}
+											image={showDialog?.data?.picturePath}
+											// onClick={() => imgPrevRef.current.show()}
+											alt={showDialog?.data?.fullName}
+											shape="circle"
+										/>
+										<Image
+											// ref={imgPrevRef}
+											src={showDialog?.data?.picturePath}
+											alt="Avatar"
+											preview
+											style={{ visibility: "hidden", height: 0 }}
+										/>
+									</div>
+								</div>
+							</div>
+						</div>
 						<div className="field col-12 md:col-6">
 							<PFormTextField
 								control={control}

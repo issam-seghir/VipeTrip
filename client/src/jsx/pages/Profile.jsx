@@ -514,9 +514,10 @@ export function Profile() {
 				<div className="flex flex-column gap-3">
 					<h3 className="text-2xl font-bold"> {toTitleCase(user?.fullName)}</h3>
 					<p className="text-sm">
-						Lorem ipsum dolor sit amet consectetur, adipisicing elit. Accusamus repellat, aut laborum
-						suscipit libero voluptas sed nihil, asperiores doloremque explicabo deserunt officia commodi
-						temporibus animi debitis minima exercitationem nostrum delectus.
+						{user?.bio}
+						Lorem ipsum dolor sit amet consectetur, adipisicing elit. Accusamus repellat, aut
+						laborum suscipit libero voluptas sed nihil, asperiores doloremque explicabo deserunt officia
+						commodi temporibus animi debitis minima exercitationem nostrum delectus.
 					</p>
 					{/* profile status */}
 					<div className="flex justify-content-between">

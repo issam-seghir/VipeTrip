@@ -15,7 +15,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Toast } from "primereact/toast";
 import { PostDialogForm } from "@jsx/components/PostDialogForm";
 import { PostCommentsDialog } from "@jsx/components/PostCommentsDialog";
-
+import { selectCurrentUser } from "@jsx/store/slices/authSlice";
 export const HomeLayout = () => {
 	const isNonMobileScreens = useMediaQuery("(min-width:1000px)");
 	const navigate = useNavigate();
@@ -24,6 +24,7 @@ export const HomeLayout = () => {
 	const toastShown = useRef(false); // Add a new ref to track whether the toast has been shown
 	const isPostDeletedSuccuss = useSelector(selectPostDeleteSuccuss);
 	const isPostRepostedSuccuss = useSelector(selectPostRespostedSuccuss);
+	const user = useSelector(selectCurrentUser);
 	const dispatch = useDispatch();
 
 	// show success message when deleting a post
@@ -124,7 +125,7 @@ export const HomeLayout = () => {
 		{
 			label: "Profile",
 			icon: "pi pi-user",
-			url: "profile",
+			url: `profile/${user?.id}`,
 			template: itemRenderer,
 		},
 		{

@@ -9,7 +9,6 @@ import { BookMarks } from "@pages/BookMarks";
 import { ForgetPasswordRequest } from "@pages/ForgetPasswordRequest";
 import { HomeLayout } from "@pages/HomeLayout";
 // import { Login } from "@pages/Login";
-import Profile from "@pages/Profile";
 import { Register } from "@pages/Register";
 import { ResetPassword } from "@pages/ResetPassword";
 import "@scss/main.scss";
@@ -30,6 +29,7 @@ const Explore = lazy(() => import("@pages/Explore").then((module) => ({ default:
 const Notifications = lazy(() => import("@pages/Notifications").then((module) => ({ default: module.Notifications })));
 const Messages = lazy(() => import("@pages/Messages").then((module) => ({ default: module.Messages })));
 const Settings = lazy(() => import("@pages/Settings").then((module) => ({ default: module.Settings })));
+const Profile = lazy(() => import("@pages/Profile").then((module) => ({ default: module.Profile })));
 // const Scheduler = React.lazy(() => import("@pages/Scheduler"));
 // const Orders = React.lazy(() => import("@pages/Orders"));
 // const Map = React.lazy(() => import("@pages/Map"));
@@ -65,7 +65,7 @@ const homeRoutes = [
 		element: <BookMarks />,
 	},
 	{
-		path: "profile",
+		path: "profile/:profileId",
 		element: <Profile />,
 	},
 	{

@@ -483,23 +483,46 @@ export  function Profile() {
 				/>
 			</div>
 
-			<div className="flex flex-column gap-2">
-				{/* <h3 className="text-2xl font-bold"> {toTitleCase(user?.fullName)}</h3> */}
+			<div className="flex flex-column gap-3">
+				<h3 className="text-2xl font-bold"> {toTitleCase(user?.fullName)}</h3>
 				<p className="text-sm">
 					Lorem ipsum dolor sit amet consectetur, adipisicing elit. Accusamus repellat, aut laborum suscipit
 					libero voluptas sed nihil, asperiores doloremque explicabo deserunt officia commodi temporibus animi
 					debitis minima exercitationem nostrum delectus.
 				</p>
 				{/* profile status */}
-				<div></div>
-				<div className={`createData-tooltip-${user?.id} `}>
-					joined {formatDistanceToNow(new Date(user?.createdAt), { addSuffix: true })}
-					<Tooltip
-						key={user?.id}
-						target={`.createData-tooltip-${user?.id}`}
-						content={format(new Date(user?.createdAt), "EEEE, MMMM d, yyyy, h:mm a")}
-						position="bottom"
-					/>
+				<div className="flex justify-content-between">
+					<div className="flex flex-column gap-2 w-fit">
+						<div>
+							<i className="pi pi-map-marker " /> <span className="ml-1">{user?.location}</span>
+						</div>
+						<div>
+							<i className="pi pi-briefcase" /> <span className="ml-1">{user?.job}</span>
+						</div>
+						<div className={`createData-tooltip-${user?.id} `}>
+							<i className="pi pi-calendar" />{" "}
+							<span className="ml-1">Joined : {format(new Date(user?.createdAt), "MMMM yyyy")}</span>
+							<Tooltip
+								key={user?.id}
+								target={`.createData-tooltip-${user?.id}`}
+								content={format(new Date(user?.createdAt), "EEEE, MMMM d, yyyy, h:mm a")}
+								position="bottom"
+							/>
+						</div>
+					</div>
+					<div className="flex flex-column gap-2 w-fit">
+						<div>
+							<i className="pi pi-pencil" /> <span className="ml-1">Total posts: {user?.totalPosts}</span>
+						</div>
+						<div>
+							<i className="pi pi-eye" />{" "}
+							<span className="ml-1">Profile views: {user?.totalProfileViews}</span>
+						</div>
+						<div>
+							<i className="pi pi-chart-bar" />{" "}
+							<span className="ml-1">Post impressions: {user?.totalPostImpressions}</span>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>

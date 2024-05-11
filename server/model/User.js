@@ -68,6 +68,7 @@ let userSchema = new Schema(
 		],
 		location: String,
 		job: String,
+		bio: String,
 		viewedProfile: {
 			type: Number,
 			default: 1,

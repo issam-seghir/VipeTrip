@@ -4,7 +4,6 @@ import { isDev } from "@data/constants";
 import { DevTool } from "@hookform/devtools";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Icon } from "@iconify/react";
-import { EmojiPickerOverlay } from "@jsx/components/EmojiPickerOverlay";
 import { PhotosPreview } from "@jsx/components/PhotosPreview";
 import { useUpdateUserProfileMutation ,useUpdateCurrentUserProfileMutation} from "@jsx/store/api/userApi";
 import { selectCurrentUser } from "@store/slices/authSlice";
@@ -19,8 +18,6 @@ import { useForm } from "react-hook-form";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { convertModelToFormData } from "../utils/index";
-import { PFormDropdown } from "./Form/PFormDropdown";
-import { PFormMentionTagTextArea } from "./Form/PFormMentionTagTextArea";
 import { selectPostDialogForm, setPostDialogForm } from "@store/slices/postSlice";
 import { PFormTextField } from "@components/Form/PFormTextField";
 import { PFormAutoCompleteContries } from "@jsx/components/Form/PFormAutoCompleteContries";
@@ -32,13 +29,8 @@ export function EditProfileDialog({ showDialog ,setShowDialog}) {
 	const toast = useRef(null);
 	// const showDialog = useSelector(selectPostDialogForm);
 	const dispatch = useDispatch();
-	const descriptionRef = useRef(null);
 	const { profileId } = useParams();
-	const { id: currentUserId } = useSelector(selectCurrentUser);
-	const isCurrentUser = currentUserId === profileId;
 	const [updateUserProfile, updateUserProfileResult] = useUpdateUserProfileMutation();
-	const [updateCurrentUserProfile, updateCurrentUserProfileResult] = useUpdateCurrentUserProfileMutation();
-	const updateProfileResult = isCurrentUser ? updateCurrentUserProfileResult : updateUserProfileResult;
 	const [existingImages, setExistingImages] = useState([]);
 
 	const {
@@ -54,24 +46,19 @@ export function EditProfileDialog({ showDialog ,setShowDialog}) {
 		mode: "onChange",
 		resolver: zodResolver(userProfileSchema),
 	});
+console.log(showDialog?.data);
 
-	// useEffect(() => {
-	// 	if (user) {
-	// 		const { images, ...postToEditWithoutImages } = user;
-	// 		reset(postToEditWithoutImages);
-	// 		setExistingImages(images);
-	// 	} else {
-	// 		reset({
-	// 			description: "",
-	// 			privacy: "public",
-	// 			mentions: [],
-	// 			tags: [],
-	// 			images: [],
-	// 		});
-	// 		setExistingImages([]);
-	// 	}
-	// }, [postToEdit, reset]);
-	const errorMessage = updateProfileResult?.isError ? updateProfileResult?.error : errorsForm;
+	useEffect(() => {
+		if (showDialog?.data) {
+			// const { images, ...postToEditWithoutImages } = showDialog.data;
+			// reset(postToEditWithoutImages);
+			reset(showDialog.data);
+			// setExistingImages(images);
+
+			// setExistingImages([]);
+		}
+	}, [showDialog.data, reset]);
+	const errorMessage = updateUserProfileResult?.isError ? updateUserProfileResult?.error : errorsForm;
 
 	const getFormErrorMessage = (name) => {
 		if (errorMessage[name]) {
@@ -107,7 +94,7 @@ export function EditProfileDialog({ showDialog ,setShowDialog}) {
 			}
 
 			let res = null;
-			res = await (isCurrentUser ? updateCurrentUserProfile(formData).unwrap() : updateUserProfile({ id: profileId, data: formData }).unwrap());
+			res = await updateUserProfile({ id: profileId, data: formData }).unwrap();
 
 			if (res) {
 				reset();
@@ -144,9 +131,7 @@ export function EditProfileDialog({ showDialog ,setShowDialog}) {
 
 	const values = getValues(); // You can get all input values
 	console.log(values);
-	const handlePollOpen = () => {
-		// handle poll click
-	};
+
 
 	const onPhotoRemove = (photo) => {
 		if (existingImages.length > 0 && existingImages.includes(photo)) {
@@ -182,8 +167,8 @@ export function EditProfileDialog({ showDialog ,setShowDialog}) {
 					// setExistingImages(postToEdit?.images);
 				}}
 				draggable={false}
-				dismissableMask={!isSubmitting && !updateProfileResult?.isLoading}
-				closeOnEscape={!isSubmitting && !updateProfileResult?.isLoading}
+				dismissableMask={!isSubmitting && !updateUserProfileResult?.isLoading}
+				closeOnEscape={!isSubmitting && !updateUserProfileResult?.isLoading}
 				footer={
 					<>
 						{/* Creat Post Actions */}
@@ -208,10 +193,10 @@ export function EditProfileDialog({ showDialog ,setShowDialog}) {
 						<Divider />
 						<Button
 							type="submit"
-							label={updateProfileResult?.isLoading ? "Updatting ..." : "Update Profile"}
+							label={updateUserProfileResult?.isLoading ? "Updatting ..." : "Update Profile"}
 							className="w-full"
 							iconPos="right"
-							loading={isSubmitting || updateProfileResult?.isLoading}
+							loading={isSubmitting || updateUserProfileResult?.isLoading}
 							onClick={handleSubmit(onSubmit)}
 						/>
 					</>
@@ -243,8 +228,8 @@ export function EditProfileDialog({ showDialog ,setShowDialog}) {
 							<PFormTextAreaField
 								control={control}
 								name={"bio"}
-								fullWidth
 								placeholder="Your Bio ..."
+								fullWidth
 								errorMessage={errorMessage}
 							/>
 						</div>
@@ -280,7 +265,7 @@ export function EditProfileDialog({ showDialog ,setShowDialog}) {
 							photos={images}
 							existingImages={existingImages}
 							onPhotoRemove={onPhotoRemove}
-							disabled={isSubmitting || updateProfileResult?.isLoading}
+							disabled={isSubmitting || updateUserProfileResult?.isLoading}
 						/>
 					)}
 				</form>

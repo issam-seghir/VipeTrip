@@ -224,6 +224,18 @@ const getCurrentUser = asyncWrapper(async (req, res, next) => {
 	res.json({ success: "get user success", data: user });
 });
 
+
+// update user profile
+const updateUserProfile = asyncWrapper(async (req, res, next) => {
+	const user = await User.findByIdAndUpdate
+		(req.user.id, req.body, { new: true, runValidators: true });
+	if (!user) {
+		return next(new createError.NotFound("User not found"));
+	}
+	res.json({ success: "User updated successfully", data:user });
+}
+);
+
 const updateUser = asyncWrapper(async (req, res, next) => {
 	const user = await User.findByIdAndUpdate(req.user.id, req.body, { new: true, runValidators: true });
 	if (!user) {
@@ -245,6 +257,7 @@ module.exports = {
 	getUser,
 	getCurrentUser,
 	getUserPosts,
+	updateUserProfile,
 	updateUser,
 	deleteUser,
 };

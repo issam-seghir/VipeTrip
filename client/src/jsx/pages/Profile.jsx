@@ -496,12 +496,20 @@ export function Profile() {
 							style={{ visibility: "hidden", height: 0 }}
 						/>
 					</div>
-					<Button
-						label="Edit profile"
-						className="z-4 p-button-text p-2 border-round-2xl border-primary"
-						onClick={() => setShowEditProfileDialog({ open: true, data: user })}
-						style={{ minWidth: "8rem" }}
-					/>
+					{isCurrentUser && (
+						<>
+							<Button
+								label="Edit profile"
+								className="z-4 p-button-text p-2 border-round-2xl border-primary"
+								onClick={() => setShowEditProfileDialog({ open: true, data: user })}
+								style={{ minWidth: "8rem" }}
+							/>
+							<EditProfileDialog
+								showDialog={showEditProfileDialog}
+								setShowDialog={setShowEditProfileDialog}
+							/>
+						</>
+					)}
 				</div>
 				<div className="flex flex-column gap-3">
 					<h3 className="text-2xl font-bold"> {toTitleCase(user?.fullName)}</h3>
@@ -551,7 +559,6 @@ export function Profile() {
 				{isCurrentUser && <CreatePostWidget />}
 				<UserPosts />
 			</div>
-			<EditProfileDialog showDialog={showEditProfileDialog} setShowDialog={setShowEditProfileDialog} />
 		</>
 	);
 }

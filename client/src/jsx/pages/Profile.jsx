@@ -24,13 +24,7 @@ export function Profile() {
 		isError: isCurrentUserError,
 		error: currentUserError,
 	} = useGetCurrentUserQuery(undefined,{ skip: currentUserId !== profileId });
-	const {
-		data: currentUserPosts,
-		isFetching: isCurrentUserPostsFetching,
-		isLoading: isCurrentUserPostsLoading,
-		isError: isCurrentUserPostsError,
-		error: currentUserPostsError,
-	} = useGetCurrentUserPostsQuery(undefined, { skip: currentUserId !== profileId });
+
 
 	const {
 		data: otherUser,

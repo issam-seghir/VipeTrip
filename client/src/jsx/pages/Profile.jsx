@@ -1,28 +1,47 @@
-import { useGetCurrentUserQuery } from "@jsx/store/api/userApi";
+import { CreatePostWidget } from "@components/CreatePostWidget";
+import { FeedPostsSection } from "@components/FeedPostsSection";
+import { useGetCurrentUserQuery, useGetUserQuery, useGetUserPostsQuery,useGetCurrentUserPostsQuery } from "@jsx/store/api/userApi";
 import { toTitleCase } from "@jsx/utils";
-import { format, formatDistanceToNow } from "date-fns";
+import { selectCurrentUser } from "@store/slices/authSlice";
+import { format } from "date-fns";
 import { Avatar } from "primereact/avatar";
 import { Button } from "primereact/button";
 import { Image } from "primereact/image";
+import { Skeleton } from "primereact/skeleton";
 import { Tooltip } from "primereact/tooltip";
 import { useRef } from "react";
+import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import { Skeleton } from "primereact/skeleton";
 
-
-
-export  function Profile() {
+export function Profile() {
 	const { profileId } = useParams();
+	const { id: currentUserId } = useSelector(selectCurrentUser);
 	const imgPrevRef = useRef(null);
 	const {
-		data: user,
+		data: currentUser,
+		isFetching: isCurrentUserFetching,
+		isLoading: isCurrentUserLoading,
+		isError: isCurrentUserError,
+		error: currentUserError,
+	} = useGetCurrentUserQuery(undefined,{ skip: currentUserId !== profileId });
+	const {
+		data: currentUserPosts,
+		isFetching: isCurrentUserPostsFetching,
+		isLoading: isCurrentUserPostsLoading,
+		isError: isCurrentUserPostsError,
+		error: currentUserPostsError,
+	} = useGetCurrentUserPostsQuery(undefined, { skip: currentUserId !== profileId });
+
+	const {
+		data: otherUser,
 		isFetching: isUserFetching,
 		isLoading: isUserLoading,
 		isError: isUserError,
 		error: userError,
-	} = useGetCurrentUserQuery();
+	} = useGetUserQuery(profileId, { skip: currentUserId === profileId });
+	const user = currentUser || otherUser;
 
-  	if (isUserLoading  || isUserFetching) {
+	if (isUserLoading || isUserFetching || isCurrentUserFetching || isCurrentUserLoading) {
 		return (
 			<div>
 				<h5>Rectangle</h5>
@@ -438,12 +457,13 @@ export  function Profile() {
 		);
 	}
 
-	if (isUserError) {
-		console.log(userError);
+	if (isUserError || isCurrentUserError) {
+		console.log(userError || currentUserError);
 		<div>
-			{userError.status} {JSON.stringify(userError.data)}
+			{userError?.status} {JSON.stringify(userError?.data)}
+			{currentUserError?.status} {JSON.stringify(currentUserError?.data)}
 		</div>;
-		// toast.error("échec de la requet des user");
+		// toast.error("échec de la requet des currentUser");
 	}
 	return (
 		<div className="flex flex-column">
@@ -525,6 +545,8 @@ export  function Profile() {
 					</div>
 				</div>
 			</div>
+			<CreatePostWidget />
+			<FeedPostsSection />
 		</div>
 	);
 }

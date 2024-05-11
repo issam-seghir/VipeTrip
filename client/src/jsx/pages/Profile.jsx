@@ -1,6 +1,6 @@
 import { CreatePostWidget } from "@components/CreatePostWidget";
-import { FeedPostsSection } from "@components/FeedPostsSection";
-import { useGetCurrentUserQuery, useGetUserQuery, useGetUserPostsQuery,useGetCurrentUserPostsQuery } from "@jsx/store/api/userApi";
+import { UserPosts } from "@components/UserPosts";
+import { useGetCurrentUserQuery, useGetUserQuery } from "@jsx/store/api/userApi";
 import { toTitleCase } from "@jsx/utils";
 import { selectCurrentUser } from "@store/slices/authSlice";
 import { format } from "date-fns";
@@ -16,6 +16,7 @@ import { useParams } from "react-router-dom";
 export function Profile() {
 	const { profileId } = useParams();
 	const { id: currentUserId } = useSelector(selectCurrentUser);
+	const isCurrentUser = currentUserId === profileId;
 	const imgPrevRef = useRef(null);
 	const {
 		data: currentUser,
@@ -23,8 +24,7 @@ export function Profile() {
 		isLoading: isCurrentUserLoading,
 		isError: isCurrentUserError,
 		error: currentUserError,
-	} = useGetCurrentUserQuery(undefined,{ skip: currentUserId !== profileId });
-
+	} = useGetCurrentUserQuery(undefined, { skip: !isCurrentUser });
 
 	const {
 		data: otherUser,
@@ -32,7 +32,7 @@ export function Profile() {
 		isLoading: isUserLoading,
 		isError: isUserError,
 		error: userError,
-	} = useGetUserQuery(profileId, { skip: currentUserId === profileId });
+	} = useGetUserQuery(profileId, { skip: isCurrentUser });
 	const user = currentUser || otherUser;
 
 	if (isUserLoading || isUserFetching || isCurrentUserFetching || isCurrentUserLoading) {
@@ -460,87 +460,91 @@ export function Profile() {
 		// toast.error("échec de la requet des currentUser");
 	}
 	return (
-		<div className="flex flex-column">
-			<div className="cover-overlay h-18rem w-full">
-				<img src="https://primefaces.org/cdn/primereact/images/galleria/galleria10.jpg" alt="Cover" />
-			</div>
-			<div className="flex align-items-start px-4 justify-content-between pt-3">
-				<div className="z-4">
-					<Avatar
-						size="large"
-						icon="pi pi-user"
-						className="p-overlay border-0 border-circle"
-						style={{
-							minWidth: "48px",
-							width: "35%",
-							height: "auto",
-							marginTop: "-23%",
-							border: "1rem red solid",
-						}}
-						image={user?.picturePath}
-						onClick={() => imgPrevRef.current.show()}
-						alt={user?.fullName}
-						shape="circle"
-					/>
-					<Image
-						ref={imgPrevRef}
-						src={user?.picturePath}
-						alt="Avatar"
-						preview
-						style={{ visibility: "hidden", height: 0 }}
+		<>
+			<div className="flex flex-column mb-6">
+				<div className="cover-overlay h-18rem w-full">
+					<img src="https://primefaces.org/cdn/primereact/images/galleria/galleria10.jpg" alt="Cover" />
+				</div>
+				<div className="flex align-items-start px-4 justify-content-between pt-3">
+					<div className="z-4">
+						<Avatar
+							size="large"
+							icon="pi pi-user"
+							className="p-overlay border-0 border-circle"
+							style={{
+								minWidth: "48px",
+								width: "35%",
+								height: "auto",
+								marginTop: "-23%",
+								border: "1rem red solid",
+							}}
+							image={user?.picturePath}
+							onClick={() => imgPrevRef.current.show()}
+							alt={user?.fullName}
+							shape="circle"
+						/>
+						<Image
+							ref={imgPrevRef}
+							src={user?.picturePath}
+							alt="Avatar"
+							preview
+							style={{ visibility: "hidden", height: 0 }}
+						/>
+					</div>
+					<Button
+						label="Edit profile"
+						className="z-4 p-button-text p-2 border-round-2xl border-primary"
+						style={{ minWidth: "8rem" }}
 					/>
 				</div>
-				<Button
-					label="Edit profile"
-					className="z-4 p-button-text p-2 border-round-2xl border-primary"
-					style={{ minWidth: "8rem" }}
-				/>
-			</div>
-
-			<div className="flex flex-column gap-3">
-				<h3 className="text-2xl font-bold"> {toTitleCase(user?.fullName)}</h3>
-				<p className="text-sm">
-					Lorem ipsum dolor sit amet consectetur, adipisicing elit. Accusamus repellat, aut laborum suscipit
-					libero voluptas sed nihil, asperiores doloremque explicabo deserunt officia commodi temporibus animi
-					debitis minima exercitationem nostrum delectus.
-				</p>
-				{/* profile status */}
-				<div className="flex justify-content-between">
-					<div className="flex flex-column gap-2 w-fit">
-						<div>
-							<i className="pi pi-map-marker " /> <span className="ml-1">{user?.location}</span>
+				<div className="flex flex-column gap-3">
+					<h3 className="text-2xl font-bold"> {toTitleCase(user?.fullName)}</h3>
+					<p className="text-sm">
+						Lorem ipsum dolor sit amet consectetur, adipisicing elit. Accusamus repellat, aut laborum
+						suscipit libero voluptas sed nihil, asperiores doloremque explicabo deserunt officia commodi
+						temporibus animi debitis minima exercitationem nostrum delectus.
+					</p>
+					{/* profile status */}
+					<div className="flex justify-content-between">
+						<div className="flex flex-column gap-2 w-fit">
+							<div>
+								<i className="pi pi-map-marker " /> <span className="ml-1">{user?.location}</span>
+							</div>
+							<div>
+								<i className="pi pi-briefcase" /> <span className="ml-1">{user?.job}</span>
+							</div>
+							<div className={`createData-tooltip-${user?.id} `}>
+								<i className="pi pi-calendar" />{" "}
+								<span className="ml-1">Joined : {format(new Date(user?.createdAt), "MMMM yyyy")}</span>
+								<Tooltip
+									key={user?.id}
+									target={`.createData-tooltip-${user?.id}`}
+									content={format(new Date(user?.createdAt), "EEEE, MMMM d, yyyy, h:mm a")}
+									position="bottom"
+								/>
+							</div>
 						</div>
-						<div>
-							<i className="pi pi-briefcase" /> <span className="ml-1">{user?.job}</span>
-						</div>
-						<div className={`createData-tooltip-${user?.id} `}>
-							<i className="pi pi-calendar" />{" "}
-							<span className="ml-1">Joined : {format(new Date(user?.createdAt), "MMMM yyyy")}</span>
-							<Tooltip
-								key={user?.id}
-								target={`.createData-tooltip-${user?.id}`}
-								content={format(new Date(user?.createdAt), "EEEE, MMMM d, yyyy, h:mm a")}
-								position="bottom"
-							/>
-						</div>
-					</div>
-					<div className="flex flex-column gap-2 w-fit">
-						<div>
-							<i className="pi pi-pencil" /> <span className="ml-1">Total posts: {user?.totalPosts}</span>
-						</div>
-						<div>
-							<i className="pi pi-eye" />{" "}
-							<span className="ml-1">Profile views: {user?.totalProfileViews}</span>
-						</div>
-						<div>
-							<i className="pi pi-chart-bar" />{" "}
-							<span className="ml-1">Post impressions: {user?.totalPostImpressions}</span>
+						<div className="flex flex-column gap-2 w-fit">
+							<div>
+								<i className="pi pi-pencil" />{" "}
+								<span className="ml-1">Total posts: {user?.totalPosts}</span>
+							</div>
+							<div>
+								<i className="pi pi-eye" />{" "}
+								<span className="ml-1">Profile views: {user?.totalProfileViews}</span>
+							</div>
+							<div>
+								<i className="pi pi-chart-bar" />{" "}
+								<span className="ml-1">Post impressions: {user?.totalPostImpressions}</span>
+							</div>
 						</div>
 					</div>
 				</div>
 			</div>
-			<CreatePostWidget />
-			<FeedPostsSection />
-		</div>
+			<div className="flex flex-column gap-6">
+				{isCurrentUser && <CreatePostWidget />}
+				<UserPosts />
+			</div>
+		</>
 	);
 }

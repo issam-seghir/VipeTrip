@@ -9,14 +9,16 @@ import { Button } from "primereact/button";
 import { Image } from "primereact/image";
 import { Skeleton } from "primereact/skeleton";
 import { Tooltip } from "primereact/tooltip";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
+import { EditProfileDialog } from "@components/EditProfileDialog";
 
 export function Profile() {
 	const { profileId } = useParams();
 	const { id: currentUserId } = useSelector(selectCurrentUser);
 	const isCurrentUser = currentUserId === profileId;
+	const [showEditProfileDialog,setShowEditProfileDialog]= useState({open:false,data:null});
 	const imgPrevRef = useRef(null);
 	const {
 		data: currentUser,
@@ -450,7 +452,7 @@ export function Profile() {
 			</svg>
 		);
 	}
-
+console.log(showEditProfileDialog);
 	if (isUserError || isCurrentUserError) {
 		console.log(userError || currentUserError);
 		<div>
@@ -461,10 +463,14 @@ export function Profile() {
 	}
 	return (
 		<>
+			<Image
+				className="cover h-18rem w-full"
+				imageClassName="border-round-md z-0"
+				src={user?.coverPath}
+				alt="Cover"
+				preview
+			/>
 			<div className="flex flex-column mb-6">
-				<div className="cover-overlay h-18rem w-full">
-					<img src="https://primefaces.org/cdn/primereact/images/galleria/galleria10.jpg" alt="Cover" />
-				</div>
 				<div className="flex align-items-start px-4 justify-content-between pt-3">
 					<div className="z-4">
 						<Avatar
@@ -494,6 +500,7 @@ export function Profile() {
 					<Button
 						label="Edit profile"
 						className="z-4 p-button-text p-2 border-round-2xl border-primary"
+						onClick={()=>setShowEditProfileDialog({open:true,data:user})}
 						style={{ minWidth: "8rem" }}
 					/>
 				</div>
@@ -545,6 +552,7 @@ export function Profile() {
 				{isCurrentUser && <CreatePostWidget />}
 				<UserPosts />
 			</div>
+			<EditProfileDialog showDialog={showEditProfileDialog} setShowDialog={setShowEditProfileDialog} />
 		</>
 	);
 }

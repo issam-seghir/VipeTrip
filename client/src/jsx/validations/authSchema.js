@@ -20,7 +20,7 @@ const passSchema = stringNonEmpty()
 
 
 
-const baseSchema = z.object({
+export const baseSchema = z.object({
 	firstName: credinalSchema,
 	lastName: credinalSchema,
 	email: stringNonEmpty().email().trim().toLowerCase(),

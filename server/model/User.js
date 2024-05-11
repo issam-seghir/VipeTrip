@@ -54,7 +54,7 @@ let userSchema = new Schema(
 		},
 		coverPath: {
 			type: String,
-			default: "https://placehold.co/1200x400/ffe5a6/FFF",
+			default: "https://i.imgur.com/p2aIYMy.png", // https://i.imgur.com/WY640Kg.png
 		},
 		totalPosts: {
 			type: Number,

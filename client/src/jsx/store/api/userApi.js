@@ -29,7 +29,23 @@ export const userApi = api.enhanceEndpoints({ addTagTypes: ["User"] }).injectEnd
 			transformResponse: (response) => response.data,
 			providesTags: (result, error) => [{ type: "User", id: "LIST" }],
 		}),
+		updateUserProfile: builder.mutation({
+			query: ({ id, data }) => ({
+				url: `users/${id}/profile`,
+				method: "PUT",
+				body: data,
+			}),
+			invalidatesTags: (result, error, { id }) => [{ type: "User", id }],
+		}),
+		updateCurrentUserProfile: builder.mutation({
+			query: (data) => ({
+				url: `users/me/profile`,
+				method: "PUT",
+				body: data,
+			}),
+			invalidatesTags: (result, error, { id }) => [{ type: "User", id : "LIST" }],
+		}),
 	}),
 });
 
-export const { useGetUserQuery, useGetCurrentUserQuery,useGetCurrentUserPostsQuery,useGetUserPostsQuery} = userApi;
+export const { useGetUserQuery, useGetCurrentUserQuery,useGetCurrentUserPostsQuery,useGetUserPostsQuery ,useUpdateCurrentUserProfileMutation, useUpdateUserProfileMutation } = userApi;

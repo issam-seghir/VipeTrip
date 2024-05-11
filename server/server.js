@@ -26,6 +26,8 @@ const { normalize } = require("@utils/plugins");
 const autopopulate = require("mongoose-autopopulate");
 const passport = require("passport");
 const { passportConfig } = require("@config/PassportjsConfig");
+const { Server } = require("socket.io");
+const { createServer } = require("node:http");
 
 // global mongoose plugins
 mongoose.plugin(normalize);
@@ -34,6 +36,8 @@ mongoose.plugin(autopopulate);
 const PORT = ENV.PORT;
 
 const app = express();
+const server = createServer(app);
+const io = new Server(server);
 
 // Connect to MongoDB
 connectDB();
@@ -85,6 +89,15 @@ app.use("/api/v1", require("@api/v1"));
 // global error handling
 app.use(errorHandler);
 
+// Socket.io
+io.on("connection", (socket) => {
+	console.log("a user connected");
+	socket.on("disconnect", () => {
+		console.log("user disconnected");
+	});
+});
+
+
 connection.once("open", () => {
 	console.log("Connected to MongoDB .... 🐲");
 	const MongoDbInfo = {
@@ -95,5 +108,5 @@ connection.once("open", () => {
 	};
 	console.table(MongoDbInfo);
 
-	app.listen(PORT, () => log.database(`Server running on port `, `${PORT}`));
+	server.listen(PORT, () => log.database(`Server running on port `, `${PORT}`));
 });

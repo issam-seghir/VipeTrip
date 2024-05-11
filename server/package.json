@@ -86,6 +86,7 @@
 		"passport-twitter-oauth2.0": "^1.1.0",
 		"rate-limiter-flexible": "^4.0.1",
 		"safe-regex": "^2.1.1",
+		"socket.io": "^4.7.5",
 		"uuid": "^9.0.1",
 		"zod_utilz": "^0.7.3"
 	}

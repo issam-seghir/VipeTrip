@@ -101,6 +101,8 @@
 		"redux": "^5.0.0",
 		"redux-persist": "^6.0.0",
 		"rfs": "^10.0.0",
+		"socket.io": "^4.7.5",
+		"socket.io-client": "^4.7.5",
 		"usehooks-ts": "^3.1.0",
 		"zod": "^3.22.4"
 	}

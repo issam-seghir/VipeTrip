@@ -7,8 +7,12 @@ import {
 import { PrimeReactProvider, addLocale } from "primereact/api";
 import { useDispatch, useSelector } from "react-redux";
 import { Outlet } from "react-router-dom";
+import io from "socket.io-client";
+
+const socket = io(import.meta.env.VITE_SERVER_URL)
 
 addLocale("ar", arLocale);
+
 
 function App() {
   const mode = useSelector(selectMode);
@@ -30,7 +34,7 @@ function App() {
     ripple: false,
   };
 
-  
+
   return (
     // <ThemeProvider theme={theme}>
     <PrimeReactProvider value={primereactConfig}>

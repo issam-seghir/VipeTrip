@@ -92,11 +92,63 @@ app.use(errorHandler);
 // Socket.io
 io.on("connection", (socket) => {
 	console.log("a user connected");
+	socket.broadcast.emit("user online", { userId: socket.id });
 	socket.on("disconnect", () => {
 		console.log("user disconnected");
+		socket.broadcast.emit("user offline", { userId: socket.id });
+	});
+
+	// Listen for a friend request event
+	// Listen for a friend request event
+	socket.on("friend request status", (request) => {
+		const statusMessages = {
+			Requested: `${request.userName} sent you a friend request`,
+			Accepted: `${request.userName} accepted your friend request`,
+			Declined: `${request.userName} declined your friend request`,
+		};
+
+		const message = statusMessages[request.status];
+		io.to(request.friendId).emit("notification", { message });
+	});
+
+	// Listen for a new like event
+	socket.on("new like", (data) => {
+		const typeMessage = data.type === "Post" ? "post" : "comment";
+		const message = `${data.senderName} liked your ${typeMessage}`;
+		// Define the link based on the type
+		const link = data.type === "Post" ? `/post/${data.postId}` : `/comment/${data.commentId}`;
+		// Emit the notification
+		io.to(data.recipientId).emit("notification", { message, link });
+	});
+
+	// Listen for a new comment event
+	socket.on("new comment", (data) => {
+		// Emit a notification event to the author of the post
+		io.to(data.postAuthorId).emit("notification", {
+			message: `${data.senderName} commented on your post`,
+			link: `/post/${data.postId}`,
+		});
+	});
+
+	socket.on("new post", (data) => {
+		const friends = getFriends(data.senderId);
+		friends.forEach((friendId) => {
+			io.to(friendId).emit("notification", {
+				message: `${data.senderName} created a new post`,
+				link: `/post/${data.postId}`,
+			});
+		});
+	});
+
+	// Listen for a new message event
+	socket.on("new message", (data) => {
+		// Emit a notification event to the recipient
+		io.to(data.recipientId).emit("notification", {
+			message: `New message from ${data.senderName}`,
+			link: `/messages/${data.senderId}`,
+		});
 	});
 });
-
 
 connection.once("open", () => {
 	console.log("Connected to MongoDB .... 🐲");

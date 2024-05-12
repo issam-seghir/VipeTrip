@@ -37,7 +37,9 @@ const PORT = ENV.PORT;
 
 const app = express();
 const server = createServer(app);
-const io = new Server(server);
+const io = new Server(server, {
+	cors: corsOptions,
+});
 
 // Connect to MongoDB
 connectDB();
@@ -92,10 +94,10 @@ app.use(errorHandler);
 // Socket.io
 io.on("connection", (socket) => {
 	console.log("a user connected");
-	socket.broadcast.emit("user online", { userId: socket.id });
+	socket.emit("user online", { userId: socket.id });
 	socket.on("disconnect", () => {
 		console.log("user disconnected");
-		socket.broadcast.emit("user offline", { userId: socket.id });
+		socket.emit("user offline", { userId: socket.id });
 	});
 
 	// Listen for a friend request event
@@ -130,15 +132,23 @@ io.on("connection", (socket) => {
 		});
 	});
 
-	socket.on("new post", (data) => {
-		const friends = getFriends(data.senderId);
-		friends.forEach((friendId) => {
-			io.to(friendId).emit("notification", {
-				message: `${data.senderName} created a new post`,
-				link: `/post/${data.postId}`,
-			});
+	// listen for a new replay event
+	socket.on("new replay", (data) => {
+		// Emit a notification event to the author of the post
+		io.to(data.commentAuthorId).emit("notification", {
+			message: `${data.senderName} replied to your comment`,
+			link: `/comment/${data.commentId}`,
 		});
 	});
+	// socket.on("new post", (data) => {
+	// 	const friends = getFriends(data.senderId);
+	// 	friends.forEach((friendId) => {
+	// 		io.to(friendId).emit("notification", {
+	// 			message: `${data.senderName} created a new post`,
+	// 			link: `/post/${data.postId}`,
+	// 		});
+	// 	});
+	// });
 
 	// Listen for a new message event
 	socket.on("new message", (data) => {

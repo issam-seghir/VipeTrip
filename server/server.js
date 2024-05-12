@@ -28,6 +28,7 @@ const passport = require("passport");
 const { passportConfig } = require("@config/PassportjsConfig");
 const { Server } = require("socket.io");
 const { createServer } = require("node:http");
+const verifyJWT = require("@/middleware/auth/verifyJWT");
 
 // global mongoose plugins
 mongoose.plugin(normalize);
@@ -37,9 +38,6 @@ const PORT = ENV.PORT;
 
 const app = express();
 const server = createServer(app);
-const io = new Server(server, {
-	cors: corsOptions,
-});
 
 // Connect to MongoDB
 connectDB();
@@ -91,15 +89,36 @@ app.use("/api/v1", require("@api/v1"));
 // global error handling
 app.use(errorHandler);
 
+// init socket io
+const io = new Server(server, {
+	// synchronize the state of the client upon reconnection:
+	connectionStateRecovery: {},
+	cors: corsOptions,
+});
+
+//  jwt auth the socket server
+
+io.engine.use(verifyJWT);
+
 // Socket.io
 io.on("connection", (socket) => {
+	const userId = socket.request.user.id;
+
+	// The user ID is used as a room
+	socket.join(`user:${userId}`);
+
 	console.log("a user connected");
-	socket.emit("user online", { userId: socket.id });
+	console.log(userId);
+
+	// Emit the 'user online' event to all connections of this user
+	io.to(`user:${userId}`).emit("user online", { userId: socket.id });
+
 	socket.on("disconnect", () => {
 		console.log("user disconnected");
-		socket.emit("user offline", { userId: socket.id });
-	});
 
+		// Emit the 'user offline' event to all connections of this user
+		io.to(`user:${userId}`).emit("user offline", { userId: socket.id });
+	});
 	// Listen for a friend request event
 	// Listen for a friend request event
 	socket.on("friend request status", (request) => {

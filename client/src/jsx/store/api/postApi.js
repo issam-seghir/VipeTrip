@@ -2,6 +2,7 @@ import { api } from "@jsx/store/api/api";
 import { store } from "@jsx/store/store";
 import { current } from "immer";
 import { userApi } from "@jsx/store/api/userApi";
+
 export const postApi = api.enhanceEndpoints({ addTagTypes: ["Post"] }).injectEndpoints({
 	endpoints: (builder) => ({
 		getAllPosts: builder.query({

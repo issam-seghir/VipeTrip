@@ -2,7 +2,6 @@ import AdvertWidget from "@components/AdvertWidget";
 import FriendListWidget from "@components/FriendListWidget";
 import MyPostWidget from "@components/MyPostWidget";
 import Navbar from "@components/NavBar";
-import UserWidget from "@components/UserWidget";
 import { Box, useMediaQuery } from "@mui/material";
 import { useSelector } from "react-redux";
 import { Toast } from "primereact/toast";
@@ -24,7 +23,6 @@ export const Home = () => {
 				justifyContent="space-between"
 			>
 				<Box flexBasis={isNonMobileScreens ? "26%" : undefined}>
-					{/* <UserWidget userId={_id} picturePath={picturePath} /> */}
 				</Box>
 				<Box flexBasis={isNonMobileScreens ? "42%" : undefined} mt={isNonMobileScreens ? undefined : "2rem"}>
 					{/* <MyPostWidget picturePath={picturePath} /> */}

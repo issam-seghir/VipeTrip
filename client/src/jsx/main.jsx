@@ -128,7 +128,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
 		<ReduxStoreProvider store={store}>
 			{/* delay the rendering of our app's UI until the persisted data is available in the Redux store. */}
 			<PersistGate loading={null} persistor={persistor}>
-				<RouterProvider router={router} />
+					<RouterProvider router={router} />
 				{/* <RouterProvider router={router} fallbackElement={<Loading />} /> */}
 			</PersistGate>
 		</ReduxStoreProvider>

@@ -13,14 +13,12 @@ const getAllUsers = asyncWrapper(async (req, res, next) => {
 });
 
 const getUserPosts = asyncWrapper(async (req, res, next) => {
-	const { userId } = req.params ;
-	const id = userId || req.user.id
-	try {
-		ObjectIdSchema.parse(id); //pass the validation
-	} catch (error) {
-		return next(new createError.BadRequest(error));
-	}
-
+	const { userId } = req.params;
+	const id = userId || req.user.id;
+console.log("userId");
+console.log(userId);
+console.log("req.user");
+console.log(req.user);
 	if (!id) return next(new createError.BadRequest("User ID required"));
 
 	const user = await User.findById(req.user.id);
@@ -34,7 +32,6 @@ const getUserPosts = asyncWrapper(async (req, res, next) => {
 	// Get the IDs of the posts that the user has liked
 	const userLikes = await Like.find({ liker: user.id, type: "Post" });
 	const likedPostIds = new Set(userLikes.map((like) => like.likedPost._id.toString()));
-
 
 	let userPosts = await Post.find({ author: id });
 
@@ -86,17 +83,10 @@ const getUserPosts = asyncWrapper(async (req, res, next) => {
 	);
 
 	res.json({ success: "get user posts", data: userPosts });
-
 });
-
 
 const getUser = asyncWrapper(async (req, res, next) => {
 	const { userId } = req.params;
-	try {
-		ObjectIdSchema.parse(userId); //pass the validation
-	} catch (error) {
-		return next(new createError.BadRequest(error));
-	}
 
 	if (!userId) return next(new createError.BadRequest("User ID required"));
 
@@ -110,7 +100,6 @@ const getUser = asyncWrapper(async (req, res, next) => {
 	// Get the IDs of the posts that the user has liked
 	const userLikes = await Like.find({ liker: user.id, type: "Post" });
 	const likedPostIds = new Set(userLikes.map((like) => like.likedPost._id.toString()));
-
 
 	// Fetch the first three likers for each post
 	const likes = await Like.aggregate([
@@ -224,17 +213,14 @@ const getCurrentUser = asyncWrapper(async (req, res, next) => {
 	res.json({ success: "get user success", data: user });
 });
 
-
 // update user profile
 const updateUserProfile = asyncWrapper(async (req, res, next) => {
-	const user = await User.findByIdAndUpdate
-		(req.user.id, req.body, { new: true, runValidators: true });
+	const user = await User.findByIdAndUpdate(req.user.id, req.body, { new: true, runValidators: true });
 	if (!user) {
 		return next(new createError.NotFound("User not found"));
 	}
-	res.json({ success: "User updated successfully", data:user });
-}
-);
+	res.json({ success: "User updated successfully", data: user });
+});
 
 const updateUser = asyncWrapper(async (req, res, next) => {
 	const user = await User.findByIdAndUpdate(req.user.id, req.body, { new: true, runValidators: true });

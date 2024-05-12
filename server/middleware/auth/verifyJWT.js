@@ -3,8 +3,13 @@ const { ENV } = require("@/validations/envSchema");
 const createError = require("http-errors");
 const log = require("@/utils/chalkLogger");
 
-//* This is a middlware
 const verifyJWT = (req, res, next) => {
+	//* for web socket io auth
+	const isHandshake = req?._query?.sid === undefined;
+	if (!isHandshake) {
+		console.log("isHandshake for socket io :", isHandshake);
+		return next();
+	}
 	const authHeader = req.headers["authorization"];
 
 	if (!authHeader || !authHeader.startsWith("Bearer ")) {

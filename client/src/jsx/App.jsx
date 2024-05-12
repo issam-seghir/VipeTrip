@@ -9,6 +9,7 @@ import { Outlet } from "react-router-dom";
 import { selectCurrentToken } from "@store/slices/authSlice";
 import { getCookie } from "@utils/index";
 import io from "socket.io-client";
+import { useSocket } from "@context/SocketContext";
 
 addLocale("ar", arLocale);
 
@@ -18,6 +19,7 @@ function App() {
 	const theme = useSelector(selectTheme);
 	const local = useSelector(selectLocal);
 	const dispatch = useDispatch();
+	const socket = useSocket();
 	const primereactConfig = {
 		// inputStyle: "filled",
 		//  zIndex: {
@@ -32,54 +34,65 @@ function App() {
 		ripple: false,
 	};
 
+	useEffect(() => {
+		if (socket) {
+			socket.emit("testEvent", "Test message");
+		
+			socket.on("testResponse", (data) => {
+				console.log("Received response: ", data);
+			});
+		}
+	}, [socket]);
+
 	// "undefined" means the URL will be computed from the `window.location` object
 	// const URL = process.env.NODE_ENV === 'production' ? undefined : 'http://localhost:4000';
 
-	const localToken = useSelector(selectCurrentToken);
-	const socialToken = getCookie("socialToken");
-	const token = localToken || socialToken;
-	const socket = io(import.meta.env.VITE_SERVER_URL, {
-		extraHeaders: {
-			authorization: `Bearer ${token}`,
-		},
-	});
+	// const localToken = useSelector(selectCurrentToken);
+	// const socialToken = getCookie("socialToken");
+	// const token = localToken || socialToken;
+	// const socket = io(import.meta.env.VITE_SERVER_URL, {
+	// 	extraHeaders: {
+	// 		authorization: `Bearer ${token}`,
+	// 	},
+	// });
 
-	socket.on("connect_error", (err) => {
-		console.log(err); // not authorized
-		console.log(err); // { content: "Please retry later" }
-	});
+	// socket.on("connect_error", (err) => {
+	// 	console.log(err); // not authorized
+	// 	console.log(err); // { content: "Please retry later" }
+	// });
 
-	const [isConnected, setIsConnected] = useState(socket.connected);
-	const [fooEvents, setFooEvents] = useState([]);
+	// const [isConnected, setIsConnected] = useState(socket.connected);
+	// const [fooEvents, setFooEvents] = useState([]);
 
-	useEffect(() => {
-		// named functions, so calling socket.off() only removes this specific listener:
-		function onConnect() {
-			setIsConnected(true);
-		}
+	// useEffect(() => {
+	// 	// named functions, so calling socket.off() only removes this specific listener:
+	// 	function onConnect() {
+	// 		setIsConnected(true);
+	// 	}
 
-		function onDisconnect() {
-			setIsConnected(false);
-		}
+	// 	function onDisconnect() {
+	// 		setIsConnected(false);
+	// 	}
 
-		function onFooEvent(value) {
-			setFooEvents((previous) => [...previous, value]);
-		}
+	// 	function onFooEvent(value) {
+	// 		setFooEvents((previous) => [...previous, value]);
+	// 	}
 
-		socket.on("connect", onConnect);
-		socket.on("disconnect", onDisconnect);
-		socket.on("foo", onFooEvent);
+	// 	socket.on("connect", onConnect);
+	// 	socket.on("disconnect", onDisconnect);
+	// 	socket.on("foo", onFooEvent);
 
-		return () => {
-			socket.off("connect", onConnect);
-			socket.off("disconnect", onDisconnect);
-			socket.off("foo", onFooEvent);
-		};
-	}, []);
+	// 	return () => {
+	// 		socket.off("connect", onConnect);
+	// 		socket.off("disconnect", onDisconnect);
+	// 		socket.off("foo", onFooEvent);
+	// 	};
+	// }, []);
 
-	console.log(isConnected);
+	// console.log(isConnected);
 
 	return (
+
 		<PrimeReactProvider value={primereactConfig}>
 			<Outlet />
 		</PrimeReactProvider>

@@ -57,6 +57,7 @@ module.exports = {
 					// ["@api", "./src/jsx/api"],
 					["@components", "./src/jsx/components"],
 					["@contexts", "./src/jsx/contexts"],
+					["@context", "./src/jsx/context"],
 					["@data", "./src/jsx/data"],
 					["@hooks", "./src/jsx/hooks"],
 					["@pages", "./src/jsx/pages"],

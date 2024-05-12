@@ -21,6 +21,7 @@ import { PersistGate } from "redux-persist/integration/react";
 import Error from "./pages/Error";
 // const Loading = React.lazy(() => import("@pages/Loading"));
 // const Login = lazy(() => import("@pages/Login"));
+import { SocketProvider } from "@jsx/context/SocketContext";
 import { Loader } from "./components/Loader";
 
 const Login = lazy(() => import("@pages/Login").then((module) => ({ default: module.Login })));
@@ -40,7 +41,6 @@ const Profile = lazy(() => import("@pages/Profile").then((module) => ({ default:
 // const Drawer = React.lazy(() => import("@pages/Drawer"));
 // const Customers = React.lazy(() => import("@pages/Customers"));
 // const Analytics = React.lazy(() => import("@pages/Analytics"));
-
 
 // Nested routes for HomeLayout
 const homeRoutes = [
@@ -74,8 +74,6 @@ const homeRoutes = [
 	},
 ];
 
-
-
 export const router = createBrowserRouter(
 	[
 		{
@@ -87,7 +85,7 @@ export const router = createBrowserRouter(
 				{
 					index: true,
 					element: (
-						<Suspense fallback={<Loader/>}>
+						<Suspense fallback={<Loader />}>
 							<Login />
 						</Suspense>
 					),
@@ -121,16 +119,16 @@ export const router = createBrowserRouter(
 	{ basename: import.meta.env.BASE_URL }
 );
 
-
-
 ReactDOM.createRoot(document.getElementById("root")).render(
 	<StrictMode>
 		<ReduxStoreProvider store={store}>
-			{/* delay the rendering of our app's UI until the persisted data is available in the Redux store. */}
-			<PersistGate loading={null} persistor={persistor}>
+			<SocketProvider store={store}>
+				{/* delay the rendering of our app's UI until the persisted data is available in the Redux store. */}
+				<PersistGate loading={null} persistor={persistor}>
 					<RouterProvider router={router} />
-				{/* <RouterProvider router={router} fallbackElement={<Loading />} /> */}
-			</PersistGate>
+					{/* <RouterProvider router={router} fallbackElement={<Loading />} /> */}
+				</PersistGate>
+			</SocketProvider>
 		</ReduxStoreProvider>
 	</StrictMode>
 );

@@ -113,6 +113,12 @@ io.on("connection", (socket) => {
 	// Emit the 'user online' event to all connections of this user
 	io.to(`user:${userId}`).emit("user online", { userId: socket.id });
 
+	  socket.on("testEvent", (data) => {
+			console.log("Received testEvent with data: ", data);
+
+			socket.emit("testResponse", "Test response");
+		});
+		
 	socket.on("disconnect", () => {
 		console.log("user disconnected");
 

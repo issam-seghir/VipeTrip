@@ -146,7 +146,6 @@ io.on("connection", async (socket) => {
 
 	// Listen for a new like event
 	socket.on("new like", (data) => {
-		console.log(data);
 		if(data){
 			// Check if the liker is the same as the author of the post
 			if (data.liker.id === data.likedPost.author.id) {

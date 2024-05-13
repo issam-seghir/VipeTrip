@@ -22,6 +22,7 @@ import { PFormMentionTagTextArea } from "./Form/PFormMentionTagTextArea";
 import { setPostCommentsDialog ,selectPostCommentsDialog } from "@store/slices/postSlice";
 import { userApi } from "@jsx/store/api/userApi";
 import { selectCurrentUser } from "@store/slices/authSlice";
+import { useSocket } from "@context/SocketContext";
 
 export function PostCommentsDialog() {
 	const navigate = useNavigate();
@@ -32,6 +33,7 @@ export function PostCommentsDialog() {
 	const showDialog = useSelector(selectPostCommentsDialog);
 	const dispatch = useDispatch();
 	const user = useSelector(selectCurrentUser);
+	const [socket, isConnected] = useSocket();
 
 	const page = useSelector(selectPage);
 	const limit = useSelector(selectLimit);
@@ -165,6 +167,10 @@ export function PostCommentsDialog() {
 					position: "top-center",
 					detail: "Your Comment has been created successfully",
 				});
+				// handle create new comment notification
+				if (isConnected) {
+					socket.emit("new comment", res?.data);
+				}
 			}
 		} catch (error) {
 			console.error(error);

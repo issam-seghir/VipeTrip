@@ -146,33 +146,42 @@ io.on("connection", async (socket) => {
 
 	// Listen for a new like event (like on a post or comment)
 	socket.on("new like", (data) => {
-		console.log("new like data", data);
-		console.log("new  data?.likedComment?.author", data?.likedComment?.author);
-		  try {
-				if (!data) {
-					return;
-				}
-
-				// Check if the liker is the same as the author of the post or comment
-				const authorId = data?.type === "Post" ? data?.likedPost?.author.id : data?.likedComment?.author.id;
-				if (data?.liker?.id === authorId) {
-					// The user liked their own post/comment, so don't emit a notification
-					return;
-				}
-				// Emit a notification event to the author of the post/comment
-				io.to(`user:${authorId}`).emit("notification", { data, type: "like" });
-			} catch (error) {
-				console.error(`Error handling 'new like' event: ${error.message}`);
+		try {
+			if (!data) {
+				return;
 			}
+
+			// Check if the liker is the same as the author of the post or comment
+			const authorId = data?.type === "Post" ? data?.likedPost?.author.id : data?.likedComment?.author.id;
+			if (data?.liker?.id === authorId) {
+				// The user liked their own post/comment, so don't emit a notification
+				return;
+			}
+			// Emit a notification event to the author of the post/comment
+			io.to(`user:${authorId}`).emit("notification", { data, type: "like" });
+		} catch (error) {
+			console.error(`Error handling 'new like' event: ${error.message}`);
+		}
 	});
 
 	// Listen for a new comment event
 	socket.on("new comment", (data) => {
-		// Emit a notification event to the author of the post
-		io.to(data.postAuthorId).emit("notification", {
-			message: `${data.senderName} commented on your post`,
-			link: `/post/${data.postId}`,
-		});
+		try {
+			if (!data) {
+				return;
+			}
+console.log(data);
+			// Check if the liker is the same as the author of the post or comment
+			// const authorId = data?.type === "Post" ? data?.likedPost?.author.id : data?.likedComment?.author.id;
+			if (data?.author?.id === data?.post?.author?.id) {
+				// The user liked their own post/comment, so don't emit a notification
+				return;
+			}
+			// Emit a notification event to the author of the post/comment
+			io.to(`user:${data?.post?.author?.id}`).emit("notification", { data, type: "new-comment" });
+		} catch (error) {
+			console.error(`Error handling 'new-comment' event: ${error.message}`);
+		}
 	});
 
 	// listen for a new replay event

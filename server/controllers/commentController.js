@@ -57,8 +57,9 @@ const createComment = asyncWrapper(async (req, res) => {
 	// io.emit("commentUpdated", { commentId, postId, description, mentions: mentionIds });
 
 	await comment.save();
-
-	res.status(201).json({ message: "Comment Created  successfully", data: comment });
+	// Populate the 'liker' and 'likedPost' fields after saving the document
+	const populatedComment = await Comment.findById(comment._id).populate("post");
+	res.status(201).json({ message: "Comment Created  successfully", data: populatedComment });
 });
 
 const createReply = asyncWrapper(async (req, res) => {

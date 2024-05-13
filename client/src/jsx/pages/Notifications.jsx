@@ -245,7 +245,10 @@ export function Notifications() {
 								alt={notification?.data?.liker?.fullName}
 								shape="circle"
 							/>
-							<LikeNotification data={notification?.data} read={notification?.read} />
+							{notification?.type === "like" && (
+								<LikeNotification data={notification?.data} read={notification?.read} />
+							)}
+							{notification?.type === "new-comment" && <div>{notification?.data?.description}</div>}
 						</div>
 						<Button
 							className="p-button-text  p-button p-component border-circle	p-3 w-2rem h-2rem	"

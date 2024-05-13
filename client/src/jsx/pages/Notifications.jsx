@@ -8,13 +8,20 @@ import { Tooltip } from "primereact/tooltip";
 import { useNavigate } from "react-router-dom";
 import { randomNumberBetween, toTitleCase } from "@jsx/utils";
 import { format, formatDistanceToNow } from "date-fns";
+import { Badge } from "primereact/badge";
+import { classNames } from "primereact/utils";
+
 export function Notifications() {
 	const [socket, isConnected, notifications, setNotifications] = useSocket();
 	const navigate = useNavigate();
 
 
   console.log(notifications);
-
+function handleNotificationRead(index) {
+	setNotifications((prevNotifications) =>
+		prevNotifications.map((notif, i) => (i === index ? { ...notif, read: true } : notif))
+	);
+}
 
 	const handleDismiss = (index) => {
 		setNotifications((prevNotifications) => prevNotifications.filter((_, i) => i !== index));
@@ -22,21 +29,25 @@ export function Notifications() {
 
 	return (
 		<div>
-			<div className="flex justify-content-between">
+			<div className="flex justify-content-between mb-5">
 				<h2>Notifications</h2>
-				<Button label="" />
+				<Button label="Clear All" className="p-button-text  p-button p-component" size="small" />
 			</div>
 			<div className="border-1 p-2 surface-border border-round-xl">
 				{notifications.map((notification, index) => (
 					<div
 						key={index}
 						onKeyDown={() => {}}
-						onClick={() => navigate(`/posts/${notification?.data?.likedPost?.id}`)}
+						onClick={() => {
+							navigate(`/posts/${notification?.data?.likedPost?.id}`);
+							handleNotificationRead(index);
+						}}
 						tabIndex={0}
 						role="button"
 						className="p-2 mb-2 flex align-items-center cursor-pointer hover:bg-primary-900 transition-linear transition-duration-500  border-round-xl"
 					>
 						<div className="flex align-items-center gap-2 flex-1">
+							{!notification?.read && <Badge size="normal" severity="info"></Badge>}
 							<Avatar
 								size="large"
 								icon="pi pi-user"
@@ -51,7 +62,9 @@ export function Notifications() {
 							/>
 							<div className="flex flex-column">
 								<div className="flex gap-2 align-items-center">
-									<h4>{toTitleCase(notification?.data?.liker?.fullName)}</h4>
+									<h4 className={classNames({ "text-primary-700": notification?.read })}>
+										{toTitleCase(notification?.data?.liker?.fullName)}
+									</h4>
 									<p className="text-xs text-400 flex gap-2">
 										{notification?.type === "like" && `liked your post`}
 									</p>
@@ -80,10 +93,12 @@ export function Notifications() {
 							</div>
 						</div>
 						<Button
-							className="p-button-text  p-button p-component"
-							label="Dismiss"
+							className="p-button-text  p-button p-component border-circle	p-3 w-2rem h-2rem	"
+							icon="pi pi-times"
 							size="small"
-							onClick={() => handleDismiss(index)}
+							onClick={(event) =>{
+									event.stopPropagation();
+                handleDismiss(index)}}
 						/>
 					</div>
 				))}

@@ -23,7 +23,7 @@ export const SocketProvider = ({ children, store }) => {
 
 	function handleLikeNotification(notification) {
 		console.log(notification);
-		setNotifications((prevNotifications) => [...prevNotifications, notification]);
+		setNotifications((prevNotifications) => [...prevNotifications, { ...notification, read: false }]);
 	}
 	function handleTestResponse(data) {
 		console.log("Received response from test Hook:", data);

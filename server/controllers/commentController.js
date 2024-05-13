@@ -301,8 +301,9 @@ const likeDislikeComment = asyncWrapper(async (req, res, next) => {
 	// If the user has not liked the post, create a new Like document
 	const like = new Like({ likedComment: commentId, liker: userId, type: "Comment" });
 	await like.save();
-
-	res.status(200).json({ message: "Comment liked successfully" });
+	// Populate the 'liker' and 'likedPost' fields after saving the document
+	const populatedLike = await Like.findById(like._id).populate("liker").populate("likedComment");
+	res.status(200).json({ message: "Comment liked successfully", data: populatedLike });
 });
 
 module.exports = {

@@ -144,29 +144,26 @@ io.on("connection", async (socket) => {
 		io.to(request.friendId).emit("notification", { message });
 	});
 
-	// Listen for a new like event
+	// Listen for a new like event (like on a post or comment)
 	socket.on("new like", (data) => {
-		if(data){
-			// Check if the liker is the same as the author of the post
-			if (data.liker.id === data.likedPost.author.id) {
-				// The user liked their own post, so don't emit a notification
-				return;
-			}
+		console.log("new like data", data);
+		console.log("new  data?.likedComment?.author", data?.likedComment?.author);
+		  try {
+				if (!data) {
+					return;
+				}
 
-			if (data.type === "Post") {
-				io.to(`user:${data?.likedPost?.author?.id}`).emit(
-					"notification",
-					{data,
-						type:"like"
-					}
-				);
-			} else {
-				io.emit(
-					"notification",
-					`${data?.liker?.fullName} like a comment of ${data?.likedComment?.author?.fullName} `
-				);
+				// Check if the liker is the same as the author of the post or comment
+				const authorId = data?.type === "Post" ? data?.likedPost?.author.id : data?.likedComment?.author.id;
+				if (data?.liker?.id === authorId) {
+					// The user liked their own post/comment, so don't emit a notification
+					return;
+				}
+				// Emit a notification event to the author of the post/comment
+				io.to(`user:${authorId}`).emit("notification", { data, type: "like" });
+			} catch (error) {
+				console.error(`Error handling 'new like' event: ${error.message}`);
 			}
-		}
 	});
 
 	// Listen for a new comment event

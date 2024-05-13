@@ -27,6 +27,7 @@ import { useDebounce } from "@uidotdev/usehooks";
 import { commentSchema } from "@validations/postSchema";
 import { useForm } from "react-hook-form";
 import { PFormMentionTagTextArea } from "./Form/PFormMentionTagTextArea";
+import { useSocket } from "@context/SocketContext";
 
 export function Comment({ comment }) {
 	const navigate = useNavigate();
@@ -37,7 +38,7 @@ export function Comment({ comment }) {
 	const [isEditing, setIsEditing] = useState(false);
 	const [isReplying, setIsReplying] = useState(false);
 	const [showReplies, setShowReplies] = useState(false);
-
+		const [socket, isConnected] = useSocket();
 	const descriptionCommentRef = useRef(null);
 	const [cursorPosition, setCursorPosition] = useState(null);
 	const user = useSelector(selectCurrentUser);
@@ -227,8 +228,16 @@ export function Comment({ comment }) {
 			: []),
 	];
 
-	const handleLikeButton = () => {
-		likeDislikeComment({ postId: comment?.post, commentId: comment?.id });
+	const handleLikeButton = async() => {
+		try {
+			const res = await likeDislikeComment({ postId: comment?.post, commentId: comment?.id }).unwrap();
+			if (res && isConnected) {
+				socket.emit("new like", res?.data);
+			}
+		} catch (error) {
+			console.error("Failed to like comment:", error);
+			return;
+		} finally {
 		if (scope?.current) {
 			animate([
 				[`.likeCommentButton-${comment?.id}`, { scale: 0.8 }, { duration: 0.1, at: "<" }],
@@ -236,6 +245,7 @@ export function Comment({ comment }) {
 				[`.likeCommentButton-${comment?.id}`, { scale: 1 }, { duration: 0.1 }],
 			]);
 		}
+	}
 	};
 
 	return (
@@ -467,6 +477,7 @@ export function Comment({ comment }) {
 							inputClassName="w-full border-none surface-ground shadow-none"
 							placeholder="Write your thought ... @ for mentions"
 							autoResize={true}
+							// eslint-disable-next-line jsx-a11y/no-autofocus
 							autoFocus={true}
 							disabled={isSubmitting || createReplyResult?.isLoading || createReplyResult?.isLoading}
 							errorMessage={errorMessage}

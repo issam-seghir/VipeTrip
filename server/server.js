@@ -115,12 +115,12 @@ io.on("connection", async (socket) => {
 	io.to(`user:${userId}`).emit("user online", { userId: socket.id });
 
 	socket.on("testEvent", (data) => {
-		console.log("Received testEvent with data: ", data);
+		console.log("Received testEvent with data:", data);
 
 		socket.emit("testResponse", "Test response");
 	});
 	socket.on("test Hook", (data) => {
-		console.log("Received test Hook from client : ", data);
+		console.log("Received test Hook from client :", data);
 
 		socket.emit("test Hook", "Test Hook server response");
 	});
@@ -146,12 +146,28 @@ io.on("connection", async (socket) => {
 
 	// Listen for a new like event
 	socket.on("new like", (data) => {
-		const typeMessage = data.type === "Post" ? "post" : "comment";
-		const message = `${data.senderName} liked your ${typeMessage}`;
-		// Define the link based on the type
-		const link = data.type === "Post" ? `/post/${data.postId}` : `/comment/${data.commentId}`;
-		// Emit the notification
-		io.to(data.recipientId).emit("notification", { message, link });
+		console.log(data);
+		if(data){
+			// Check if the liker is the same as the author of the post
+			if (data.liker.id === data.likedPost.author.id) {
+				// The user liked their own post, so don't emit a notification
+				return;
+			}
+
+			if (data.type === "Post") {
+				io.to(`user:${data?.likedPost?.author?.id}`).emit(
+					"notification",
+					{data,
+						type:"like"
+					}
+				);
+			} else {
+				io.emit(
+					"notification",
+					`${data?.liker?.fullName} like a comment of ${data?.likedComment?.author?.fullName} `
+				);
+			}
+		}
 	});
 
 	// Listen for a new comment event

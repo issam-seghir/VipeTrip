@@ -31,6 +31,7 @@ import { useCopyToClipboard } from "usehooks-ts";
 import { Gallery } from "./Gallery";
 import { PostStatus } from "./PostStatus";
 
+import { useSocket } from "@context/SocketContext";
 import {
 	setPostCommentsDialog,
 	setPostDialogForm,
@@ -51,6 +52,7 @@ export const Post = forwardRef(({ post }, ref) => {
 	const optionsMenu = useRef(null);
 	const [copiedText, copy] = useCopyToClipboard(null);
 	const dispatch = useDispatch();
+	const [socket, isConnected] = useSocket();
 
 	const user = useSelector(selectCurrentUser);
 	const [scope, animate] = useAnimate();
@@ -194,53 +196,63 @@ export const Post = forwardRef(({ post }, ref) => {
 	const handleShareButton = (e) => {
 		shareOverlay.current.toggle(e);
 	};
-	const handleLikeButton = () => {
-		likeDislikePost(post?.id);
-		const sparkles = Array.from({ length: 20 });
-		const sparklesAnimation = sparkles.map((_, index) => [
-			`.sparkle-${index}`,
-			{
-				x: randomNumberBetween(-100, 100),
-				y: randomNumberBetween(-100, 100),
-				scale: randomNumberBetween(1.5, 2.5),
-				opacity: 0,
-			},
-			{
-				duration: 0.4,
-				at: "<",
-			},
-		]);
-		const sparklesFadeOut = sparkles.map((_, index) => [
-			`.sparkle-${index}`,
-			{
-				opacity: 1,
-				scale: 1,
-			},
-			{
-				duration: 0.3,
-				at: "<",
-			},
-		]);
-
-		const sparklesReset = sparkles.map((_, index) => [
-			`.sparkle-${index}`,
-			{
-				x: 0,
-				y: 0,
-				opacity: 0,
-			},
-			{
-				duration: 0.000_001,
-			},
-		]);
-		if (scope?.current) {
-			animate([
-				...sparklesReset,
-				[".likeButton", { scale: 0.8 }, { duration: 0.1, at: "<" }],
-				[".likeButton", { scale: 1 }, { duration: 0.1 }],
-				...sparklesAnimation,
-				...sparklesFadeOut,
+	const handleLikeButton = async () => {
+		try {
+			const res = await likeDislikePost(post?.id).unwrap();
+			if (res && isConnected) {
+				socket.emit("new like", res?.data);
+			}
+		} catch (error) {
+			console.error("Failed to like post:", error);
+			return;
+		} finally {
+			// Sparkles animation
+			const sparkles = Array.from({ length: 20 });
+			const sparklesAnimation = sparkles.map((_, index) => [
+				`.sparkle-${index}`,
+				{
+					x: randomNumberBetween(-100, 100),
+					y: randomNumberBetween(-100, 100),
+					scale: randomNumberBetween(1.5, 2.5),
+					opacity: 0,
+				},
+				{
+					duration: 0.4,
+					at: "<",
+				},
 			]);
+			const sparklesFadeOut = sparkles.map((_, index) => [
+				`.sparkle-${index}`,
+				{
+					opacity: 1,
+					scale: 1,
+				},
+				{
+					duration: 0.3,
+					at: "<",
+				},
+			]);
+
+			const sparklesReset = sparkles.map((_, index) => [
+				`.sparkle-${index}`,
+				{
+					x: 0,
+					y: 0,
+					opacity: 0,
+				},
+				{
+					duration: 0.000_001,
+				},
+			]);
+			if (scope?.current) {
+				animate([
+					...sparklesReset,
+					[".likeButton", { scale: 0.8 }, { duration: 0.1, at: "<" }],
+					[".likeButton", { scale: 1 }, { duration: 0.1 }],
+					...sparklesAnimation,
+					...sparklesFadeOut,
+				]);
+			}
 		}
 	};
 

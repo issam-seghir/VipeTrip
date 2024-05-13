@@ -1,13 +1,11 @@
 import { arLocale } from "@data/localization/ar.js";
 import { selectLocal, selectMode, selectTheme } from "@jsx/store/slices/globalSlice";
 import { PrimeReactProvider, addLocale } from "primereact/api";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { Outlet } from "react-router-dom";
-// import { socket } from "./socket";
-
 import { useSocket } from "@context/SocketContext";
-import { useSocketEvent } from "@jsx/hooks/useSocketEvent";
-
+import { Toast } from "primereact/toast";
+import { useRef, useEffect } from "react";
 addLocale("ar", arLocale);
 
 function App() {
@@ -16,8 +14,7 @@ function App() {
 	const theme = useSelector(selectTheme);
 	const local = useSelector(selectLocal);
 	const [socket, isConnected] = useSocket();
-	const [listenToEvent, emitEvent] = useSocketEvent(socket);
-
+const toast = useRef(null);
 	const primereactConfig = {
 		// inputStyle: "filled",
 		//  zIndex: {
@@ -31,14 +28,39 @@ function App() {
 		locale: local,
 		ripple: false,
 	};
-	function handleTestResponse(data) {
-		console.log("Received response from test Hook:", data);
+
+	  useEffect(() => {
+		   function handleOffline() {
+				toast.current.show({
+					severity: "info",
+					summary: `You are offline. Please check your internet connection.`,
+					life: 6000,
+				});
+			}
+
+			function handleOnline() {
+				const condition = navigator.onLine ? "online" : "offline";
+				toast.current.show({ severity: "info", summary: `You are back online` });
+			}
+
+			window.addEventListener("online", handleOnline);
+			window.addEventListener("offline", handleOffline);
+
+			return () => {
+				window.removeEventListener("online", handleOnline);
+				window.removeEventListener("offline", handleOffline);
+			};
+		}, []);
+
+	if (isConnected) {
+		socket.emit("test Hook", "Test Hook message");
 	}
-	listenToEvent("test Hook", handleTestResponse);
-	emitEvent("test Hook", "Test Hook message");
 
 	return (
 		<PrimeReactProvider value={primereactConfig}>
+			<Toast ref={toast} position="bottom-left" pt={{
+				content: "p-4 m-4"
+			}} />
 			<Outlet />
 		</PrimeReactProvider>
 	);

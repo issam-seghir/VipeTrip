@@ -12,7 +12,8 @@ export const SocketProvider = ({ children, store }) => {
 	const localToken = useSelector(selectCurrentToken);
 	const socialToken = getCookie("socialToken");
 	const token = localToken || socialToken;
-
+	// "undefined" means the URL will be computed from the `window.location` object
+	// const URL = process.env.NODE_ENV === 'production' ? undefined : 'http://localhost:4000';
 	const socketUrl = import.meta.env.VITE_SERVER_URL;
 
 	const socket = useRef(null);
@@ -42,7 +43,7 @@ export const SocketProvider = ({ children, store }) => {
 				},
 			});
 
-			socket.	current.on("connect", onConnect);
+			socket.current.on("connect", onConnect);
 			socket.current.on("disconnect", onDisconnect);
 			socket.current.on("error", onError);
 
@@ -54,8 +55,8 @@ export const SocketProvider = ({ children, store }) => {
 			socket.current.off("disconnect", onDisconnect);
 			socket.current.off("error", onError);
 			socket.current.off("message", handleOnMessage);
-		// If you need to close the Socket.IO client when your component is unmounted (for example, if the connection is only needed in a specific part of your application), you should:
-		// socket?.current && socket.disconnect();
+			// If you need to close the Socket.IO client when your component is unmounted (for example, if the connection is only needed in a specific part of your application), you should:
+			// socket?.current && socket.disconnect();
 		};
 	}, []);
 

@@ -7,7 +7,6 @@ const verifyJWT = (req, res, next) => {
 	//* for web socket io auth
 	const isHandshake = req?._query?.sid === undefined;
 	if (!isHandshake) {
-		console.log("isHandshake for socket io :", isHandshake);
 		return next();
 	}
 	const authHeader = req.headers["authorization"];
@@ -17,7 +16,8 @@ const verifyJWT = (req, res, next) => {
 	}
 
 	const token = authHeader.split(" ")[1];
-
+console.log("token");
+console.log(token);
 	try {
 		const decoded = jwt.verify(token, ENV.ACCESS_TOKEN_SECRET);
 		// Attach user data to request object

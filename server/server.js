@@ -29,6 +29,7 @@ const { passportConfig } = require("@config/PassportjsConfig");
 const { Server } = require("socket.io");
 const { createServer } = require("node:http");
 const verifyJWT = require("@/middleware/auth/verifyJWT");
+// const { getUserFriends } =  require("@/controllers/socketController");
 
 // global mongoose plugins
 mongoose.plugin(normalize);
@@ -101,7 +102,7 @@ const io = new Server(server, {
 io.engine.use(verifyJWT);
 
 // Socket.io
-io.on("connection", (socket) => {
+io.on("connection", async (socket) => {
 	const userId = socket.request.user.id;
 
 	// The user ID is used as a room
@@ -113,16 +114,16 @@ io.on("connection", (socket) => {
 	// Emit the 'user online' event to all connections of this user
 	io.to(`user:${userId}`).emit("user online", { userId: socket.id });
 
-	  socket.on("testEvent", (data) => {
-			console.log("Received testEvent with data: ", data);
+	socket.on("testEvent", (data) => {
+		console.log("Received testEvent with data: ", data);
 
-			socket.emit("testResponse", "Test response");
-		});
-	  socket.on("test Hook", (data) => {
-			console.log("Received test Hook from client : ", data);
+		socket.emit("testResponse", "Test response");
+	});
+	socket.on("test Hook", (data) => {
+		console.log("Received test Hook from client : ", data);
 
-			socket.emit("test Hook", "Test Hook server response");
-		});
+		socket.emit("test Hook", "Test Hook server response");
+	});
 
 	socket.on("disconnect", () => {
 		console.log("user disconnected");

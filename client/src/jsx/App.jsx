@@ -15,8 +15,8 @@ function App() {
 	// const theme = useMemo(() => createTheme(themeSettings(mode)), [mode]);
 	const theme = useSelector(selectTheme);
 	const local = useSelector(selectLocal);
-	// const [socket, isConnected] = useSocket();
-	// const [listenToEvent, emitEvent] = useSocketEvent(socket);
+	const [socket, isConnected] = useSocket();
+	const [listenToEvent, emitEvent] = useSocketEvent(socket);
 
 	const primereactConfig = {
 		// inputStyle: "filled",
@@ -31,11 +31,11 @@ function App() {
 		locale: local,
 		ripple: false,
 	};
-	// function handleTestResponse(data) {
-	// 	console.log("Received response from test Hook:", data);
-	// }
-	// listenToEvent("test Hook", handleTestResponse);
-	// emitEvent("test Hook", "Test Hook message");
+	function handleTestResponse(data) {
+		console.log("Received response from test Hook:", data);
+	}
+	listenToEvent("test Hook", handleTestResponse);
+	emitEvent("test Hook", "Test Hook message");
 
 	return (
 		<PrimeReactProvider value={primereactConfig}>

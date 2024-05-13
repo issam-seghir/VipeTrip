@@ -16,6 +16,9 @@ import { Toast } from "primereact/toast";
 import { PostDialogForm } from "@jsx/components/PostDialogForm";
 import { PostCommentsDialog } from "@jsx/components/PostCommentsDialog";
 import { selectCurrentUser } from "@jsx/store/slices/authSlice";
+import { useSocket } from "@context/SocketContext";
+
+
 export const HomeLayout = () => {
 	const isNonMobileScreens = useMediaQuery("(min-width:1000px)");
 	const navigate = useNavigate();
@@ -26,6 +29,8 @@ export const HomeLayout = () => {
 	const isPostRepostedSuccuss = useSelector(selectPostRespostedSuccuss);
 	const user = useSelector(selectCurrentUser);
 	const dispatch = useDispatch();
+	const [socket, isConnected,notifications] = useSocket();
+	  const unreadNotifications = notifications?.filter((notification) => !notification?.read)?.length;
 
 	// show success message when deleting a post
 	useEffect(() => {
@@ -107,6 +112,7 @@ export const HomeLayout = () => {
 			label: "Notifications",
 			icon: "pi pi-bell",
 			url: "notifications",
+			badge: unreadNotifications > 0 ? unreadNotifications : null,
 			template: itemRenderer,
 		},
 		{

@@ -145,6 +145,10 @@ export function Comment({ comment }) {
 					description: "",
 					mentions: [],
 				});
+				// reply comment notification
+				if (isConnected) {
+					socket.emit("new reply", res?.data);
+				}
 			}
 		} catch (error) {
 			console.error(error);
@@ -231,6 +235,7 @@ export function Comment({ comment }) {
 	const handleLikeButton = async() => {
 		try {
 			const res = await likeDislikeComment({ postId: comment?.post, commentId: comment?.id }).unwrap();
+			// like comment notification
 			if (res && isConnected) {
 				socket.emit("new like", res?.data);
 			}

@@ -170,7 +170,6 @@ io.on("connection", async (socket) => {
 			if (!data) {
 				return;
 			}
-console.log(data);
 			// Check if the liker is the same as the author of the post or comment
 			// const authorId = data?.type === "Post" ? data?.likedPost?.author.id : data?.likedComment?.author.id;
 			if (data?.author?.id === data?.post?.author?.id) {
@@ -180,17 +179,27 @@ console.log(data);
 			// Emit a notification event to the author of the post/comment
 			io.to(`user:${data?.post?.author?.id}`).emit("notification", { data, type: "new-comment" });
 		} catch (error) {
-			console.error(`Error handling 'new-comment' event: ${error.message}`);
+			console.error(`Error handling 'new comment' event: ${error.message}`);
 		}
 	});
 
 	// listen for a new replay event
-	socket.on("new replay", (data) => {
-		// Emit a notification event to the author of the post
-		io.to(data.commentAuthorId).emit("notification", {
-			message: `${data.senderName} replied to your comment`,
-			link: `/comment/${data.commentId}`,
-		});
+	socket.on("new reply", (data) => {
+		try {
+			if (!data) {
+				return;
+			}
+			// Check if the liker is the same as the author of the post or comment
+			// const authorId = data?.type === "Post" ? data?.likedPost?.author.id : data?.likedComment?.author.id;
+			if (data?.author?.id === data?.parentComment?.author?.id) {
+				// The user liked their own post/comment, so don't emit a notification
+				return;
+			}
+			// Emit a notification event to the author of the post/comment
+			io.to(`user:${data?.parentComment?.author?.id}`).emit("notification", { data, type: "new-reply" });
+		} catch (error) {
+			console.error(`Error handling 'new replay' event: ${error.message}`);
+		}
 	});
 	// socket.on("new post", (data) => {
 	// 	const friends = getFriends(data.senderId);

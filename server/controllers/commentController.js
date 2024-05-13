@@ -99,8 +99,9 @@ const createReply = asyncWrapper(async (req, res) => {
 	parentComment.replies.push(reply);
 	parentComment.totalReplies += 1; // Increment the totalReplies count of the parent comment
 	await parentComment.save();
-
-	res.status(201).json({ message: "Reply added successfully", data: reply });
+	// Populate the 'liker' and 'likedPost' fields after saving the document
+	const populatedRelply = await Comment.findById(reply._id).populate("parentComment");
+	res.status(201).json({ message: "Reply added successfully", data: populatedRelply });
 });
 
 /**

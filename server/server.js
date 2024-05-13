@@ -118,7 +118,12 @@ io.on("connection", (socket) => {
 
 			socket.emit("testResponse", "Test response");
 		});
-		
+	  socket.on("test Hook", (data) => {
+			console.log("Received test Hook from client : ", data);
+
+			socket.emit("test Hook", "Test Hook server response");
+		});
+
 	socket.on("disconnect", () => {
 		console.log("user disconnected");
 

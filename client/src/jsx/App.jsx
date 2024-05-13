@@ -10,6 +10,7 @@ import { selectCurrentToken } from "@store/slices/authSlice";
 import { getCookie } from "@utils/index";
 import io from "socket.io-client";
 import { useSocket } from "@context/SocketContext";
+import { useSocketEvent } from "@jsx/hooks/useSocketEvent";
 
 addLocale("ar", arLocale);
 
@@ -19,7 +20,9 @@ function App() {
 	const theme = useSelector(selectTheme);
 	const local = useSelector(selectLocal);
 	const dispatch = useDispatch();
-	const socket = useSocket();
+	const [socket,isConnected] = useSocket();
+ 	const [listenToEvent, emitEvent] = useSocketEvent(socket);
+
 	const primereactConfig = {
 		// inputStyle: "filled",
 		//  zIndex: {
@@ -33,16 +36,15 @@ function App() {
 		locale: local,
 		ripple: false,
 	};
+	function handleTestResponse(data) {
+		console.log("Received response from test Hook: ", data);
+	}
 
-	useEffect(() => {
-		if (socket) {
-			socket.emit("testEvent", "Test message");
-		
-			socket.on("testResponse", (data) => {
-				console.log("Received response: ", data);
-			});
-		}
-	}, [socket]);
+
+listenToEvent('test Hook', handleTestResponse);
+
+        emitEvent('test Hook', 'Test Hook message');
+
 
 	// "undefined" means the URL will be computed from the `window.location` object
 	// const URL = process.env.NODE_ENV === 'production' ? undefined : 'http://localhost:4000';

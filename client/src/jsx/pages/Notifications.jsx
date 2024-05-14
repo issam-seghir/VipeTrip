@@ -1,5 +1,5 @@
 import { useSocket } from "@context/SocketContext";
-import { useDeleteFriendRequestMutation } from "@jsx/store/api/friendsApi";
+import { useDeleteFriendRequestMutation ,useAcceptFriendRequestMutation } from "@jsx/store/api/friendsApi";
 import { toTitleCase } from "@jsx/utils";
 import { format, formatDistanceToNow } from "date-fns";
 import { Avatar } from "primereact/avatar";
@@ -26,12 +26,24 @@ const sortedNotifications = notifications.sort((a, b) => new Date(a.data.created
 		setNotifications((prevNotifications) => prevNotifications.filter((_, i) => i !== index));
 	};
 	const [deleteFriendRequest, { isLoading: isDeleting }] = useDeleteFriendRequestMutation();
+	const [acceptFriendRequest, { isLoading: isAccepting }] = useAcceptFriendRequestMutation();
 
 	const handleDeleteFriendRequest = async (requestId, index) => {
 		try {
 			const res = await deleteFriendRequest(requestId).unwrap()
       if (res){
           socket.emit("cancel friend request",res?.data)
+        handleDismiss(index);
+      };
+		} catch (error) {
+			console.log(error);
+		}
+	};
+	const handleAcceptFriendRequest = async (requestId, index) => {
+		try {
+			const res = await acceptFriendRequest(requestId).unwrap();
+      if (res){
+          socket.emit("accept friend request", res?.data);
         handleDismiss(index);
       };
 		} catch (error) {
@@ -350,12 +362,16 @@ const sortedNotifications = notifications.sort((a, b) => new Date(a.data.created
 										<Button
 											label="Accept"
 											className="p-button-rounded px-2 py-0 w-5rem h-2rem text-sm"
-											disabled={isDeleting}
+											disabled={isAccepting || isDeleting}
+											onClick={(event) => {
+												event.stopPropagation();
+												handleAcceptFriendRequest(notification?.data?.id, index);
+											}}
 										/>
 										<Button
 											label="Decline"
 											className="p-button-rounded px-2 py-0 w-5rem h-2rem text-sm"
-											disabled={isDeleting}
+											disabled={isAccepting || isDeleting}
 											onClick={(event) => {
 												event.stopPropagation();
 												handleDeleteFriendRequest(notification?.data?.id, index);

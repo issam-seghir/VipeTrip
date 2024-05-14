@@ -139,9 +139,10 @@ io.on("connection", async (socket) => {
 		io.to(`user:${request?.friendId?.id}`).emit("notification", { data: request, type: "friend-request" });
 	});
 	socket.on("cancel friend request", (request) => {
-		console.log(request);
-		// Emit a friend request event to the recipient
 		io.to(`user:${request?.userId}`).emit("friend request declined", request);
+	});
+	socket.on("accept friend request", (request) => {
+		io.to(`user:${request?.userId}`).emit("friend request accepted", request);
 	});
 
 	// Listen for a new like event (like on a post or comment)

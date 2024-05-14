@@ -83,13 +83,12 @@ exports.deleteFriendRequest = asyncWrapper(async (req, res) => {
 		return res.status(404).json({ message: `Requesting user not found` });
 	}
 
-
 	const friendship = await FriendShip.findOneAndDelete({ _id: requestId, status: "Requested" });
 	if (!friendship) {
 		return res.status(404).json({ message: "Friend request to Delete not found" });
 	}
 
-	res.status(200).json({ message: "Friend request Declined successfully" ,data: friendship});
+	res.status(200).json({ message: "Friend request Declined successfully", data: friendship });
 });
 
 exports.removeFriend = asyncWrapper(async (req, res) => {

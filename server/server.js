@@ -32,7 +32,6 @@ const verifyJWT = require("@/middleware/auth/verifyJWT");
 // const { getUserFriends } =  require("@/controllers/socketController");
 const SocketSession = require("@model/SocketSession");
 
-
 // global mongoose plugins
 mongoose.plugin(normalize);
 mongoose.plugin(autopopulate);
@@ -113,33 +112,33 @@ io.on("connection", async (socket) => {
 	console.log("a user connected");
 	console.log(userId);
 
-	// Emit the 'user online' event to all connections of this user
-	io.to(`user:${userId}`).emit("user online", { userId: socket.id });
+	// Emit the 'user online' event to all connections except current user
+	socket.broadcast.emit("user online", { userId });
 
-	 try {
-			const userId = socket.request.user.id;
+	try {
+		const userId = socket.request.user.id;
 
-			// If a user connects multiple times with the same user ID,
-			// this will overwrite their previous session.
-			// If you want to allow multiple sessions per user, you might need to adjust this.
-			const existingSession = await SocketSession.findOne({ userId });
-			if (existingSession) {
-				await SocketSession.updateOne({ userId }, { socketId: socket.id });
-			} else {
-				const socketSession = new SocketSession({ userId, socketId: socket.id });
-				await socketSession.save();
-			}
-
-			socket.on("disconnect", async () => {
-				try {
-					await SocketSession.deleteOne({ socketId: socket.id });
-				} catch (error) {
-					console.error("Failed to delete user session:", error);
-				}
-			});
-		} catch (error) {
-			console.error("Failed to create user session:", error);
+		// If a user connects multiple times with the same user ID,
+		// this will overwrite their previous session.
+		// If you want to allow multiple sessions per user, you might need to adjust this.
+		const existingSession = await SocketSession.findOne({ userId });
+		if (existingSession) {
+			await SocketSession.updateOne({ userId }, { socketId: socket.id });
+		} else {
+			const socketSession = new SocketSession({ userId, socketId: socket.id });
+			await socketSession.save();
 		}
+
+		socket.on("disconnect", async () => {
+			try {
+				await SocketSession.deleteOne({ socketId: socket.id });
+			} catch (error) {
+				console.error("Failed to delete user session:", error);
+			}
+		});
+	} catch (error) {
+		console.error("Failed to create user session:", error);
+	}
 
 	socket.on("testEvent", (data) => {
 		console.log("Received testEvent with data:", data);
@@ -155,8 +154,8 @@ io.on("connection", async (socket) => {
 	socket.on("disconnect", () => {
 		console.log("user disconnected");
 
-		// Emit the 'user offline' event to all connections of this user
-		io.to(`user:${userId}`).emit("user offline", { userId: socket.id });
+		// Emit the 'user online' event to all connections except current user
+		socket.broadcast.emit("user offline", { userId });
 	});
 	// Listen for a friend request event
 	// Listen for a friend request event
@@ -230,23 +229,22 @@ io.on("connection", async (socket) => {
 		}
 	});
 	socket.on("new post", (data) => {
-			try {
-				if (!data) {
-					return;
-				}
-				// Check if the liker is the same as the author of the post or comment
-				// const authorId = data?.type === "Post" ? data?.likedPost?.author.id : data?.likedComment?.author.id;
-				if (data?.author?.id === data?.parentComment?.author?.id) {
-					// The user liked their own post/comment, so don't emit a notification
-					return;
-				}
-				// Emit a notification event to the author of the post/comment
-				io.to(`user:${data?.parentComment?.author?.id}`).emit("notification", { data, type: "new-reply" });
-			} catch (error) {
-				console.error(`Error handling 'new replay' event: ${error.message}`);
+		try {
+			if (!data) {
+				return;
 			}
+			// Check if the liker is the same as the author of the post or comment
+			// const authorId = data?.type === "Post" ? data?.likedPost?.author.id : data?.likedComment?.author.id;
+			if (data?.author?.id === data?.parentComment?.author?.id) {
+				// The user liked their own post/comment, so don't emit a notification
+				return;
+			}
+			// Emit a notification event to the author of the post/comment
+			io.to(`user:${data?.parentComment?.author?.id}`).emit("notification", { data, type: "new-reply" });
+		} catch (error) {
+			console.error(`Error handling 'new replay' event: ${error.message}`);
+		}
 	});
-
 });
 
 connection.once("open", () => {

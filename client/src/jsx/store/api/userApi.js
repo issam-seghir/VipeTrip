@@ -9,15 +9,14 @@ export const userApi = api.enhanceEndpoints({ addTagTypes: ["User"] }).injectEnd
 				method: "GET",
 			}),
 			transformResponse: (response) => response.data,
-			providesTags: (result, error, { id }) => [{ type: "User", id }],
+			providesTags: (result, error, id ) => [{ type: "User", id }],
 		}),
 		getUserOnlineStatus : builder.query({
 			query: (id) => ({
 				url: `/users/${id}/online-status`,
 				method: "GET",
 			}),
-			transformResponse: (response) => response.data,
-			providesTags: (result, error, { id }) => [{ type: "User", id }],
+			providesTags: (result, error,  id ) => [{type: "User" , id:"STATUS"}],
 		}),
 		getUserPosts: builder.query({
 			query: (id) => ({
@@ -25,7 +24,7 @@ export const userApi = api.enhanceEndpoints({ addTagTypes: ["User"] }).injectEnd
 				method: "GET",
 			}),
 			transformResponse: (response) => response.data,
-			providesTags: (result, error, { id }) => [{ type: "User", id }],
+			providesTags: (result, error, id ) => [{ type: "User", id }],
 		}),
 		getCurrentUser: builder.query({
 			query: () => `users/me`,

@@ -64,7 +64,7 @@ export function Profile() {
 	const [deleteFriendRequest, deleteFriendRequestResult] = useDeleteFriendRequestMutation();
 	const [removeFriend, removeFriendResult] = useRemoveFriendMutation();
 	const user = currentUser || otherUser;
-
+console.log(OnlineStatus);
 	const toggleFriendRequest = async () => {
 		if (friendRequest?.status === "Accepted") {
 			try {

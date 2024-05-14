@@ -2,6 +2,21 @@ const FriendShip = require("@model/FriendShip");
 const User = require("@model/User");
 const { asyncWrapper } = require("@middleware/asyncWrapper");
 
+exports.getFriendRequest = asyncWrapper(async (req, res) => {
+	const userId = req?.user?.id;
+	const { friendId } = req.params;
+	const user = await User.findById(userId);
+	const friend = await User.findById(friendId);
+	if (!user) {
+		return res.status(404).json({ message: `Requesting user not found` });
+	}
+	if (!friend) {
+		return res.status(404).json({ message: `Friend user not found` });
+	}
+	const friendRequest = await FriendShip.findOne({ userId, friendId, status: "Requested" });
+	res.status(200).json({ message: "Friend request sent successfully", data: friendRequest });
+});
+
 exports.createFriendRequest = asyncWrapper(async (req, res) => {
 	const { friendId } = req.params;
 	const userId = req?.user?.id;

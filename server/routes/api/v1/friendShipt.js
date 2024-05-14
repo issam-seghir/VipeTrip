@@ -2,6 +2,7 @@ const express = require("express");
 
 const router = express.Router();
 const {
+    getFriendRequest,
 	createFriendRequest,
 	acceptFriendRequest,
 	deleteFriendRequest,
@@ -11,9 +12,10 @@ const {
 // router.route("/").get(getAllFriends);
 router
 	.route("/:friendId")
+	.get(getFriendRequest)
 	.post(createFriendRequest)
 	.patch(acceptFriendRequest)
 	.delete(deleteFriendRequest)
-	.delete(removeFriend)
+	.delete(removeFriend);
 
 module.exports = router;

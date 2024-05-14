@@ -2,6 +2,7 @@ import { CreatePostWidget } from "@components/CreatePostWidget";
 import { EditProfileDialog } from "@components/EditProfileDialog";
 import { UserPosts } from "@components/UserPosts";
 import { useGetCurrentUserQuery, useGetUserQuery } from "@jsx/store/api/userApi";
+import { useCreateFriendRequestMutation, useDeleteFriendRequestMutation } from "@jsx/store/api/friendsApi";
 import { toTitleCase } from "@jsx/utils";
 import { selectCurrentUser } from "@store/slices/authSlice";
 import { format } from "date-fns";

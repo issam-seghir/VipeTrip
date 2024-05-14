@@ -13,9 +13,7 @@ exports.getFriendRequest = asyncWrapper(async (req, res) => {
 	if (!friend) {
 		return res.status(404).json({ message: `Friend user not found` });
 	}
-	const friendRequest = await FriendShip.findOne({ userId, friendId})
-		.populate("friendId")
-		.populate("userId");
+	const friendRequest = await FriendShip.findOne({ userId, friendId }).populate("friendId").populate("userId");
 	res.status(200).json({ message: "Get Friend request successfully", data: friendRequest });
 });
 

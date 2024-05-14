@@ -6,6 +6,7 @@ import {
 	useCreateFriendRequestMutation,
 	useDeleteFriendRequestMutation,
 	useGetFriendRequestQuery,
+	useRemoveFriendMutation,
 } from "@jsx/store/api/friendsApi";
 import { useGetCurrentUserQuery, useGetUserQuery } from "@jsx/store/api/userApi";
 import { toTitleCase } from "@jsx/utils";
@@ -53,11 +54,18 @@ export function Profile() {
 	} = useGetFriendRequestQuery(profileId, { skip: isCurrentUser });
 	const [createFriendRequest, createFriendRequestResult] = useCreateFriendRequestMutation();
 	const [deleteFriendRequest, deleteFriendRequestResult] = useDeleteFriendRequestMutation();
+	const [removeFriend, removeFriendResult] = useRemoveFriendMutation();
 	const user = currentUser || otherUser;
 
-
 	const toggleFriendRequest = async () => {
-		if (friendRequest) {
+		if (friendRequest?.status === "Accepted") {
+			try {
+				await removeFriend(friendRequest?.friendId?.id);
+			} catch (error) {
+				console.error("Failed to removeFriend :", error);
+				return;
+			}
+		} else if (friendRequest?.status === "Requested") {
 			try {
 				await deleteFriendRequest(friendRequest?.id);
 			} catch (error) {
@@ -66,7 +74,7 @@ export function Profile() {
 			}
 		} else {
 			try {
-				const res =  await createFriendRequest(profileId).unwrap();
+				const res = await createFriendRequest(profileId).unwrap();
 				if (res && isConnected) {
 					socket.emit("friend request", res?.data);
 				}

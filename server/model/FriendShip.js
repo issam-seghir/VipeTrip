@@ -17,7 +17,7 @@ const friendShipSchema = new Schema(
 		status: {
 			type: String,
 			enum: {
-				values: ["Requested", "Accepted", "Declined"],
+				values: ["Requested", "Accepted"],
 				message: "{VALUE} is not supported",
 			},
 			default: "Requested",

@@ -41,7 +41,7 @@ export const friendsApi = api.enhanceEndpoints({ addTagTypes: ["Friends"] }).inj
 				url: `users/me/friends/${id}`,
 				method: "DELETE",
 			}),
-			invalidatesTags: (result, error, id) => [{ type: "Friends", id: "LIST" }],
+			invalidatesTags: (result, error, id) => [{ type: "Friends", id }],
 		}),
 	}),
 });

@@ -6,6 +6,7 @@ import { Outlet } from "react-router-dom";
 import { useSocket } from "@context/SocketContext";
 import { Toast } from "primereact/toast";
 import { useRef, useEffect } from "react";
+
 addLocale("ar", arLocale);
 
 function App() {

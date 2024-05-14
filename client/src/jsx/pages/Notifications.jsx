@@ -1,19 +1,24 @@
 import { useSocket } from "@context/SocketContext";
-import { useDeleteFriendRequestMutation ,useAcceptFriendRequestMutation } from "@jsx/store/api/friendsApi";
+import { useAcceptFriendRequestMutation, useDeleteFriendRequestMutation } from "@jsx/store/api/friendsApi";
 import { toTitleCase } from "@jsx/utils";
 import { format, formatDistanceToNow } from "date-fns";
 import { Avatar } from "primereact/avatar";
 import { Badge } from "primereact/badge";
 import { Button } from "primereact/button";
+import { Toast } from "primereact/toast";
 import { Tooltip } from "primereact/tooltip";
 import { classNames } from "primereact/utils";
+import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { LikeNotification } from "./../components/LikeNotification";
 
 export function Notifications() {
 	const [socket, isConnected, notifications, setNotifications] = useSocket();
 	const navigate = useNavigate();
-const sortedNotifications = notifications.sort((a, b) => new Date(a.data.createdDate) - new Date(b.data.createdDate));
+	const sortedNotifications = notifications.sort(
+		(a, b) => new Date(a.data.createdDate) - new Date(b.data.createdDate)
+	);
+	const toast = useRef(null);
 
 	console.log(notifications);
 	function handleNotificationRead(index) {
@@ -30,24 +35,40 @@ const sortedNotifications = notifications.sort((a, b) => new Date(a.data.created
 
 	const handleDeleteFriendRequest = async (requestId, index) => {
 		try {
-			const res = await deleteFriendRequest(requestId).unwrap()
-      if (res){
-          socket.emit("cancel friend request",res?.data)
-        handleDismiss(index);
-      };
+			const res = await deleteFriendRequest(requestId).unwrap();
+			if (res) {
+				socket.emit("cancel friend request", res?.data);
+				handleDismiss(index);
+			}
 		} catch (error) {
 			console.log(error);
+			toast.current.show({
+				severity: "error",
+				position: "top-center",
+				summary: "Error",
+				detail:
+					error?.data?.message &&  `${error?.data?.message} Maybe the user cancel the request` ||
+					"Failed to Decline the Request , Maybe the user cancel it",
+			});
 		}
 	};
 	const handleAcceptFriendRequest = async (requestId, index) => {
 		try {
 			const res = await acceptFriendRequest(requestId).unwrap();
-      if (res){
-          socket.emit("accept friend request", res?.data);
-        handleDismiss(index);
-      };
+			if (res) {
+				socket.emit("accept friend request", res?.data);
+				handleDismiss(index);
+			}
 		} catch (error) {
 			console.log(error);
+			toast.current.show({
+				severity: "error",
+				position: "top-center",
+				summary: "Error",
+				detail:
+					error?.data?.message && `${error?.data?.message} Maybe the user cancel the request` ||
+					"Failed to Accept friend Request , Maybe the user cancel the request",
+			});
 		}
 	};
 
@@ -238,6 +259,7 @@ const sortedNotifications = notifications.sort((a, b) => new Date(a.data.created
 	}
 	return (
 		<div>
+			<Toast ref={toast} />
 			<div className="flex justify-content-between mb-5">
 				<h2>Notifications</h2>
 				<Button

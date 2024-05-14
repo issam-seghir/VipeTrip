@@ -11,9 +11,9 @@ const {
 // router.route("/").get(getAllFriends);
 router
 	.route("/:friendId")
-	.delete(removeFriend)
-	.delete(deleteFriendRequest)
 	.post(createFriendRequest)
-	.patch(acceptFriendRequest);
+	.patch(acceptFriendRequest)
+	.delete(deleteFriendRequest)
+	.delete(removeFriend)
 
 module.exports = router;

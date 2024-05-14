@@ -38,6 +38,11 @@ export function Profile() {
 	} = useGetUserQuery(profileId, { skip: isCurrentUser });
 	const user = currentUser || otherUser;
 
+	// const toggleFriendRequest = async() =>{
+	// 		await use
+	// }
+
+
 	if (isUserLoading || isUserFetching || isCurrentUserFetching || isCurrentUserLoading) {
 		return (
 			<div>
@@ -500,7 +505,7 @@ export function Profile() {
 					<Button
 						label={isFollowing ? "Following" : "Follow"}
 						className={classNames("z-4  p-2 border-round-2xl", { "p-button-text": isFollowing })}
-						onClick={toggleFollow}
+						onClick={toggleFriendRequest}
 						style={{ minWidth: "8rem" }}
 					/>
 					{false && (

@@ -13,6 +13,7 @@ import { Tooltip } from "primereact/tooltip";
 import { useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
+import { classNames } from "primereact/utils";
 
 export function Profile() {
 	const { profileId } = useParams();
@@ -496,7 +497,13 @@ export function Profile() {
 							style={{ visibility: "hidden", height: 0 }}
 						/>
 					</div>
-					{isCurrentUser && (
+					<Button
+						label={isFollowing ? "Following" : "Follow"}
+						className={classNames("z-4  p-2 border-round-2xl", { "p-button-text": isFollowing })}
+						onClick={toggleFollow}
+						style={{ minWidth: "8rem" }}
+					/>
+					{false && (
 						<>
 							<Button
 								label="Edit profile"
@@ -515,9 +522,9 @@ export function Profile() {
 					<h3 className="text-2xl font-bold"> {toTitleCase(user?.fullName)}</h3>
 					<p className="text-sm">
 						{user?.bio}
-						Lorem ipsum dolor sit amet consectetur, adipisicing elit. Accusamus repellat, aut
-						laborum suscipit libero voluptas sed nihil, asperiores doloremque explicabo deserunt officia
-						commodi temporibus animi debitis minima exercitationem nostrum delectus.
+						Lorem ipsum dolor sit amet consectetur, adipisicing elit. Accusamus repellat, aut laborum
+						suscipit libero voluptas sed nihil, asperiores doloremque explicabo deserunt officia commodi
+						temporibus animi debitis minima exercitationem nostrum delectus.
 					</p>
 					{/* profile status */}
 					<div className="flex justify-content-between">

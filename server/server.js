@@ -201,24 +201,24 @@ io.on("connection", async (socket) => {
 			console.error(`Error handling 'new replay' event: ${error.message}`);
 		}
 	});
-	// socket.on("new post", (data) => {
-	// 	const friends = getFriends(data.senderId);
-	// 	friends.forEach((friendId) => {
-	// 		io.to(friendId).emit("notification", {
-	// 			message: `${data.senderName} created a new post`,
-	// 			link: `/post/${data.postId}`,
-	// 		});
-	// 	});
-	// });
-
-	// Listen for a new message event
-	socket.on("new message", (data) => {
-		// Emit a notification event to the recipient
-		io.to(data.recipientId).emit("notification", {
-			message: `New message from ${data.senderName}`,
-			link: `/messages/${data.senderId}`,
-		});
+	socket.on("new post", (data) => {
+			try {
+				if (!data) {
+					return;
+				}
+				// Check if the liker is the same as the author of the post or comment
+				// const authorId = data?.type === "Post" ? data?.likedPost?.author.id : data?.likedComment?.author.id;
+				if (data?.author?.id === data?.parentComment?.author?.id) {
+					// The user liked their own post/comment, so don't emit a notification
+					return;
+				}
+				// Emit a notification event to the author of the post/comment
+				io.to(`user:${data?.parentComment?.author?.id}`).emit("notification", { data, type: "new-reply" });
+			} catch (error) {
+				console.error(`Error handling 'new replay' event: ${error.message}`);
+			}
 	});
+
 });
 
 connection.once("open", () => {

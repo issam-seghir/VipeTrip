@@ -56,6 +56,12 @@ let userSchema = new Schema(
 			type: String,
 			default: "https://i.imgur.com/p2aIYMy.png", // https://i.imgur.com/WY640Kg.png
 		},
+		friends: [
+			{
+				type: mongoose.Schema.Types.ObjectId,
+				ref: "User",
+			},
+		],
 		totalPosts: {
 			type: Number,
 			default: 0,

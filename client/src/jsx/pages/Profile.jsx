@@ -1,8 +1,12 @@
 import { CreatePostWidget } from "@components/CreatePostWidget";
 import { EditProfileDialog } from "@components/EditProfileDialog";
 import { UserPosts } from "@components/UserPosts";
+import {
+	useCreateFriendRequestMutation,
+	useDeleteFriendRequestMutation,
+	useGetFriendRequestQuery,
+} from "@jsx/store/api/friendsApi";
 import { useGetCurrentUserQuery, useGetUserQuery } from "@jsx/store/api/userApi";
-import { useCreateFriendRequestMutation, useDeleteFriendRequestMutation } from "@jsx/store/api/friendsApi";
 import { toTitleCase } from "@jsx/utils";
 import { selectCurrentUser } from "@store/slices/authSlice";
 import { format } from "date-fns";
@@ -11,10 +15,10 @@ import { Button } from "primereact/button";
 import { Image } from "primereact/image";
 import { Skeleton } from "primereact/skeleton";
 import { Tooltip } from "primereact/tooltip";
+import { classNames } from "primereact/utils";
 import { useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import { classNames } from "primereact/utils";
 
 export function Profile() {
 	const { profileId } = useParams();
@@ -37,12 +41,20 @@ export function Profile() {
 		isError: isUserError,
 		error: userError,
 	} = useGetUserQuery(profileId, { skip: isCurrentUser });
+	const {
+		data: friendRequest,
+		isFetching: isFriendRequestFetching,
+		isLoading: isFriendRequestLoading,
+		isError: isFriendRequestError,
+		error: friendRequestError,
+	} = useGetFriendRequestQuery(profileId, { skip: isCurrentUser });
+	const [createFriendRequest,createFriendRequestResult] = useCreateFriendRequestMutation();
+	const [deleteFriendRequest ,deleteFriendRequestResult ] = useDeleteFriendRequestMutation();
 	const user = currentUser || otherUser;
 
-	// const toggleFriendRequest = async() =>{
-	// 		await use
-	// }
-
+	const toggleFriendRequest = async () => {
+		await (friendRequest ? deleteFriendRequest(profileId) : createFriendRequest(profileId));
+	};
 
 	if (isUserLoading || isUserFetching || isCurrentUserFetching || isCurrentUserLoading) {
 		return (
@@ -503,13 +515,25 @@ export function Profile() {
 							style={{ visibility: "hidden", height: 0 }}
 						/>
 					</div>
-					<Button
-						label={isFollowing ? "Following" : "Follow"}
-						className={classNames("z-4  p-2 border-round-2xl", { "p-button-text": isFollowing })}
-						onClick={toggleFriendRequest}
-						style={{ minWidth: "8rem" }}
-					/>
-					{false && (
+					{!isCurrentUser && (
+						<Button
+							label={
+								friendRequest?.status === "Accepted"
+									? "friend"
+									: friendRequest
+									? "Cancel Request"
+									: "Add Friend"
+							}
+							className={classNames("z-4  p-2 border-round-2xl", {
+								"p-button-text": friendRequest?.status === "Accepted",
+							})}
+							loading={createFriendRequestResult.isLoading || deleteFriendRequestResult.isLoading}
+							onClick={toggleFriendRequest}
+							style={{ minWidth: "8rem" }}
+						/>
+					)}
+
+					{isCurrentUser && (
 						<>
 							<Button
 								label="Edit profile"

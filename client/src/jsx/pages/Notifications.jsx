@@ -248,10 +248,10 @@ export function Notifications() {
 								className="p-overlay"
 								onClick={(event) => {
 									event.stopPropagation();
-									navigate(`/profile/${notification?.data?.liker?.id}`);
+									navigate(`/profile/${notification?.data?.liker?.id || notification?.data?.userId?.id}`);
 								}}
-								image={notification?.data?.liker?.picturePath}
-								alt={notification?.data?.liker?.fullName}
+								image={notification?.data?.liker?.picturePath || notification?.data?.userId?.picturePath}
+								alt={notification?.data?.liker?.fullName || notification?.data?.userId?.fullName}
 								shape="circle"
 							/>
 							{notification?.type === "like" && (
@@ -308,6 +308,49 @@ export function Notifications() {
 												<Tooltip
 													key={notification?.data?.author?.id}
 													target={`.createData-tooltip-${notification?.data?.author?.id}`}
+													content={format(
+														new Date(notification?.data?.createdAt),
+														"EEEE, MMMM d, yyyy, h:mm a"
+													)}
+													position="bottom"
+												/>
+											</div>
+										</div>
+									</div>
+								</div>
+							)}
+							{notification?.type === "friend-request" && (
+								<div className="flex flex-column gap-2">
+									<div className="flex gap-2 align-items-baseline">
+										<h4 className={classNames({ "text-primary-700": notification?.read })}>
+											{toTitleCase(notification?.data?.userId?.fullName)}
+										</h4>
+										<p className="text-xs text-400 flex gap-2"> has sent you a friend request.</p>
+									</div>
+									<div className="flex gap-2">
+										<Button
+											label="Accept"
+											className="p-button-rounded px-2 py-0 w-5rem h-2rem text-sm"
+										/>
+										<Button
+											label="Decline"
+											className="p-button-rounded px-2 py-0 w-5rem h-2rem text-sm"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        handleDismiss(index);
+                      }
+                      }
+										/>
+									</div>
+									<div className="flex">
+										<div className={`text-xs text-400 flex gap-2`}>
+											<div className={`createData-tooltip-${notification?.data?.userId?.id} `}>
+												{formatDistanceToNow(new Date(notification?.data?.createdAt), {
+													addSuffix: true,
+												})}
+												<Tooltip
+													key={notification?.data?.userId?.id}
+													target={`.createData-tooltip-${notification?.data?.userId?.id}`}
 													content={format(
 														new Date(notification?.data?.createdAt),
 														"EEEE, MMMM d, yyyy, h:mm a"

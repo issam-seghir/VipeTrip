@@ -44,7 +44,11 @@ exports.createFriendRequest = asyncWrapper(async (req, res) => {
 	});
 	await newFriendShip.save();
 
-	res.status(201).json({ message: "Friend request sent successfully", data: newFriendShip });
+	const populatedNewFriendShip = await FriendShip.findOne({ userId, friendId, status: "Requested" })
+		.populate("friendId")
+		.populate("userId");
+
+	res.status(201).json({ message: "Friend request sent successfully", data: populatedNewFriendShip });
 });
 
 exports.acceptFriendRequest = asyncWrapper(async (req, res) => {

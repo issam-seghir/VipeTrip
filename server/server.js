@@ -135,6 +135,8 @@ io.on("connection", async (socket) => {
 	// Listen for a friend request event
 	socket.on("friend request", (request) => {
 		console.log(request);
+		// Emit a friend request event to the recipient
+		io.to(`user:${request?.friendId?.id}`).emit("notification", { data: request, type: "friend-request" });
 	});
 
 	// Listen for a new like event (like on a post or comment)

@@ -13,7 +13,7 @@ exports.getFriendRequest = asyncWrapper(async (req, res) => {
 	if (!friend) {
 		return res.status(404).json({ message: `Friend user not found` });
 	}
-	const friendRequest = await FriendShip.findOne({ userId, friendId, status: "Requested" })
+	const friendRequest = await FriendShip.findOne({ userId, friendId})
 		.populate("friendId")
 		.populate("userId");
 	res.status(200).json({ message: "Get Friend request successfully", data: friendRequest });
@@ -62,7 +62,7 @@ exports.acceptFriendRequest = asyncWrapper(async (req, res) => {
 	}
 
 	const friendship = await FriendShip.findOneAndUpdate(
-		{ id: requestId, status: "Requested" },
+		{ _id: requestId, status: "Requested" },
 		{ status: "Accepted" },
 		{ new: true } // This option returns the updated document
 	);

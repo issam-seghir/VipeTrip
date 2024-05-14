@@ -554,7 +554,8 @@ export function Profile() {
 									: "Add Friend"
 							}
 							className={classNames("z-4  p-2 border-round-2xl", {
-								"p-button-text": friendRequest?.status === "Accepted",
+								"p-button-outlined": friendRequest?.status === "Accepted",
+								"p-button-secondary": friendRequest?.status === "Requested",
 							})}
 							loading={createFriendRequestResult.isLoading || deleteFriendRequestResult.isLoading}
 							onClick={toggleFriendRequest}

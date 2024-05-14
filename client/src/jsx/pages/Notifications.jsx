@@ -370,7 +370,7 @@ const sortedNotifications = notifications.sort((a, b) => new Date(a.data.created
 										/>
 										<Button
 											label="Decline"
-											className="p-button-rounded px-2 py-0 w-5rem h-2rem text-sm"
+											className="p-button-rounded p-button-secondary px-2 py-0 w-5rem h-2rem text-sm"
 											disabled={isAccepting || isDeleting}
 											onClick={(event) => {
 												event.stopPropagation();

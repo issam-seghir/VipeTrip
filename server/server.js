@@ -133,15 +133,8 @@ io.on("connection", async (socket) => {
 	});
 	// Listen for a friend request event
 	// Listen for a friend request event
-	socket.on("friend request status", (request) => {
-		const statusMessages = {
-			Requested: `${request.userName} sent you a friend request`,
-			Accepted: `${request.userName} accepted your friend request`,
-			Declined: `${request.userName} declined your friend request`,
-		};
-
-		const message = statusMessages[request.status];
-		io.to(request.friendId).emit("notification", { message });
+	socket.on("friend request", (request) => {
+		console.log(request);
 	});
 
 	// Listen for a new like event (like on a post or comment)

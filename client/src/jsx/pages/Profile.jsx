@@ -1,6 +1,7 @@
 import { CreatePostWidget } from "@components/CreatePostWidget";
 import { EditProfileDialog } from "@components/EditProfileDialog";
 import { UserPosts } from "@components/UserPosts";
+import { useSocket } from "@context/SocketContext";
 import {
 	useCreateFriendRequestMutation,
 	useDeleteFriendRequestMutation,
@@ -25,6 +26,8 @@ export function Profile() {
 	const { id: currentUserId } = useSelector(selectCurrentUser);
 	const isCurrentUser = currentUserId === profileId;
 	const [showEditProfileDialog, setShowEditProfileDialog] = useState({ open: false, data: null });
+	const [socket, isConnected] = useSocket();
+
 	const imgPrevRef = useRef(null);
 	const {
 		data: currentUser,
@@ -48,12 +51,29 @@ export function Profile() {
 		isError: isFriendRequestError,
 		error: friendRequestError,
 	} = useGetFriendRequestQuery(profileId, { skip: isCurrentUser });
-	const [createFriendRequest,createFriendRequestResult] = useCreateFriendRequestMutation();
-	const [deleteFriendRequest ,deleteFriendRequestResult ] = useDeleteFriendRequestMutation();
+	const [createFriendRequest, createFriendRequestResult] = useCreateFriendRequestMutation();
+	const [deleteFriendRequest, deleteFriendRequestResult] = useDeleteFriendRequestMutation();
 	const user = currentUser || otherUser;
 
 	const toggleFriendRequest = async () => {
-		await (friendRequest ? deleteFriendRequest(profileId) : createFriendRequest(profileId));
+		if (friendRequest) {
+			try {
+				await deleteFriendRequest(profileId);
+			} catch (error) {
+				console.error("Failed to deleteFriendRequest :", error);
+				return;
+			}
+		} else {
+			try {
+				const res =  await createFriendRequest(profileId).unwrap();
+				if (res && isConnected) {
+					socket.emit("friend request", res?.data);
+				}
+			} catch (error) {
+				console.error("Failed to deleteFriendRequest :", error);
+				return;
+			}
+		}
 	};
 
 	if (isUserLoading || isUserFetching || isCurrentUserFetching || isCurrentUserLoading) {

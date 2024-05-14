@@ -8,11 +8,12 @@ import {
 	useGetFriendRequestQuery,
 	useRemoveFriendMutation,
 } from "@jsx/store/api/friendsApi";
-import { useGetCurrentUserQuery, useGetUserQuery } from "@jsx/store/api/userApi";
+import { useGetCurrentUserQuery, useGetUserOnlineStatusQuery, useGetUserQuery } from "@jsx/store/api/userApi";
 import { toTitleCase } from "@jsx/utils";
 import { selectCurrentUser } from "@store/slices/authSlice";
 import { format } from "date-fns";
 import { Avatar } from "primereact/avatar";
+import { Badge } from "primereact/badge";
 import { Button } from "primereact/button";
 import { Image } from "primereact/image";
 import { Skeleton } from "primereact/skeleton";
@@ -45,6 +46,13 @@ export function Profile() {
 		isError: isUserError,
 		error: userError,
 	} = useGetUserQuery(profileId, { skip: isCurrentUser });
+	const {
+		data: OnlineStatus,
+		isFetching: isOnlineStatusFetching,
+		isLoading: isOnlineStatusLoading,
+		isError: isOnlineStatusError,
+		error: onlineStatusError,
+	} = useGetUserOnlineStatusQuery(profileId, { skip: isCurrentUser });
 	const {
 		data: friendRequest,
 		isFetching: isFriendRequestFetching,
@@ -517,13 +525,14 @@ export function Profile() {
 				alt="Cover"
 				preview
 			/>
+
 			<div className="flex flex-column mb-6">
 				<div className="flex align-items-start px-4 justify-content-between pt-3">
 					<div className="z-4">
 						<Avatar
 							size="large"
 							icon="pi pi-user"
-							className="p-overlay border-0 border-circle"
+							className="p-overlay p-overlay-badge border-0 border-circle"
 							style={{
 								minWidth: "48px",
 								width: "35%",
@@ -535,7 +544,14 @@ export function Profile() {
 							onClick={() => imgPrevRef.current.show()}
 							alt={user?.fullName}
 							shape="circle"
-						/>
+						>
+							{!isCurrentUser && OnlineStatus?.online && (
+								<Badge severity="success" className="left-0 p-2" style={{ top: "15%" }}></Badge>
+							)}
+							{!isCurrentUser && !OnlineStatus?.online && (
+								<Badge severity="danger" className="left-0 p-2" style={{ top: "15%" }}></Badge>
+							)}
+						</Avatar>
 						<Image
 							ref={imgPrevRef}
 							src={user?.picturePath}

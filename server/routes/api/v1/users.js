@@ -7,6 +7,7 @@ const {
 	getUserPosts,
 	deleteUser,
 	getUser,
+	getUserOnlineStatus,
 	updateUser,
 	updateUserProfile,
 } = require("@controllers/usersController");
@@ -24,6 +25,7 @@ router.use("/me/friends", require("./friendShip"));
 router.use("/me/notifications", require("./friendShip"));
 // id routes must be the last one to passed correctly
 router.route("/:userId").get(getUser);
+router.route("/:userId/online-status").get(getUserOnlineStatus);
 router.route("/:userId/posts").get(getUserPosts);
 
 module.exports = router;

@@ -39,6 +39,10 @@ export const SocketProvider = ({ children, store }) => {
 		console.log(data);
 		store.dispatch(postApi.util.invalidateTags([{ type: "Friends", id: data.friendId }]));
 	}
+	function handleUserOnline(data) {
+		console.log("user are online : socket id");
+		console.log(data);
+	}
 
 	useEffect(() => {
 		function onConnect() {
@@ -68,6 +72,7 @@ export const SocketProvider = ({ children, store }) => {
 		socket.current.on("notification", handleLikeNotification);
 	socket.current.on("friend request declined", handleDeclinedFriendRequest );
 	socket.current.on("friend request accepted", handleAcceptedFriendRequest );
+	socket.current.on("user online", handleUserOnline);
 
 	return () => {
 		socket.current.off("connect", onConnect);
@@ -77,7 +82,7 @@ export const SocketProvider = ({ children, store }) => {
 			socket.current.off("notification", handleLikeNotification);
 			socket.current.off("friend request declined", handleDeclinedFriendRequest );
 			socket.current.off("friend request accepted", handleAcceptedFriendRequest );
-
+socket.current.off("user online", handleUserOnline );
 			// socket.current.disconnect();
 			// If you need to close the Socket.IO client when your component is unmounted (for example, if the connection is only needed in a specific part of your application), you should:
 		};

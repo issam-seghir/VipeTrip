@@ -30,6 +30,8 @@ const { Server } = require("socket.io");
 const { createServer } = require("node:http");
 const verifyJWT = require("@/middleware/auth/verifyJWT");
 // const { getUserFriends } =  require("@/controllers/socketController");
+const SocketSession = require("@model/SocketSession");
+
 
 // global mongoose plugins
 mongoose.plugin(normalize);
@@ -113,6 +115,31 @@ io.on("connection", async (socket) => {
 
 	// Emit the 'user online' event to all connections of this user
 	io.to(`user:${userId}`).emit("user online", { userId: socket.id });
+
+	 try {
+			const userId = socket.request.user.id;
+
+			// If a user connects multiple times with the same user ID,
+			// this will overwrite their previous session.
+			// If you want to allow multiple sessions per user, you might need to adjust this.
+			const existingSession = await SocketSession.findOne({ userId });
+			if (existingSession) {
+				await SocketSession.updateOne({ userId }, { socketId: socket.id });
+			} else {
+				const socketSession = new SocketSession({ userId, socketId: socket.id });
+				await socketSession.save();
+			}
+
+			socket.on("disconnect", async () => {
+				try {
+					await SocketSession.deleteOne({ socketId: socket.id });
+				} catch (error) {
+					console.error("Failed to delete user session:", error);
+				}
+			});
+		} catch (error) {
+			console.error("Failed to create user session:", error);
+		}
 
 	socket.on("testEvent", (data) => {
 		console.log("Received testEvent with data:", data);

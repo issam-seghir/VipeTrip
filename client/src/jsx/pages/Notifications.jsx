@@ -39,15 +39,19 @@ export function Notifications() {
 			if (res) {
 				socket.emit("cancel friend request", res?.data);
 				handleDismiss(index);
+				toast.current.show({
+					severity: "success",
+					summary: "Success",
+					detail: "the Friend Request is Declined",
+				});
 			}
 		} catch (error) {
 			console.log(error);
 			toast.current.show({
 				severity: "error",
-				position: "top-center",
 				summary: "Error",
 				detail:
-					error?.data?.message &&  `${error?.data?.message} Maybe the user cancel the request` ||
+					(error?.data?.message && `${error?.data?.message} Maybe the user cancel the request`) ||
 					"Failed to Decline the Request , Maybe the user cancel it",
 			});
 		}
@@ -58,15 +62,19 @@ export function Notifications() {
 			if (res) {
 				socket.emit("accept friend request", res?.data);
 				handleDismiss(index);
+				toast.current.show({
+					severity: "success",
+					summary: "Success",
+					detail: `Congratulaiton you have a new Friend ${res?.data?.fullName} 🥳`,
+				});
 			}
 		} catch (error) {
 			console.log(error);
 			toast.current.show({
 				severity: "error",
-				position: "top-center",
 				summary: "Error",
 				detail:
-					error?.data?.message && `${error?.data?.message} Maybe the user cancel the request` ||
+					(error?.data?.message && `${error?.data?.message} Maybe the user cancel the request`) ||
 					"Failed to Accept friend Request , Maybe the user cancel the request",
 			});
 		}

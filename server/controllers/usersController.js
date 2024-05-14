@@ -1,9 +1,17 @@
 const User = require("@model/User");
 const Post = require("@model/Post");
+const SocketSession = require("@model/SocketSession");
 const Like = require("@model/Like");
 const { asyncWrapper } = require("@middleware/asyncWrapper");
 const { ObjectIdSchema } = require("@utils/zodUtils");
 const createError = require("http-errors");
+
+const getUserOnlineStatus = asyncWrapper(async (req, res, next) => {
+	const { userId } = req.params;
+
+	const session = await SocketSession.findOne({ userId });
+	return session ? res.status(200).json({ online: true }) : res.status(200).json({ online: false });
+});
 
 const getAllUsers = asyncWrapper(async (req, res, next) => {
 	const users = await User.find();
@@ -15,10 +23,7 @@ const getAllUsers = asyncWrapper(async (req, res, next) => {
 const getUserPosts = asyncWrapper(async (req, res, next) => {
 	const { userId } = req.params;
 	const id = userId || req.user.id;
-console.log("userId");
-console.log(userId);
-console.log("req.user");
-console.log(req.user);
+
 	if (!id) return next(new createError.BadRequest("User ID required"));
 
 	const user = await User.findById(req.user.id);
@@ -241,6 +246,7 @@ const deleteUser = asyncWrapper(async (req, res, next) => {
 module.exports = {
 	getAllUsers,
 	getUser,
+	getUserOnlineStatus,
 	getCurrentUser,
 	getUserPosts,
 	updateUserProfile,

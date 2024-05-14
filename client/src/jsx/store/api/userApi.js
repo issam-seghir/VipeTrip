@@ -11,6 +11,14 @@ export const userApi = api.enhanceEndpoints({ addTagTypes: ["User"] }).injectEnd
 			transformResponse: (response) => response.data,
 			providesTags: (result, error, { id }) => [{ type: "User", id }],
 		}),
+		getUserOnlineStatus : builder.query({
+			query: (id) => ({
+				url: `/users/${id}/online-status`,
+				method: "GET",
+			}),
+			transformResponse: (response) => response.data,
+			providesTags: (result, error, { id }) => [{ type: "User", id }],
+		}),
 		getUserPosts: builder.query({
 			query: (id) => ({
 				url: `/users/${id}/posts`,
@@ -40,4 +48,4 @@ export const userApi = api.enhanceEndpoints({ addTagTypes: ["User"] }).injectEnd
 	}),
 });
 
-export const { useGetUserQuery, useGetCurrentUserQuery,useGetCurrentUserPostsQuery,useGetUserPostsQuery, useUpdateUserProfileMutation } = userApi;
+export const { useGetUserQuery,useGetUserOnlineStatusQuery, useGetCurrentUserQuery,useGetCurrentUserPostsQuery,useGetUserPostsQuery, useUpdateUserProfileMutation } = userApi;

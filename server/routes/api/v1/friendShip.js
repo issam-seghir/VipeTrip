@@ -1,8 +1,8 @@
 const express = require("express");
 
-const router = express.Router({mergeParams: true});
+const router = express.Router({ mergeParams: true });
 const {
-    getFriendRequest,
+	getFriendRequest,
 	createFriendRequest,
 	acceptFriendRequest,
 	deleteFriendRequest,
@@ -14,8 +14,7 @@ router
 	.route("/:friendId")
 	.get(getFriendRequest)
 	.post(createFriendRequest)
-	.patch(acceptFriendRequest)
-	.delete(deleteFriendRequest)
 	.delete(removeFriend);
 
+router.route("/friends-request/:requestId").patch(acceptFriendRequest).delete(deleteFriendRequest);
 module.exports = router;

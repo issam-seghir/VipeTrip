@@ -4,6 +4,7 @@ import { selectCurrentToken } from "@store/slices/authSlice";
 import { getCookie } from "@utils/index";
 import { useSelector } from "react-redux";
 import io from "socket.io-client";
+import { postApi } from "@jsx/store/api/postApi";
 
 export const SocketContext = createContext();
 
@@ -27,6 +28,11 @@ export const SocketProvider = ({ children, store }) => {
 	}
 	function handleTestResponse(data) {
 		console.log("Received response from test Hook:", data);
+	}
+	function handleDeclinedFriendRequest(data) {
+		console.log("handleDeclinedFriendRequest");
+		console.log(data);
+		store.dispatch(postApi.util.invalidateTags([{ type: "Friends", id: data.friendId }]));
 	}
 
 	useEffect(() => {
@@ -55,14 +61,15 @@ export const SocketProvider = ({ children, store }) => {
 		socket.current.on("error", onError);
 		socket.current.on("test Hook", handleTestResponse);
 		socket.current.on("notification", handleLikeNotification);
+	socket.current.on("friend request declined", handleDeclinedFriendRequest );
 
-
-		return () => {
-			socket.current.off("connect", onConnect);
-			socket.current.off("disconnect", onDisconnect);
+	return () => {
+		socket.current.off("connect", onConnect);
+		socket.current.off("disconnect", onDisconnect);
 			socket.current.off("error", onError);
 			socket.current.off("test Hook", handleTestResponse);
 			socket.current.off("notification", handleLikeNotification);
+			socket.current.off("friend request declined", handleDeclinedFriendRequest );
 
 			// socket.current.disconnect();
 			// If you need to close the Socket.IO client when your component is unmounted (for example, if the connection is only needed in a specific part of your application), you should:

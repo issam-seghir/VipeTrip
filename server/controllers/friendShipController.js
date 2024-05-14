@@ -52,21 +52,17 @@ exports.createFriendRequest = asyncWrapper(async (req, res) => {
 });
 
 exports.acceptFriendRequest = asyncWrapper(async (req, res) => {
-	const { friendId } = req.params;
+	const { requestId } = req.params;
 	const userId = req?.user?.id;
 
 	const user = await User.findById(userId);
-	const friend = await User.findById(friendId);
 
 	if (!user) {
 		return res.status(404).json({ message: `Requesting user not found` });
 	}
-	if (!friend) {
-		return res.status(404).json({ message: `Friend user not found` });
-	}
 
 	const friendship = await FriendShip.findOneAndUpdate(
-		{ userId, friendId, status: "Requested" },
+		{ id: requestId, status: "Requested" },
 		{ status: "Accepted" },
 		{ new: true } // This option returns the updated document
 	);
@@ -74,30 +70,26 @@ exports.acceptFriendRequest = asyncWrapper(async (req, res) => {
 		return res.status(404).json({ message: "Friend request not found" });
 	}
 
-	user.friends.push(friendId);
+	user.friends.push(friendship?.friendId);
 
 	res.status(200).json({ message: "Friend request Accepted successfully", data: friendship });
 });
 
 exports.deleteFriendRequest = asyncWrapper(async (req, res) => {
-	const { friendId } = req.params;
+	const { requestId } = req.params;
 	const userId = req?.user?.id;
-
 	const user = await User.findById(userId);
-	const friend = await User.findById(friendId);
 	if (!user) {
 		return res.status(404).json({ message: `Requesting user not found` });
 	}
-	if (!friend) {
-		return res.status(404).json({ message: `Friend user not found` });
-	}
 
-	const friendship = await FriendShip.findOneAndDelete({ userId, friendId, status: "Requested" });
+
+	const friendship = await FriendShip.findOneAndDelete({ _id: requestId, status: "Requested" });
 	if (!friendship) {
-		return res.status(404).json({ message: "Friend Deleted not found" });
+		return res.status(404).json({ message: "Friend request to Delete not found" });
 	}
 
-	res.status(200).json({ message: "Friend request Declined successfully" });
+	res.status(200).json({ message: "Friend request Declined successfully" ,data: friendship});
 });
 
 exports.removeFriend = asyncWrapper(async (req, res) => {

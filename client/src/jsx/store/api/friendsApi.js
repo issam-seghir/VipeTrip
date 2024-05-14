@@ -24,17 +24,17 @@ export const friendsApi = api.enhanceEndpoints({ addTagTypes: ["Friends"] }).inj
 		}),
 		acceptFriendRequest: builder.mutation({
 			query: (id) => ({
-				url: `users/me/friends/${id}`,
+				url: `users/me/friends/friends-request/${id}`,
 				method: "PATCH",
 			}),
-			invalidatesTags: (result, error, id) => [{ type: "Friends", id: "LIST" }],
+			invalidatesTags: (result, error, id) => [{ type: "Friends", id }],
 		}),
 		deleteFriendRequest: builder.mutation({
 			query: (id) => ({
-				url: `users/me/friends/${id}`,
+				url: `users/me/friends/friends-request/${id}`,
 				method: "DELETE",
 			}),
-			invalidatesTags: (result, error, id) => [{ type: "Friends", id }],
+			invalidatesTags: (result, error) => [{ type: "Friends", id: result.friendId }],
 		}),
 		removeFriend: builder.mutation({
 			query: (id) => ({

@@ -1,17 +1,19 @@
 import { useSocket } from "@context/SocketContext";
+import { useDeleteFriendRequestMutation } from "@jsx/store/api/friendsApi";
+import { toTitleCase } from "@jsx/utils";
+import { format, formatDistanceToNow } from "date-fns";
 import { Avatar } from "primereact/avatar";
 import { Badge } from "primereact/badge";
 import { Button } from "primereact/button";
-import { useNavigate } from "react-router-dom";
-import { LikeNotification } from "./../components/LikeNotification";
-import { toTitleCase } from "@jsx/utils";
-import { format, formatDistanceToNow } from "date-fns";
 import { Tooltip } from "primereact/tooltip";
 import { classNames } from "primereact/utils";
+import { useNavigate } from "react-router-dom";
+import { LikeNotification } from "./../components/LikeNotification";
 
 export function Notifications() {
 	const [socket, isConnected, notifications, setNotifications] = useSocket();
 	const navigate = useNavigate();
+const sortedNotifications = notifications.sort((a, b) => new Date(a.data.createdDate) - new Date(b.data.createdDate));
 
 	console.log(notifications);
 	function handleNotificationRead(index) {
@@ -22,6 +24,19 @@ export function Notifications() {
 
 	const handleDismiss = (index) => {
 		setNotifications((prevNotifications) => prevNotifications.filter((_, i) => i !== index));
+	};
+	const [deleteFriendRequest, { isLoading: isDeleting }] = useDeleteFriendRequestMutation();
+
+	const handleDeleteFriendRequest = async (requestId, index) => {
+		try {
+			const res = await deleteFriendRequest(requestId).unwrap()
+      if (res){
+          socket.emit("cancel friend request",res?.data)
+        handleDismiss(index);
+      };
+		} catch (error) {
+			console.log(error);
+		}
 	};
 
 	if (notifications.length === 0) {
@@ -221,7 +236,7 @@ export function Notifications() {
 				/>
 			</div>
 			<div className="border-1 p-2 surface-border border-round-xl">
-				{notifications.map((notification, index) => (
+				{sortedNotifications.map((notification, index) => (
 					<div
 						key={index}
 						onKeyDown={() => {}}
@@ -248,9 +263,13 @@ export function Notifications() {
 								className="p-overlay"
 								onClick={(event) => {
 									event.stopPropagation();
-									navigate(`/profile/${notification?.data?.liker?.id || notification?.data?.userId?.id}`);
+									navigate(
+										`/profile/${notification?.data?.liker?.id || notification?.data?.userId?.id}`
+									);
 								}}
-								image={notification?.data?.liker?.picturePath || notification?.data?.userId?.picturePath}
+								image={
+									notification?.data?.liker?.picturePath || notification?.data?.userId?.picturePath
+								}
 								alt={notification?.data?.liker?.fullName || notification?.data?.userId?.fullName}
 								shape="circle"
 							/>
@@ -331,15 +350,16 @@ export function Notifications() {
 										<Button
 											label="Accept"
 											className="p-button-rounded px-2 py-0 w-5rem h-2rem text-sm"
+											disabled={isDeleting}
 										/>
 										<Button
 											label="Decline"
 											className="p-button-rounded px-2 py-0 w-5rem h-2rem text-sm"
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        handleDismiss(index);
-                      }
-                      }
+											disabled={isDeleting}
+											onClick={(event) => {
+												event.stopPropagation();
+												handleDeleteFriendRequest(notification?.data?.id, index);
+											}}
 										/>
 									</div>
 									<div className="flex">
@@ -367,6 +387,7 @@ export function Notifications() {
 							className="p-button-text  p-button p-component border-circle	p-3 w-2rem h-2rem	"
 							icon="pi pi-times"
 							size="small"
+							disabled={isDeleting}
 							onClick={(event) => {
 								event.stopPropagation();
 								handleDismiss(index);

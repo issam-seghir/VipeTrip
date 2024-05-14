@@ -55,10 +55,11 @@ export function Profile() {
 	const [deleteFriendRequest, deleteFriendRequestResult] = useDeleteFriendRequestMutation();
 	const user = currentUser || otherUser;
 
+
 	const toggleFriendRequest = async () => {
 		if (friendRequest) {
 			try {
-				await deleteFriendRequest(profileId);
+				await deleteFriendRequest(friendRequest?.id);
 			} catch (error) {
 				console.error("Failed to deleteFriendRequest :", error);
 				return;

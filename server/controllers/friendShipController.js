@@ -13,7 +13,16 @@ exports.getFriendRequest = asyncWrapper(async (req, res) => {
 	if (!friend) {
 		return res.status(404).json({ message: `Friend user not found` });
 	}
-	const friendRequest = await FriendShip.findOne({ userId, friendId }).populate("friendId").populate("userId");
+	// Check if User A sent a friend request to User B or User B sent a friend request to User A
+	// A --> B , B --> A realtionship
+	const friendRequest = await FriendShip.findOne({
+		$or: [
+			{ userId: userId, friendId: friendId },
+			{ userId: friendId, friendId: userId },
+		],
+	})
+		.populate("friendId")
+		.populate("userId");
 	res.status(200).json({ message: "Get Friend request successfully", data: friendRequest });
 });
 
@@ -30,7 +39,14 @@ exports.createFriendRequest = asyncWrapper(async (req, res) => {
 		return res.status(404).json({ message: `Friend user not found` });
 	}
 
-	const existingFriendship = await FriendShip.findOne({ userId, friendId });
+	// Check if User A sent a friend request to User B or User B sent a friend request to User A
+	// A --> B , B --> A realtionship
+	const existingFriendship = await FriendShip.findOne({
+		$or: [
+			{ userId: userId, friendId: friendId },
+			{ userId: friendId, friendId: userId },
+		],
+	});
 	if (existingFriendship) {
 		return res.status(400).json({ message: "Friend request already exists" });
 	}
@@ -42,7 +58,12 @@ exports.createFriendRequest = asyncWrapper(async (req, res) => {
 	});
 	await newFriendShip.save();
 
-	const populatedNewFriendShip = await FriendShip.findOne({ userId, friendId, status: "Requested" })
+	const populatedNewFriendShip = await FriendShip.findOne({
+		$or: [
+			{ userId: userId, friendId: friendId, status: "Requested" },
+			{ userId: friendId, friendId: userId, status: "Requested" },
+		],
+	})
 		.populate("friendId")
 		.populate("userId");
 
@@ -68,7 +89,16 @@ exports.acceptFriendRequest = asyncWrapper(async (req, res) => {
 		return res.status(404).json({ message: "Friend request not found" });
 	}
 
+	// Add friendId to user's friends array
 	user.friends.push(friendship?.friendId);
+	await user.save();
+
+	// Find the friend and add userId to friend's friends array
+	const friend = await User.findById(friendship?.friendId);
+	if (friend) {
+		friend.friends.push(userId);
+		await friend.save();
+	}
 
 	res.status(200).json({ message: "Friend request Accepted successfully", data: friendship });
 });
@@ -102,7 +132,13 @@ exports.removeFriend = asyncWrapper(async (req, res) => {
 		return res.status(404).json({ message: `Friend user not found` });
 	}
 
-	const friendship = await FriendShip.findOneAndDelete({ userId, friendId, status: "Accepted" });
+	// Check if User A is a friend of User B or User B is a friend of User A
+	const friendship = await FriendShip.findOneAndDelete({
+		$or: [
+			{ userId: userId, friendId: friendId, status: "Accepted" },
+			{ userId: friendId, friendId: userId, status: "Accepted" },
+		],
+	});
 	if (!friendship) {
 		return res.status(404).json({ message: "Friendship not found" });
 	}
@@ -110,6 +146,10 @@ exports.removeFriend = asyncWrapper(async (req, res) => {
 	// Remove friendId from user's friends array
 	user.friends = user.friends.filter((id) => id.toString() !== friendId);
 	await user.save();
+
+	// Remove userId from friend's friends array
+	friend.friends = friend.friends.filter((id) => id.toString() !== userId);
+	await friend.save();
 
 	res.status(200).json({ message: "Friend removed successfully" });
 });

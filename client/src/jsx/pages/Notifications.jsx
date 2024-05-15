@@ -15,9 +15,7 @@ import { LikeNotification } from "./../components/LikeNotification";
 export function Notifications() {
 	const [socket, isConnected, notifications, setNotifications] = useSocket();
 	const navigate = useNavigate();
-	const sortedNotifications = notifications.sort(
-		(a, b) => new Date(a.data.createdDate) - new Date(b.data.createdDate)
-	);
+
 	const toast = useRef(null);
 
 	console.log(notifications);
@@ -278,7 +276,7 @@ export function Notifications() {
 				/>
 			</div>
 			<div className="border-1 p-2 surface-border border-round-xl">
-				{sortedNotifications.map((notification, index) => (
+				{notifications.map((notification, index) => (
 					<div
 						key={index}
 						onKeyDown={() => {}}

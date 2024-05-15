@@ -15,6 +15,7 @@ import { format } from "date-fns";
 import { Avatar } from "primereact/avatar";
 import { Badge } from "primereact/badge";
 import { Button } from "primereact/button";
+import { ConfirmDialog,confirmDialog } from "primereact/confirmdialog";
 import { Image } from "primereact/image";
 import { Skeleton } from "primereact/skeleton";
 import { Tooltip } from "primereact/tooltip";
@@ -64,15 +65,27 @@ export function Profile() {
 	const [deleteFriendRequest, deleteFriendRequestResult] = useDeleteFriendRequestMutation();
 	const [removeFriend, removeFriendResult] = useRemoveFriendMutation();
 	const user = currentUser || otherUser;
-console.log(OnlineStatus);
+	console.log(friendRequest);
+
 	const toggleFriendRequest = async () => {
 		if (friendRequest?.status === "Accepted") {
-			try {
-				await removeFriend(friendRequest?.friendId?.id);
-			} catch (error) {
-				console.error("Failed to removeFriend :", error);
-				return;
-			}
+			confirmDialog({
+				tagKey: `remove-friend-dialog-${friendRequest?.id}`,
+				message: `Are you sure you want to remove ${friendRequest?.friendId?.fullName} as your friend?`,
+				header: `Unfriend ${friendRequest?.friendId?.fullName}`,
+				icon: "pi pi-info-circle",
+				headerClassName: "text-center",
+				defaultFocus: "reject",
+				acceptClassName: "p-button-danger",
+				accept: async () => {
+					try {
+						await removeFriend(friendRequest?.friendId?.id);
+					} catch (error) {
+						console.error("Failed to removeFriend :", error);
+					}
+				},
+				reject: () => {},
+			});
 		} else if (friendRequest?.status === "Requested") {
 			try {
 				await deleteFriendRequest(friendRequest?.id);
@@ -518,6 +531,11 @@ console.log(OnlineStatus);
 	}
 	return (
 		<>
+			<ConfirmDialog
+				tagKey={`remove-friend-dialog-${friendRequest?.id}`}
+				id={`remove-friend-dialog-${friendRequest?.id}`}
+				key={friendRequest?.id}
+			/>
 			<Image
 				className="cover h-18rem w-full"
 				imageClassName="border-round-md z-0"

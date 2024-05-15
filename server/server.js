@@ -196,6 +196,9 @@ io.on("connection", async (socket) => {
 				return;
 			}
 
+			// real time likes for all other users
+			socket.broadcast.emit("like update", data?.likedPost?.id);
+
 			// Check if a like notification already exists
 			const notificationQuery = {
 				userTo: postAuthorId,
@@ -252,26 +255,40 @@ io.on("connection", async (socket) => {
 			await notification.save();
 
 			// Emit a notification event to the author of the post/comment
-			io.to(`user:${data?.post?.author?.id}`).emit("notification", { data, type: "new-comment" });
+			io.to(`user:${data?.post?.author?.id}`).emit("notification");
 		} catch (error) {
 			console.error(`Error handling 'new comment' event: ${error.message}`);
 		}
 	});
 
 	// listen for a new replay event
-	socket.on("new reply", (data) => {
+	socket.on("new reply", async (data) => {
 		try {
 			if (!data) {
 				return;
 			}
-			// Check if the liker is the same as the author of the post or comment
-			// const authorId = data?.type === "Post" ? data?.likedPost?.author.id : data?.likedComment?.author.id;
-			if (data?.author?.id === data?.parentComment?.author?.id) {
-				// The user liked their own post/comment, so don't emit a notification
+			// Check if the reply author is the same  author of  the comment
+			const authorId = data?.author?.id;
+			const parentCommentAuthorId = data?.parentComment?.author?.id;
+
+			if (authorId === parentCommentAuthorId) {
+				// The user replied to their own comment, so don't emit a notification
 				return;
 			}
+
+			// Create a new notification
+			const notification = new Notification({
+				userTo: parentCommentAuthorId,
+				userFrom: authorId,
+				post: data?.post?.id,
+				comment: data?.id,
+				type: "Comment",
+			});
+
+			await notification.save();
+
 			// Emit a notification event to the author of the post/comment
-			io.to(`user:${data?.parentComment?.author?.id}`).emit("notification", { data, type: "new-reply" });
+			io.to(`user:${parentCommentAuthorId}`).emit("notification");
 		} catch (error) {
 			console.error(`Error handling 'new replay' event: ${error.message}`);
 		}

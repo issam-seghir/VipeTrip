@@ -50,6 +50,10 @@ export const SocketProvider = ({ children, store }) => {
 		console.log(id);
 		store.dispatch(friendsApi.util.invalidateTags([{ type: "Friends", id: "REQUEST" }]));
 	}
+	function handleLikeUpdate(id) {
+		console.log("handleLikeUpdate");
+		store.dispatch(postApi.util.invalidateTags([{ type: "Post", id}]));
+	}
 	function handleUserOnline({ userId }) {
 		console.log("user are online :");
 		console.log(userId);
@@ -90,6 +94,7 @@ export const SocketProvider = ({ children, store }) => {
 		socket.current.on("friend request pending", handlePendingFriendRequest);
 		socket.current.on("friend request declined", handleDeclinedFriendRequest);
 		socket.current.on("friend request accepted", handleAcceptedFriendRequest);
+		socket.current.on("like update", handleLikeUpdate);
 		socket.current.on("removed friendShip", handleRemovedFriendShip);
 		socket.current.on("user online", handleUserOnline);
 		socket.current.on("user offline", handleUserOffline);
@@ -103,6 +108,7 @@ export const SocketProvider = ({ children, store }) => {
 			socket.current.off("friend request pending", handlePendingFriendRequest);
 			socket.current.off("friend request declined", handleDeclinedFriendRequest);
 			socket.current.off("friend request accepted", handleAcceptedFriendRequest);
+			socket.current.off("like update", handleLikeUpdate);
 			socket.current.off("removed friendShip", handleRemovedFriendShip);
 			socket.current.off("user online", handleUserOnline);
 			socket.current.off("user offline", handleUserOffline);

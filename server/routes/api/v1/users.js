@@ -22,7 +22,7 @@ router.route("/me").get(getCurrentUser);
 router.route("/me/posts").get(getUserPosts);
 router.route("/me/profile").put(upload.array("images", 2), multerErrorHandler(upload), updateUserProfile);
 router.use("/me/friends", require("./friendShip"));
-router.use("/me/notifications", require("./friendShip"));
+router.use("/me/notifications", require("./notifications"));
 // id routes must be the last one to passed correctly
 router.route("/:userId").get(getUser);
 router.route("/:userId/online-status").get(getUserOnlineStatus);

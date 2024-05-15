@@ -4,10 +4,21 @@ const Schema = mongoose.Schema;
 
 const notificationSchema = new Schema(
 	{
-		userId: {
+		userTo: {
+			// The user who will receive the notification
 			type: Schema.Types.ObjectId,
 			ref: "User",
 			required: true,
+		},
+		userFrom: {
+			// The user who triggered the notification
+			type: Schema.Types.ObjectId,
+			ref: "User",
+			required: true,
+		},
+		post: {
+			type: Schema.Types.ObjectId,
+			ref: "Post",
 		},
 		type: {
 			type: String,
@@ -21,22 +32,6 @@ const notificationSchema = new Schema(
 		read: {
 			type: Boolean,
 			default: false,
-		},
-		postId: {
-			type: Schema.Types.ObjectId,
-			ref: "Post",
-		},
-		commentId: {
-			type: Schema.Types.ObjectId,
-			ref: "Comment",
-		},
-		likeId: {
-			type: Schema.Types.ObjectId,
-			ref: "Like",
-		},
-		friendId: {
-			type: Schema.Types.ObjectId,
-			ref: "FriendShip",
 		},
 	},
 	{ timestamps: true }

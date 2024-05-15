@@ -12,7 +12,7 @@ export const SocketContext = createContext();
 
 export const SocketProvider = ({ children, store }) => {
 	const [isConnected, setConnected] = useState(false);
-	const [notifications, setNotifications] = useState([]);
+	// const [notifications, setNotifications] = useState([]);
 
 	const localToken = useSelector(selectCurrentToken);
 	const socialToken = getCookie("socialToken");
@@ -23,9 +23,10 @@ export const SocketProvider = ({ children, store }) => {
 
 	const socket = useRef(null);
 
-	function handleLikeNotification(notification) {
+	function handleNotification(notification) {
 		console.log(notification);
-		setNotifications((prevNotifications) => [...prevNotifications, { ...notification, read: false }]);
+		store.dispatch(userApi.util.invalidateTags([{ type: "User", id: "NOTIFICATIONS" }]));
+		// setNotifications((prevNotifications) => [...prevNotifications, { ...notification, read: false }]);
 	}
 	function handleTestResponse(data) {
 		console.log("Received response from test Hook:", data);
@@ -86,7 +87,7 @@ export const SocketProvider = ({ children, store }) => {
 		socket.current.on("disconnect", onDisconnect);
 		socket.current.on("error", onError);
 		socket.current.on("test Hook", handleTestResponse);
-		socket.current.on("notification", handleLikeNotification);
+		socket.current.on("notification", handleNotification);
 		socket.current.on("friend request pending", handlePendingFriendRequest);
 		socket.current.on("friend request declined", handleDeclinedFriendRequest);
 		socket.current.on("friend request accepted", handleAcceptedFriendRequest);
@@ -99,7 +100,7 @@ export const SocketProvider = ({ children, store }) => {
 			socket.current.off("disconnect", onDisconnect);
 			socket.current.off("error", onError);
 			socket.current.off("test Hook", handleTestResponse);
-			socket.current.off("notification", handleLikeNotification);
+			socket.current.off("notification", handleNotification);
 			socket.current.off("friend request pending", handlePendingFriendRequest);
 			socket.current.off("friend request declined", handleDeclinedFriendRequest);
 			socket.current.off("friend request accepted", handleAcceptedFriendRequest);
@@ -113,7 +114,7 @@ export const SocketProvider = ({ children, store }) => {
 	}, []);
 
 	return (
-		<SocketContext.Provider value={[socket.current, isConnected, notifications, setNotifications]}>
+		<SocketContext.Provider value={[socket.current, isConnected]}>
 			{children}
 		</SocketContext.Provider>
 	);

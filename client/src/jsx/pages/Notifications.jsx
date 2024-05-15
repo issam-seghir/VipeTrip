@@ -1,5 +1,6 @@
 import { useSocket } from "@context/SocketContext";
 import { useAcceptFriendRequestMutation, useDeleteFriendRequestMutation } from "@jsx/store/api/friendsApi";
+import { useGetCurrentUserNotificationsQuery, useMarkNotificationsAsReadMutation } from "@jsx/store/api/userApi";
 import { toTitleCase } from "@jsx/utils";
 import { format, formatDistanceToNow } from "date-fns";
 import { Avatar } from "primereact/avatar";
@@ -10,19 +11,29 @@ import { Tooltip } from "primereact/tooltip";
 import { classNames } from "primereact/utils";
 import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { LikeNotification } from "./../components/LikeNotification";
+import { LikeNotification } from "@components/LikeNotification";
 
 export function Notifications() {
-	const [socket, isConnected, notifications, setNotifications] = useSocket();
+	const [socket, isConnected] = useSocket();
 	const navigate = useNavigate();
+const [markAsRead, markAsReadResult] = useMarkNotificationsAsReadMutation();
+	const {
+		data: notifications,
+		isFetching,
+		isLoading,
+		isError,
+		error,
+	} = useGetCurrentUserNotificationsQuery();
 
 	const toast = useRef(null);
 
 	console.log(notifications);
-	function handleNotificationRead(index) {
-		setNotifications((prevNotifications) =>
-			prevNotifications.map((notif, i) => (i === index ? { ...notif, read: true } : notif))
-		);
+	async function handleNotificationRead(index) {
+		try {
+			await markAsRead(index).unwrap();
+		} catch (error) {
+			console.log(error);
+		}
 	}
 
 	const handleDismiss = (index) => {
@@ -289,7 +300,7 @@ export function Notifications() {
 									notification?.data?.parentComment?.post
 								}`
 							);
-							handleNotificationRead(index);
+							handleNotificationRead(notification?.id);
 						}}
 						tabIndex={0}
 						role="button"

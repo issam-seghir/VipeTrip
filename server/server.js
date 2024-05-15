@@ -31,6 +31,7 @@ const { createServer } = require("node:http");
 const verifyJWT = require("@/middleware/auth/verifyJWT");
 // const { getUserFriends } =  require("@/controllers/socketController");
 const SocketSession = require("@model/SocketSession");
+const Notification = require("@model/Notification");
 
 // global mongoose plugins
 mongoose.plugin(normalize);
@@ -181,7 +182,7 @@ io.on("connection", async (socket) => {
 	});
 
 	// Listen for a new like event (like on a post or comment)
-	socket.on("new like", (data) => {
+	socket.on("new like", async(data) => {
 		try {
 			if (!data) {
 				return;
@@ -193,6 +194,17 @@ io.on("connection", async (socket) => {
 				// The user liked their own post/comment, so don't emit a notification
 				return;
 			}
+			// Create a new notification
+			const notification = new Notification({
+				userTo: authorId,
+				userFrom: data?.liker?.id,
+				type: "Like",
+				description: data?.type === "Post" ? "liked your post" : "liked your comment",
+				post: data?.likedPost?.id,
+			});
+
+			await notification.save();
+			
 			// Emit a notification event to the author of the post/comment
 			io.to(`user:${authorId}`).emit("notification", { data, type: "like" });
 		} catch (error) {

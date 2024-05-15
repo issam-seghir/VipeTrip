@@ -30,12 +30,13 @@ const { Server } = require("socket.io");
 const { createServer } = require("node:http");
 const verifyJWT = require("@/middleware/auth/verifyJWT");
 // const { getUserFriends } =  require("@/controllers/socketController");
-const SocketSession = require("@model/SocketSession");
-const Notification = require("@model/Notification");
 
-// global mongoose plugins
+// global mongoose plugins : declare them before declarring any mongoose module
 mongoose.plugin(normalize);
 mongoose.plugin(autopopulate);
+
+const SocketSession = require("@model/SocketSession");
+const Notification = require("@model/Notification");
 
 const PORT = ENV.PORT;
 
@@ -167,7 +168,7 @@ io.on("connection", async (socket) => {
 		// Emit a friend request event to the recipient
 		io.to(`user:${request?.friendId?.id}`).emit("notification", { data: request, type: "friend-request" });
 		// for adding "confirm request" label in receiver button
-		io.to(`user:${request?.friendId?.id}`).emit("friend request pending", { data: request});
+		io.to(`user:${request?.friendId?.id}`).emit("friend request pending", { data: request });
 	});
 	socket.on("cancel friend request", (profileId) => {
 		console.log(profileId);
@@ -182,31 +183,46 @@ io.on("connection", async (socket) => {
 	});
 
 	// Listen for a new like event (like on a post or comment)
-	socket.on("new like", async(data) => {
+	socket.on("new like", async (data) => {
 		try {
 			if (!data) {
 				return;
 			}
 
 			// Check if the liker is the same as the author of the post or comment
-			const authorId = data?.type === "Post" ? data?.likedPost?.author.id : data?.likedComment?.author.id;
-			if (data?.liker?.id === authorId) {
+			const postAuthorId = data?.type === "Post" ? data?.likedPost?.author.id : data?.likedComment?.author.id;
+			if (data?.liker?.id === postAuthorId) {
 				// The user liked their own post/comment, so don't emit a notification
 				return;
 			}
-			// Create a new notification
-			const notification = new Notification({
-				userTo: authorId,
+
+			// Check if a like notification already exists
+			const notificationQuery = {
+				userTo: postAuthorId,
 				userFrom: data?.liker?.id,
 				type: "Like",
-				description: data?.type === "Post" ? "liked your post" : "liked your comment",
-				post: data?.likedPost?.id,
-			});
+			};
+
+			if (data?.likedComment?.id) {
+				notificationQuery.comment = data?.likedComment?.id;
+			}
+			if (data?.likedPost?.id) {
+				notificationQuery.post = data?.likedPost?.id;
+			}
+			const existingNotification = await Notification.findOne(notificationQuery);
+
+			// If a like notification already exists, don't create a new one
+			if (existingNotification) {
+				return;
+			}
+
+			// Create a new notification
+			const notification = new Notification(notificationQuery);
 
 			await notification.save();
 
 			// Emit a notification event to the author of the post/comment
-			io.to(`user:${authorId}`).emit("notification");
+			io.to(`user:${postAuthorId}`).emit("notification");
 		} catch (error) {
 			console.error(`Error handling 'new like' event: ${error.message}`);
 		}

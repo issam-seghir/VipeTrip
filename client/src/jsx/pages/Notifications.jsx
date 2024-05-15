@@ -1,6 +1,12 @@
+import { LikeNotification } from "@components/LikeNotification";
 import { useSocket } from "@context/SocketContext";
 import { useAcceptFriendRequestMutation, useDeleteFriendRequestMutation } from "@jsx/store/api/friendsApi";
-import { useGetCurrentUserNotificationsQuery, useMarkNotificationsAsReadMutation ,useDeleteNotificationMutation,useDeleteAllNotificationsMutation} from "@jsx/store/api/userApi";
+import {
+	useDeleteAllNotificationsMutation,
+	useDeleteNotificationMutation,
+	useGetCurrentUserNotificationsQuery,
+	useMarkNotificationsAsReadMutation,
+} from "@jsx/store/api/userApi";
 import { toTitleCase } from "@jsx/utils";
 import { format, formatDistanceToNow } from "date-fns";
 import { Avatar } from "primereact/avatar";
@@ -11,21 +17,15 @@ import { Tooltip } from "primereact/tooltip";
 import { classNames } from "primereact/utils";
 import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { LikeNotification } from "@components/LikeNotification";
+import { Skeleton } from "primereact/skeleton";
 
 export function Notifications() {
 	const [socket, isConnected] = useSocket();
 	const navigate = useNavigate();
-const [markAsRead, markAsReadResult] = useMarkNotificationsAsReadMutation();
-const [deleteNotification, deleteNotificationResult] = useDeleteNotificationMutation();
-const [deleteAllNotifications, deleteAllNotificationsResult] = useDeleteAllNotificationsMutation();
-	const {
-		data: notifications,
-		isFetching,
-		isLoading,
-		isError,
-		error,
-	} = useGetCurrentUserNotificationsQuery();
+	const [markAsRead, markAsReadResult] = useMarkNotificationsAsReadMutation();
+	const [deleteNotification, deleteNotificationResult] = useDeleteNotificationMutation();
+	const [deleteAllNotifications, deleteAllNotificationsResult] = useDeleteAllNotificationsMutation();
+	const { data: notifications, isFetching, isLoading, isError, error } = useGetCurrentUserNotificationsQuery();
 
 	const toast = useRef(null);
 
@@ -38,7 +38,7 @@ const [deleteAllNotifications, deleteAllNotificationsResult] = useDeleteAllNotif
 		}
 	}
 
-	const handleDismiss = async(id) => {
+	const handleDismiss = async (id) => {
 		try {
 			await deleteNotification(id).unwrap();
 		} catch (error) {
@@ -95,7 +95,28 @@ const [deleteAllNotifications, deleteAllNotificationsResult] = useDeleteAllNotif
 		}
 	};
 
-	if (notifications.length === 0) {
+	if (isLoading) {
+		return (
+			<div>
+				<Skeleton shape="rectangle" size="2rem" className="mb-5" />
+				<div className="border-1 p-2 surface-border border-round-xl">
+					{Array.from({ length: 5 }).map((_, index) => (
+						<div
+							key={index}
+							className="p-2 mb-2 flex align-items-center cursor-pointer hover:bg-primary-900 transition-linear transition-duration-500  border-round-xl"
+						>
+							<div className="flex align-items-center gap-2 flex-1">
+								<Skeleton shape="circle" size="2rem" className="mr-2" />
+								<Skeleton shape="rectangle" size="1rem" className="flex-1" />
+							</div>
+						</div>
+					))}
+				</div>
+			</div>
+		);
+	}
+
+	if (!notifications || notifications.length === 0) {
 		return (
 			<div>
 				<div className="flex justify-content-between mb-5">
@@ -289,49 +310,51 @@ const [deleteAllNotifications, deleteAllNotificationsResult] = useDeleteAllNotif
 					label="Clear All"
 					className="p-button-text  p-button p-component"
 					size="small"
+					disabled={
+						isDeleting ||
+						isAccepting ||
+						deleteNotificationResult.isLoading ||
+						deleteAllNotificationsResult.isLoading
+					}
 					onClick={() => deleteAllNotifications()}
 				/>
 			</div>
 			<div className="border-1 p-2 surface-border border-round-xl">
 				{notifications.map((notification, index) => (
 					<div
-						key={index}
+						key={notification?.id}
 						onKeyDown={() => {}}
 						onClick={() => {
-							navigate(
-								`/posts/${
-									notification?.data?.likedPost?.id ||
-									notification?.data?.likedComment?.post ||
-									notification?.data?.post?.id ||
-									notification?.data?.parentComment?.post
-								}`
-							);
-							handleNotificationRead(notification?.id);
+							if (!deleteNotificationResult.isLoading) {
+								navigate(`/posts/${notification?.post?.id || notification?.comment?.post}`);
+								handleNotificationRead(notification?.id);
+							}
 						}}
 						tabIndex={0}
 						role="button"
-						className="p-2 mb-2 flex align-items-center cursor-pointer hover:bg-primary-900 transition-linear transition-duration-500  border-round-xl"
+						className={`p-2 mb-2 flex align-items-center cursor-pointer ${
+							deleteNotificationResult.isLoading || deleteAllNotificationsResult.isLoading
+								? ""
+								: "hover:bg-primary-900"
+						} transition-linear transition-duration-500  border-round-xl`}
 					>
-						<div className="flex align-items-center gap-2 flex-1">
+						<div className="flex align-items-center gap-2 flex-1 ">
 							{!notification?.read && <Badge size="normal" severity="info"></Badge>}
+							{notification?.read && <span className="p-badge-dot"></span>}
 							<Avatar
 								size="large"
 								icon="pi pi-user"
 								className="p-overlay"
 								onClick={(event) => {
 									event.stopPropagation();
-									navigate(
-										`/profile/${notification?.data?.liker?.id || notification?.data?.userId?.id}`
-									);
+									navigate(`/profile/${notification?.userFrom?.id}`);
 								}}
-								image={
-									notification?.data?.liker?.picturePath || notification?.data?.userId?.picturePath
-								}
-								alt={notification?.data?.liker?.fullName || notification?.data?.userId?.fullName}
+								image={notification?.userFrom?.picturePath}
+								alt={notification?.userFrom?.fullName}
 								shape="circle"
 							/>
-							{notification?.type === "like" && (
-								<LikeNotification data={notification?.data} read={notification?.read} />
+							{notification?.type === "Like" && (
+								<LikeNotification notification={notification} read={notification?.read} />
 							)}
 							{notification?.type === "new-comment" && (
 								<div className="flex flex-column">
@@ -448,10 +471,15 @@ const [deleteAllNotifications, deleteAllNotificationsResult] = useDeleteAllNotif
 							className="p-button-text  p-button p-component border-circle	p-3 w-2rem h-2rem	"
 							icon="pi pi-times"
 							size="small"
-							disabled={isDeleting}
+							disabled={
+								isDeleting ||
+								isAccepting ||
+								deleteNotificationResult.isLoading ||
+								deleteAllNotificationsResult.isLoading
+							}
 							onClick={(event) => {
 								event.stopPropagation();
-								handleDismiss(index);
+								handleDismiss(notification?.id);
 							}}
 						/>
 					</div>

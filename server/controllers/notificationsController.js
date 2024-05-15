@@ -9,7 +9,11 @@ exports.getNotifications = asyncWrapper(async (req, res) => {
 	if (!user) {
 		return res.status(404).json({ message: `Requesting user not found` });
 	}
-	const notifications = await Notification.find({ userTo: req?.user?.id }).populate("userFrom").populate("post");
+	const notifications = await Notification.find({ userTo: req?.user?.id })
+		.populate("userFrom")
+		.populate("post")
+		.populate("comment")
+		.sort({ createdAt: -1 }); // sort by creation date, most recent first;
 	res.status(200).json({ message: "Get Notifications  successfully", data: notifications });
 });
 
@@ -47,7 +51,7 @@ exports.deleteNotification = asyncWrapper(async (req, res) => {
 		return res.status(404).json({ message: "Cannot find notification" });
 	}
 
-	await notification.remove();
+	await notification.deleteOne();
 	res.status(200).json({ message: "Delete Notification successfully" });
 });
 
@@ -59,6 +63,6 @@ exports.deleteAllNotifications = asyncWrapper(async (req, res) => {
 		return res.status(404).json({ message: `Requesting user not found` });
 	}
 
-	await Notification.deleteMany({ userId: req?.user?.id });
+	await Notification.deleteMany({ userTo: req?.user?.id });
 	res.status(200).json({ message: "Delete all Notifications successfully" });
 });

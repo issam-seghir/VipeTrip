@@ -1,6 +1,6 @@
 import { api } from "@jsx/store/api/api";
 
-export const userApi = api.enhanceEndpoints({ addTagTypes: ["User"] }).injectEndpoints({
+export const userApi = api.enhanceEndpoints({ addTagTypes: ["User", "Notification"] }).injectEndpoints({
 	// get user by id query
 	endpoints: (builder) => ({
 		getUser: builder.query({
@@ -39,28 +39,10 @@ export const userApi = api.enhanceEndpoints({ addTagTypes: ["User"] }).injectEnd
 		getCurrentUserNotifications: builder.query({
 			query: () => `users/me/notifications`,
 			transformResponse: (response) => response.data,
-			providesTags: (result, error) => [{ type: "User", id: "NOTIFICATIONS" }],
-		}),
-		markNotificationsAsRead: builder.mutation({
-			query: (id) => ({
-				url: `users/me/notifications/${id}`,
-				method: "PUT",
-			}),
-			invalidatesTags: (result, error) => [{ type: "User", id: "NOTIFICATIONS" }],
-		}),
-		deleteNotification: builder.mutation({
-			query: (id) => ({
-				url: `users/me/notifications/${id}`,
-				method: "DELETE",
-			}),
-			invalidatesTags: (result, error) => [{ type: "User", id: "NOTIFICATIONS" }],
-		}),
-		deleteAllNotifications: builder.mutation({
-			query: () => ({
-				url: `users/me/notifications`,
-				method: "DELETE",
-			}),
-			invalidatesTags: (result, error) => [{ type: "User", id: "NOTIFICATIONS" }],
+			providesTags: (result) =>
+				result
+					? [...result.map(({ id }) => ({ type: "Notification", id })), { type: "Notification", id: "LIST" }]
+					: [{ type: "Notification", id: "LIST" }],
 		}),
 		updateUserProfile: builder.mutation({
 			query: (data) => ({
@@ -69,6 +51,27 @@ export const userApi = api.enhanceEndpoints({ addTagTypes: ["User"] }).injectEnd
 				body: data,
 			}),
 			invalidatesTags: (result, error) => [{ type: "User", id: "LIST" }],
+		}),
+		markNotificationsAsRead: builder.mutation({
+			query: (id) => ({
+				url: `users/me/notifications/${id}`,
+				method: "PUT",
+			}),
+			invalidatesTags: (result, error, id) => [{ type: "Notification", id }],
+		}),
+		deleteNotification: builder.mutation({
+			query: (id) => ({
+				url: `users/me/notifications/${id}`,
+				method: "DELETE",
+			}),
+			invalidatesTags: (result, error, id) => [{ type: "Notification", id }],
+		}),
+		deleteAllNotifications: builder.mutation({
+			query: () => ({
+				url: `users/me/notifications`,
+				method: "DELETE",
+			}),
+			invalidatesTags: (result, error) => [{ type: "Notification", id: "LIST" }],
 		}),
 	}),
 });

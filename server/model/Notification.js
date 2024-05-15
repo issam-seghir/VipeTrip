@@ -20,13 +20,13 @@ const notificationSchema = new Schema(
 			type: Schema.Types.ObjectId,
 			ref: "Post",
 		},
+		comment: {
+			type: Schema.Types.ObjectId,
+			ref: "Comment",
+		},
 		type: {
 			type: String,
 			enum: ["Post", "Comment", "Like", "Friend"],
-			required: true,
-		},
-		description: {
-			type: String,
 			required: true,
 		},
 		read: {

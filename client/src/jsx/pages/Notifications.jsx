@@ -1,6 +1,6 @@
 import { useSocket } from "@context/SocketContext";
 import { useAcceptFriendRequestMutation, useDeleteFriendRequestMutation } from "@jsx/store/api/friendsApi";
-import { useGetCurrentUserNotificationsQuery, useMarkNotificationsAsReadMutation } from "@jsx/store/api/userApi";
+import { useGetCurrentUserNotificationsQuery, useMarkNotificationsAsReadMutation ,useDeleteNotificationMutation,useDeleteAllNotificationsMutation} from "@jsx/store/api/userApi";
 import { toTitleCase } from "@jsx/utils";
 import { format, formatDistanceToNow } from "date-fns";
 import { Avatar } from "primereact/avatar";
@@ -17,6 +17,8 @@ export function Notifications() {
 	const [socket, isConnected] = useSocket();
 	const navigate = useNavigate();
 const [markAsRead, markAsReadResult] = useMarkNotificationsAsReadMutation();
+const [deleteNotification, deleteNotificationResult] = useDeleteNotificationMutation();
+const [deleteAllNotifications, deleteAllNotificationsResult] = useDeleteAllNotificationsMutation();
 	const {
 		data: notifications,
 		isFetching,
@@ -28,16 +30,20 @@ const [markAsRead, markAsReadResult] = useMarkNotificationsAsReadMutation();
 	const toast = useRef(null);
 
 	console.log(notifications);
-	async function handleNotificationRead(index) {
+	async function handleNotificationRead(id) {
 		try {
-			await markAsRead(index).unwrap();
+			await markAsRead(id).unwrap();
 		} catch (error) {
 			console.log(error);
 		}
 	}
 
-	const handleDismiss = (index) => {
-		setNotifications((prevNotifications) => prevNotifications.filter((_, i) => i !== index));
+	const handleDismiss = async(id) => {
+		try {
+			await deleteNotification(id).unwrap();
+		} catch (error) {
+			console.log(error);
+		}
 	};
 	const [deleteFriendRequest, { isLoading: isDeleting }] = useDeleteFriendRequestMutation();
 	const [acceptFriendRequest, { isLoading: isAccepting }] = useAcceptFriendRequestMutation();
@@ -283,7 +289,7 @@ const [markAsRead, markAsReadResult] = useMarkNotificationsAsReadMutation();
 					label="Clear All"
 					className="p-button-text  p-button p-component"
 					size="small"
-					onClick={() => setNotifications([])}
+					onClick={() => deleteAllNotifications()}
 				/>
 			</div>
 			<div className="border-1 p-2 surface-border border-round-xl">

@@ -23,8 +23,7 @@ export const SocketProvider = ({ children, store }) => {
 
 	const socket = useRef(null);
 
-	function handleNotification(notification) {
-		console.log(notification);
+	function handleNotification() {
 		store.dispatch(userApi.util.invalidateTags([{ type: "User", id: "NOTIFICATIONS" }]));
 		// setNotifications((prevNotifications) => [...prevNotifications, { ...notification, read: false }]);
 	}

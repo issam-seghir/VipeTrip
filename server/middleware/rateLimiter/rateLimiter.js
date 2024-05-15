@@ -25,7 +25,7 @@ var ratelimiter = async () => {
 		storeClient: mongoConn,
 		dbName: ENV.DATABASE_NAME,
 		keyPrefix: "middleware",
-		points: 20, // 20 requests
+		points: 40, // 20 requests
 		duration: 1, // per 1 second by IP
 		tableName: "rate_limits", // Name of the collection to use for storing rate limit data
 	});
@@ -36,7 +36,7 @@ var ratelimiterSocketio = async () => {
 		storeClient: mongoConn,
 		dbName: ENV.DATABASE_NAME,
 		keyPrefix: "socketio",
-		points: 40, // 40 requests
+		points: 70, // 40 requests
 		duration: 1, // per 1 second by IP
 		tableName: "rate_limits", // Name of the collection to use for storing rate limit data
 	});

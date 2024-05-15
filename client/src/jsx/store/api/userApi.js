@@ -48,6 +48,20 @@ export const userApi = api.enhanceEndpoints({ addTagTypes: ["User"] }).injectEnd
 			}),
 			invalidatesTags: (result, error) => [{ type: "User", id: "NOTIFICATIONS" }],
 		}),
+		deleteNotification: builder.mutation({
+			query: (id) => ({
+				url: `users/me/notifications/${id}`,
+				method: "DELETE",
+			}),
+			invalidatesTags: (result, error) => [{ type: "User", id: "NOTIFICATIONS" }],
+		}),
+		deleteAllNotifications: builder.mutation({
+			query: () => ({
+				url: `users/me/notifications`,
+				method: "DELETE",
+			}),
+			invalidatesTags: (result, error) => [{ type: "User", id: "NOTIFICATIONS" }],
+		}),
 		updateUserProfile: builder.mutation({
 			query: (data) => ({
 				url: `users/me/profile`,
@@ -68,4 +82,6 @@ export const {
 	useGetUserPostsQuery,
 	useUpdateUserProfileMutation,
 	useMarkNotificationsAsReadMutation,
+	useDeleteNotificationMutation,
+	useDeleteAllNotificationsMutation,
 } = userApi;

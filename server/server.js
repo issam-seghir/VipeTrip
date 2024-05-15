@@ -204,9 +204,9 @@ io.on("connection", async (socket) => {
 			});
 
 			await notification.save();
-			
+
 			// Emit a notification event to the author of the post/comment
-			io.to(`user:${authorId}`).emit("notification", { data, type: "like" });
+			io.to(`user:${authorId}`).emit("notification");
 		} catch (error) {
 			console.error(`Error handling 'new like' event: ${error.message}`);
 		}

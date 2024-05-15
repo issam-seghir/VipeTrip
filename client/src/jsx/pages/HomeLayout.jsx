@@ -17,6 +17,9 @@ import { PostDialogForm } from "@jsx/components/PostDialogForm";
 import { PostCommentsDialog } from "@jsx/components/PostCommentsDialog";
 import { selectCurrentUser } from "@jsx/store/slices/authSlice";
 import { useSocket } from "@context/SocketContext";
+import {
+	useGetCurrentUserNotificationsQuery,
+} from "@jsx/store/api/userApi";
 
 
 export const HomeLayout = () => {
@@ -29,8 +32,9 @@ export const HomeLayout = () => {
 	const isPostRepostedSuccuss = useSelector(selectPostRespostedSuccuss);
 	const user = useSelector(selectCurrentUser);
 	const dispatch = useDispatch();
-	const [socket, isConnected,notifications] = useSocket();
-	  const unreadNotifications = notifications?.filter((notification) => !notification?.read)?.length;
+	const [socket, isConnected] = useSocket();
+	const { data: notifications, isFetching, isLoading, isError, error } = useGetCurrentUserNotificationsQuery();
+	const unreadNotifications = notifications?.filter((notification) => !notification?.read)?.length;
 
 	// show success message when deleting a post
 	useEffect(() => {

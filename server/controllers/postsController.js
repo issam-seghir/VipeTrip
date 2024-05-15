@@ -41,7 +41,7 @@ const createPost = asyncWrapper(async (req, res) => {
 	});
 	await newPost.save();
 
-	res.status(201).json({ message: "Post Created  successfully" });
+	res.status(201).json({ message: "Post Created  successfully", data: newPost });
 });
 
 const deletePost = asyncWrapper(async (req, res, next) => {
@@ -401,7 +401,7 @@ const likeDislikePost = asyncWrapper(async (req, res, next) => {
 	await like.save();
 	// Populate the 'liker' and 'likedPost' fields after saving the document
 	const populatedLike = await Like.findById(like._id).populate("liker").populate("likedPost");
-	
+
 	res.status(200).json({ message: "Post liked successfully", data: populatedLike });
 });
 

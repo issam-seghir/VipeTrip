@@ -12,12 +12,13 @@ import { format, formatDistanceToNow } from "date-fns";
 import { Avatar } from "primereact/avatar";
 import { Badge } from "primereact/badge";
 import { Button } from "primereact/button";
+import { Skeleton } from "primereact/skeleton";
 import { Toast } from "primereact/toast";
 import { Tooltip } from "primereact/tooltip";
 import { classNames } from "primereact/utils";
 import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Skeleton } from "primereact/skeleton";
+import { CommentNotification } from "./../components/CommentNotification";
 
 export function Notifications() {
 	const [socket, isConnected] = useSocket();
@@ -356,16 +357,17 @@ export function Notifications() {
 							{notification?.type === "Like" && (
 								<LikeNotification notification={notification} read={notification?.read} />
 							)}
-							{notification?.type === "Comment" && (
+							{notification?.type === "Comment" && <CommentNotification notification={notification} />}
+							{notification?.type === "Post" && (
 								<div className="flex flex-column">
 									<div className="flex gap-2 align-items-baseline">
 										<h4 className={classNames({ "text-primary-700": notification?.read })}>
 											{toTitleCase(notification?.userFrom?.fullName)}
 										</h4>
-										<p className="text-xs text-400 flex gap-2">commented on your post </p>
+										<p className="text-xs text-400 flex gap-2">Add a new pos🚀</p>
 									</div>
 									<p className="text-xs text-400 flex gap-2">
-										text : {notification?.comment?.description?.slice(0, 20)}...
+										text : {notification?.post?.description?.slice(0, 20)}...
 									</p>
 									<div className="flex">
 										<div className={`text-xs text-400 flex gap-2`}>
@@ -378,37 +380,6 @@ export function Notifications() {
 													target={`.createData-tooltip-${notification?.userFrom?.id}`}
 													content={format(
 														new Date(notification?.createdAt),
-														"EEEE, MMMM d, yyyy, h:mm a"
-													)}
-													position="bottom"
-												/>
-											</div>
-										</div>
-									</div>
-								</div>
-							)}
-							{notification?.type === "new-reply" && (
-								<div className="flex flex-column">
-									<div className="flex gap-2 align-items-baseline">
-										<h4 className={classNames({ "text-primary-700": notification?.read })}>
-											{toTitleCase(notification?.data?.author?.fullName)}
-										</h4>
-										<p className="text-xs text-400 flex gap-2">add reply to your comment </p>
-									</div>
-									<p className="text-xs text-400 flex gap-2">
-										text : {notification?.data?.description?.slice(0, 20)}...
-									</p>
-									<div className="flex">
-										<div className={`text-xs text-400 flex gap-2`}>
-											<div className={`createData-tooltip-${notification?.data?.author?.id} `}>
-												{formatDistanceToNow(new Date(notification?.data?.createdAt), {
-													addSuffix: true,
-												})}
-												<Tooltip
-													key={notification?.data?.author?.id}
-													target={`.createData-tooltip-${notification?.data?.author?.id}`}
-													content={format(
-														new Date(notification?.data?.createdAt),
 														"EEEE, MMMM d, yyyy, h:mm a"
 													)}
 													position="bottom"

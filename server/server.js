@@ -301,10 +301,6 @@ io.on("connection", async (socket) => {
 			}
 			const authorId = data?.author?.id;
 
-			if (authorId === userId) {
-				// The user posted their own post, so don't emit a notification
-				return;
-			}
 			const user = await User.findById(authorId);
 			const friends = user.friends;
 			// Create a new notification for each friend
@@ -312,7 +308,7 @@ io.on("connection", async (socket) => {
 				const notification = new Notification({
 					userTo: friendId,
 					userFrom: authorId,
-					post: data?.post?.id,
+					post: data?.id,
 					type: "Post",
 				});
 

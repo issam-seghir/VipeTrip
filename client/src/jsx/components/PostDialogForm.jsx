@@ -1,4 +1,5 @@
 import { FileUploadDialog } from "@components/FileUploadDialog";
+import { useSocket } from "@context/SocketContext";
 import { isDev } from "@data/constants";
 import { DevTool } from "@hookform/devtools";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -7,6 +8,7 @@ import { EmojiPickerOverlay } from "@jsx/components/EmojiPickerOverlay";
 import { PhotosPreview } from "@jsx/components/PhotosPreview";
 import { useCreatePostMutation, useGetPostQuery, useUpdatePostMutation } from "@jsx/store/api/postApi";
 import { selectCurrentUser } from "@store/slices/authSlice";
+import { selectPostDialogForm, setPostDialogForm } from "@store/slices/postSlice";
 import { useDebounce } from "@uidotdev/usehooks";
 import { createPostSchema } from "@validations/postSchema";
 import { Avatar } from "primereact/avatar";
@@ -16,15 +18,11 @@ import { Divider } from "primereact/divider";
 import { Toast } from "primereact/toast";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { convertModelToFormData } from "../utils/index";
 import { PFormDropdown } from "./Form/PFormDropdown";
 import { PFormMentionTagTextArea } from "./Form/PFormMentionTagTextArea";
-import {
-	selectPostDialogForm,
-	setPostDialogForm,
-} from "@store/slices/postSlice";
 
 const privacies = [
 	{ label: "onlyMe", value: "onlyMe" },
@@ -39,6 +37,8 @@ export function PostDialogForm() {
 	const dispatch = useDispatch();
 	const descriptionRef = useRef(null);
 	const [cursorPosition, setCursorPosition] = useState(null);
+	const [socket, isConnected] = useSocket();
+
 	const [createPost, createPostResult] = useCreatePostMutation();
 	const [updatePost, updatePostResult] = useUpdatePostMutation();
 	const {
@@ -115,6 +115,11 @@ export function PostDialogForm() {
 			const formData = convertModelToFormData(data);
 			const res = await createPost(formData).unwrap();
 			if (res) {
+				// handle create new comment notification
+				if (isConnected) {
+					console.log("new post event to server");
+					socket.emit("new post", res?.data);
+				}
 				reset();
 				dispatch(setPostDialogForm({ open: false, id: null }));
 
@@ -173,7 +178,6 @@ export function PostDialogForm() {
 	}
 
 	const onSubmit = (data) => {
-
 		if (isUpdate) {
 			handleUpdatePost(data);
 		} else {
@@ -212,8 +216,8 @@ export function PostDialogForm() {
 				start + emojiObject?.emoji.length;
 		}, 0);
 	};
-const values = getValues(); // You can get all input values
-console.log(values);
+	const values = getValues(); // You can get all input values
+	console.log(values);
 	const handlePollOpen = () => {
 		// handle poll click
 	};
@@ -253,7 +257,7 @@ console.log(values);
 				contentClassName="py-0"
 				breakpoints={{ "960px": "75vw", "640px": "90vw" }}
 				onHide={() => {
-									dispatch(setPostDialogForm({ open: false, id: isUpdate ? postToEdit?.id : null }));
+					dispatch(setPostDialogForm({ open: false, id: isUpdate ? postToEdit?.id : null }));
 
 					// setShowDialog({ open: false, id: isUpdate ? postToEdit?.id : null });
 					if (isUpdate) {

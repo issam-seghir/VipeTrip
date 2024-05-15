@@ -5,6 +5,7 @@ import { useSocket } from "@context/SocketContext";
 import {
 	useCreateFriendRequestMutation,
 	useDeleteFriendRequestMutation,
+	useAcceptFriendRequestMutation,
 	useGetFriendRequestQuery,
 	useRemoveFriendMutation,
 } from "@jsx/store/api/friendsApi";
@@ -15,7 +16,7 @@ import { format } from "date-fns";
 import { Avatar } from "primereact/avatar";
 import { Badge } from "primereact/badge";
 import { Button } from "primereact/button";
-import { ConfirmDialog,confirmDialog } from "primereact/confirmdialog";
+import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
 import { Image } from "primereact/image";
 import { Skeleton } from "primereact/skeleton";
 import { Tooltip } from "primereact/tooltip";
@@ -63,6 +64,8 @@ export function Profile() {
 	} = useGetFriendRequestQuery(profileId, { skip: isCurrentUser });
 	const [createFriendRequest, createFriendRequestResult] = useCreateFriendRequestMutation();
 	const [deleteFriendRequest, deleteFriendRequestResult] = useDeleteFriendRequestMutation();
+	const [acceptFriendRequest, { isLoading: isAccepting }] = useAcceptFriendRequestMutation();
+
 	const [removeFriend, removeFriendResult] = useRemoveFriendMutation();
 	const user = currentUser || otherUser;
 	console.log(friendRequest);
@@ -79,19 +82,39 @@ export function Profile() {
 				acceptClassName: "p-button-danger",
 				accept: async () => {
 					try {
-						await removeFriend(friendRequest?.friendId?.id);
+						const res = await removeFriend(profileId).unwrap();
+						if (res && isConnected) {
+							socket.emit("remove friend", profileId );
+						}
 					} catch (error) {
 						console.error("Failed to removeFriend :", error);
 					}
 				},
 				reject: () => {},
 			});
-		} else if (friendRequest?.status === "Requested") {
+		} else if (friendRequest?.status === "Requested" && friendRequest?.type === "sender") {
 			try {
-				await deleteFriendRequest(friendRequest?.id);
+				const res = await deleteFriendRequest(friendRequest?.id).unwrap();
+				console.log(res);
+				if (res) {
+					socket.emit("cancel friend request", profileId);
+					// remove it from notifications
+					// handleDismiss(index);
+				}
 			} catch (error) {
 				console.error("Failed to deleteFriendRequest :", error);
 				return;
+			}
+		} else if (friendRequest?.status === "Requested" && friendRequest?.type === "receiver") {
+			try {
+				const res = await acceptFriendRequest(friendRequest?.id).unwrap();
+				if (res) {
+					socket.emit("accept friend request", res?.data);
+					// remove it from notifications
+					// handleDismiss(index);
+				}
+			} catch (error) {
+				console.log(error);
 			}
 		} else {
 			try {
@@ -583,9 +606,11 @@ export function Profile() {
 							label={
 								friendRequest?.status === "Accepted"
 									? "friend"
-									: friendRequest
+									: friendRequest?.status === "Requested" && friendRequest?.type === "sender"
 									? "Cancel Request"
-									: "Add Friend"
+									: friendRequest?.status === "Requested" && friendRequest?.type === "receiver"
+									? "Confirm Request"
+									: "Add friend"
 							}
 							className={classNames("z-4  p-2 border-round-2xl", {
 								"p-button-outlined": friendRequest?.status === "Accepted",

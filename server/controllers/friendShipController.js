@@ -23,6 +23,11 @@ exports.getFriendRequest = asyncWrapper(async (req, res) => {
 	})
 		.populate("friendId")
 		.populate("userId");
+	if (friendRequest) {
+		// Determine if the current user is the sender or receiver of the friend request
+		friendRequest.type = friendRequest.userId.id.toString() === userId ? "sender" : "receiver";
+	}
+
 	res.status(200).json({ message: "Get Friend request successfully", data: friendRequest });
 });
 
@@ -116,13 +121,13 @@ exports.deleteFriendRequest = asyncWrapper(async (req, res) => {
 		return res.status(404).json({ message: "Friend request to Delete not found" });
 	}
 
-	res.status(200).json({ message: "Friend request Declined successfully", data: friendship });
+	res.status(200).json({ message: "Friend request Declined successfully" });
 });
 
 exports.removeFriend = asyncWrapper(async (req, res) => {
 	const { friendId } = req.params;
 	const userId = req?.user?.id;
-
+	console.log(friendId, userId);
 	const user = await User.findById(userId);
 	const friend = await User.findById(friendId);
 	if (!user) {

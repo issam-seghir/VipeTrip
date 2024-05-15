@@ -3,7 +3,7 @@ require("module-alias/register");
 
 const express = require("express");
 const mongoose = require("mongoose");
-const rateLimiterMiddleware = require("@/middleware/rateLimiter/rateLimiter");
+const { rateLimiterMiddleware, rateLimiterMiddlewareSocketIo } = require("@/middleware/rateLimiter/rateLimiter");
 const { readyStates } = require("@config/const");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
@@ -101,6 +101,7 @@ const io = new Server(server, {
 //  jwt auth the socket server
 
 io.engine.use(verifyJWT);
+io.engine.use(rateLimiterMiddlewareSocketIo);
 
 // Socket.io
 io.on("connection", async (socket) => {
@@ -160,15 +161,22 @@ io.on("connection", async (socket) => {
 	// Listen for a friend request event
 	// Listen for a friend request event
 	socket.on("friend request", (request) => {
+		console.log("send friend request");
 		console.log(request);
 		// Emit a friend request event to the recipient
 		io.to(`user:${request?.friendId?.id}`).emit("notification", { data: request, type: "friend-request" });
+		// for adding "confirm request" label in receiver button
+		io.to(`user:${request?.friendId?.id}`).emit("friend request pending", { data: request});
 	});
-	socket.on("cancel friend request", (request) => {
-		io.to(`user:${request?.userId}`).emit("friend request declined", request);
+	socket.on("cancel friend request", (profileId) => {
+		console.log(profileId);
+		io.to(`user:${profileId}`).emit("friend request declined", profileId);
 	});
 	socket.on("accept friend request", (request) => {
 		io.to(`user:${request?.userId}`).emit("friend request accepted", request);
+	});
+	socket.on("remove friend", (profileId) => {
+		io.to(`user:${profileId}`).emit("removed friendShip", profileId);
 	});
 
 	// Listen for a new like event (like on a post or comment)

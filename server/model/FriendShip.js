@@ -26,4 +26,8 @@ const friendShipSchema = new Schema(
 	{ timestamps: true }
 );
 
+//? --------- virtual (set / get) methods ----------------
+
+friendShipSchema.virtual("type");
+
 module.exports = mongoose.model("FriendShip", friendShipSchema);

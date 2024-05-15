@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useRef, useState } from "react";
 
 import { postApi } from "@jsx/store/api/postApi";
 import { userApi } from "@jsx/store/api/userApi";
+import { friendsApi } from "@jsx/store/api/friendsApi";
 import { selectCurrentToken } from "@store/slices/authSlice";
 import { getCookie } from "@utils/index";
 import { useSelector } from "react-redux";
@@ -29,15 +30,25 @@ export const SocketProvider = ({ children, store }) => {
 	function handleTestResponse(data) {
 		console.log("Received response from test Hook:", data);
 	}
-	function handleDeclinedFriendRequest(data) {
-		console.log("handleDeclinedFriendRequest");
+	function handlePendingFriendRequest(data) {
+		console.log("handlePendingFriendRequest");
 		console.log(data);
-		store.dispatch(postApi.util.invalidateTags([{ type: "Friends", id: data.friendId }]));
+		store.dispatch(friendsApi.util.invalidateTags([{type: "Friends", id: "REQUEST"}]));
+	}
+	function handleDeclinedFriendRequest(profileId) {
+		console.log("handleDeclinedFriendRequest");
+		console.log(profileId);
+		store.dispatch(friendsApi.util.invalidateTags([{ type: "Friends", id: "REQUEST" }]));
 	}
 	function handleAcceptedFriendRequest(data) {
 		console.log("handleAcceptedFriendRequest");
 		console.log(data);
-		store.dispatch(postApi.util.invalidateTags([{ type: "Friends", id: data.friendId }]));
+		store.dispatch(friendsApi.util.invalidateTags([{ type: "Friends", id: "REQUEST" }]));
+	}
+	function handleRemovedFriendShip(id) {
+		console.log("handleRemovedFriendShip");
+		console.log(id);
+		store.dispatch(friendsApi.util.invalidateTags([{ type: "Friends", id: "REQUEST" }]));
 	}
 	function handleUserOnline({ userId }) {
 		console.log("user are online :");
@@ -76,8 +87,10 @@ export const SocketProvider = ({ children, store }) => {
 		socket.current.on("error", onError);
 		socket.current.on("test Hook", handleTestResponse);
 		socket.current.on("notification", handleLikeNotification);
+		socket.current.on("friend request pending", handlePendingFriendRequest);
 		socket.current.on("friend request declined", handleDeclinedFriendRequest);
 		socket.current.on("friend request accepted", handleAcceptedFriendRequest);
+		socket.current.on("removed friendShip", handleRemovedFriendShip);
 		socket.current.on("user online", handleUserOnline);
 		socket.current.on("user offline", handleUserOffline);
 
@@ -87,8 +100,10 @@ export const SocketProvider = ({ children, store }) => {
 			socket.current.off("error", onError);
 			socket.current.off("test Hook", handleTestResponse);
 			socket.current.off("notification", handleLikeNotification);
+			socket.current.off("friend request pending", handlePendingFriendRequest);
 			socket.current.off("friend request declined", handleDeclinedFriendRequest);
 			socket.current.off("friend request accepted", handleAcceptedFriendRequest);
+			socket.current.off("removed friendShip", handleRemovedFriendShip);
 			socket.current.off("user online", handleUserOnline);
 			socket.current.off("user offline", handleUserOffline);
 

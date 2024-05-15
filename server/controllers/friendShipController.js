@@ -94,16 +94,10 @@ exports.acceptFriendRequest = asyncWrapper(async (req, res) => {
 		return res.status(404).json({ message: "Friend request not found" });
 	}
 
-	// Add friendId to user's friends array
-	user.friends.push(friendship?.friendId);
-	await user.save();
-
-	// Find the friend and add userId to friend's friends array
-	const friend = await User.findById(friendship?.friendId);
-	if (friend) {
-		friend.friends.push(userId);
-		await friend.save();
-	}
+	// Add friend's ID to user's friends array
+	await User.findByIdAndUpdate(friendship?.userId, { $addToSet: { friends: friendship?.friendId } });
+	// Add user's ID to friend's friends array
+	await User.findByIdAndUpdate(friendship?.friendId, { $addToSet: { friends: friendship?.userId } });
 
 	res.status(200).json({ message: "Friend request Accepted successfully", data: friendship });
 });

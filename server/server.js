@@ -37,6 +37,7 @@ mongoose.plugin(autopopulate);
 
 const SocketSession = require("@model/SocketSession");
 const Notification = require("@model/Notification");
+const User = require("@model/User");
 
 const PORT = ENV.PORT;
 
@@ -293,21 +294,35 @@ io.on("connection", async (socket) => {
 			console.error(`Error handling 'new replay' event: ${error.message}`);
 		}
 	});
-	socket.on("new post", (data) => {
+	socket.on("new post", async (data) => {
 		try {
 			if (!data) {
 				return;
 			}
-			// Check if the liker is the same as the author of the post or comment
-			// const authorId = data?.type === "Post" ? data?.likedPost?.author.id : data?.likedComment?.author.id;
-			if (data?.author?.id === data?.parentComment?.author?.id) {
-				// The user liked their own post/comment, so don't emit a notification
+			const authorId = data?.author?.id;
+
+			if (authorId === userId) {
+				// The user posted their own post, so don't emit a notification
 				return;
 			}
-			// Emit a notification event to the author of the post/comment
-			io.to(`user:${data?.parentComment?.author?.id}`).emit("notification", { data, type: "new-reply" });
+			const user = await User.findById(authorId);
+			const friends = user.friends;
+			// Create a new notification for each friend
+			for (let friendId of friends) {
+				const notification = new Notification({
+					userTo: friendId,
+					userFrom: authorId,
+					post: data?.post?.id,
+					type: "Post",
+				});
+
+				await notification.save();
+
+				// Emit a notification event to the friend
+				io.to(`user:${friendId}`).emit("notification");
+			}
 		} catch (error) {
-			console.error(`Error handling 'new replay' event: ${error.message}`);
+			console.error(`Error handling 'new post' event: ${error.message}`);
 		}
 	});
 });

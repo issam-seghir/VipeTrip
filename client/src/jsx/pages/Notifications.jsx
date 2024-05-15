@@ -356,28 +356,28 @@ export function Notifications() {
 							{notification?.type === "Like" && (
 								<LikeNotification notification={notification} read={notification?.read} />
 							)}
-							{notification?.type === "new-comment" && (
+							{notification?.type === "Comment" && (
 								<div className="flex flex-column">
 									<div className="flex gap-2 align-items-baseline">
 										<h4 className={classNames({ "text-primary-700": notification?.read })}>
-											{toTitleCase(notification?.data?.author?.fullName)}
+											{toTitleCase(notification?.userFrom?.fullName)}
 										</h4>
 										<p className="text-xs text-400 flex gap-2">commented on your post </p>
 									</div>
 									<p className="text-xs text-400 flex gap-2">
-										text : {notification?.data?.description?.slice(0, 20)}...
+										text : {notification?.comment?.description?.slice(0, 20)}...
 									</p>
 									<div className="flex">
 										<div className={`text-xs text-400 flex gap-2`}>
-											<div className={`createData-tooltip-${notification?.data?.author?.id} `}>
-												{formatDistanceToNow(new Date(notification?.data?.createdAt), {
+											<div className={`createData-tooltip-${notification?.userFrom?.id} `}>
+												{formatDistanceToNow(new Date(notification?.createdAt), {
 													addSuffix: true,
 												})}
 												<Tooltip
-													key={notification?.data?.author?.id}
-													target={`.createData-tooltip-${notification?.data?.author?.id}`}
+													key={notification?.userFrom?.id}
+													target={`.createData-tooltip-${notification?.userFrom?.id}`}
 													content={format(
-														new Date(notification?.data?.createdAt),
+														new Date(notification?.createdAt),
 														"EEEE, MMMM d, yyyy, h:mm a"
 													)}
 													position="bottom"

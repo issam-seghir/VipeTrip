@@ -229,17 +229,28 @@ io.on("connection", async (socket) => {
 	});
 
 	// Listen for a new comment event
-	socket.on("new comment", (data) => {
+	socket.on("new comment", async (data) => {
 		try {
 			if (!data) {
 				return;
 			}
-			// Check if the liker is the same as the author of the post or comment
-			// const authorId = data?.type === "Post" ? data?.likedPost?.author.id : data?.likedComment?.author.id;
+
 			if (data?.author?.id === data?.post?.author?.id) {
 				// The user liked their own post/comment, so don't emit a notification
 				return;
 			}
+
+			// Create a new notification
+			const notification = new Notification({
+				userTo: data?.post?.author?.id,
+				userFrom: data?.author?.id,
+				post: data?.post?.id,
+				comment: data?.id,
+				type: "Comment",
+			});
+
+			await notification.save();
+
 			// Emit a notification event to the author of the post/comment
 			io.to(`user:${data?.post?.author?.id}`).emit("notification", { data, type: "new-comment" });
 		} catch (error) {

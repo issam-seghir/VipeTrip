@@ -174,6 +174,7 @@ io.on("connection", async (socket) => {
 	});
 	socket.on("accept friend request", (request) => {
 		io.to(`user:${request?.userId}`).emit("friend request accepted", request);
+		io.to(`user:${request?.friendId}`).emit("friend request accepted", request);
 	});
 	socket.on("remove friend", (profileId) => {
 		io.to(`user:${profileId}`).emit("removed friendShip", profileId);

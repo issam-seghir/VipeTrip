@@ -94,6 +94,24 @@ app.use("/api/v1", require("@api/v1"));
 // global error handling
 app.use(errorHandler);
 
+// if you're using common js
+const StreamChat = require('stream-chat').StreamChat;
+
+// instantiate your stream client using the API key and secret
+// the secret is only used server side and gives you full access to the API
+// find your API keys here https://getstream.io/dashboard/
+const serverClient = StreamChat.getInstance('3jjquz92zekn', 'wf3bmbt9fsvq5mtv25vzgqy67uj3c6dpamk2jv5ay6hde2xk2exw7ab5nvvzv2qs');
+// you can still use new StreamChat('api_key', 'api_secret');
+
+// generate a token for the user with id 'john'
+app.get("/stream-chat/token", (req, res) => {
+	const userId = req.user.id;
+	const token = serverClient.createToken(userId);
+	res.json({ token });
+});
+// next, hand this token to the client in your in your login or registration response
+
+
 // init socket io
 const io = new Server(server, {
 	// synchronize the state of the client upon reconnection:
@@ -163,13 +181,31 @@ io.on("connection", async (socket) => {
 	});
 	// Listen for a friend request event
 	// Listen for a friend request event
-	socket.on("friend request", (request) => {
+	socket.on("friend request", async (request) => {
 		console.log("send friend request");
 		console.log(request);
-		// Emit a friend request event to the recipient
-		io.to(`user:${request?.friendId?.id}`).emit("notification", { data: request, type: "friend-request" });
-		// for adding "confirm request" label in receiver button
-		io.to(`user:${request?.friendId?.id}`).emit("friend request pending", { data: request });
+		try {
+			if (!request) {
+				return;
+			}
+
+			// Create a new notification for the receiver
+			const notification = new Notification({
+				userTo: receiverId,
+				userFrom: senderId,
+				type: "FriendRequest",
+				content: `${data?.sender?.name} has sent you a friend request.`,
+			});
+
+			await notification.save();
+
+			// Emit a friend request event to the recipient
+			io.to(`user:${request?.friendId?.id}`).emit("notification", { data: request, type: "friend-request" });
+			// for adding "confirm request" label in receiver button
+			io.to(`user:${request?.friendId?.id}`).emit("friend request pending", { data: request });
+		} catch (error) {
+			console.error(`Error handling 'friendRequest' event: ${error.message}`);
+		}
 	});
 	socket.on("cancel friend request", (profileId) => {
 		console.log(profileId);

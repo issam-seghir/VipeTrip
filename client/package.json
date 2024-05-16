@@ -104,6 +104,8 @@
 		"socket.io": "^4.7.5",
 		"socket.io-client": "^4.7.5",
 		"socket.io-react-hook": "^2.4.4",
+		"stream-chat": "^8.31.0",
+		"stream-chat-react": "^11.18.1",
 		"usehooks-ts": "^3.1.0",
 		"zod": "^3.22.4"
 	}

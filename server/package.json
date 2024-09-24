@@ -87,7 +87,7 @@
 		"rate-limiter-flexible": "^4.0.1",
 		"safe-regex": "^2.1.1",
 		"socket.io": "^4.7.5",
-		"stream-chat": "^8.31.0",
+		"stream-chat": "^8.40.0",
 		"uuid": "^9.0.1",
 		"zod_utilz": "^0.7.3"
 	}
